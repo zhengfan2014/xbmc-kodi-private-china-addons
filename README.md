@@ -36,7 +36,7 @@
 
 # 目前正在开发
 ## 处于开发流程1阶段
-- [![acfun](https://s2.ax1x.com/2020/03/03/3hsNan.th.png)](https://imgchr.com/i/3hsNan) 
+- [![acfun](https://raw.githubusercontent.com/zhengfan2014/xbmc-kodi-private-china-addons/master/icons/acfun.png)] 
 ## 处于开发流程2阶段
 - bilibili
 > - [x] 实现选择栏目显示视频列表功能
