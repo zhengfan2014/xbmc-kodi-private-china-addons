@@ -1,5 +1,7 @@
 # zhengfan2014的kodi插件仓库
 
+> 关于[dev]:dev tag是指插件处于开发者预览版，非最终成品，有许多核心功能无法使用，仅供体验。
+
 ## kodi插件开发流程
 
 1. 用py写出爬虫代码爬出视频列表
@@ -36,7 +38,7 @@
 
 # 目前正在开发
 ## 处于开发流程1阶段
-- [![acfun](https://raw.githubusercontent.com/zhengfan2014/xbmc-kodi-private-china-addons/master/icons/acfun.png)] 
+- acfun
 ## 处于开发流程2阶段
 - bilibili
 > - [x] 实现选择栏目显示视频列表功能
