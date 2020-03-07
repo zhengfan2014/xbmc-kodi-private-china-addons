@@ -66,7 +66,33 @@ def get_videos(category):
     #videoelements = soup.find('ul', id='list1').find_all('li')
     #videoelements = contenter.find_all("a", attrs={"data-original": True})
     videoelements = soup.find_all('li',class_='rank-item')
+    rectext = r.text
+    cutjson =str(rectext.encode('utf-8'))
+    str1 = cutjson.find('window.__INITIAL_STATE__=')
+    str2 = cutjson.find(';(function(){var s;')
+    rankinfojson = cutjson[str1+25:str2]
+    j = json.loads(rankinfojson)
 
+    #urlnum = category[:-4]
+    #cut = re.compile('\d+')
+    #rid = cut.findall(urlnum)
+
+    
+    #rec = requests.get('https://api.bilibili.com/x/web-interface/ranking?day=1&rid='+str(rid[0]))
+    #rectext = rec.text
+    #j = json.loads(rectext)
+    #k = j['data']['list'][0]['pic']
+    #k = k.encode('utf-8')
+
+    #if urlnum.find('all') != None:
+        #普通排行榜
+    #else:
+        #if urlnum.find('bangumi') != None:
+            #番剧排行榜
+
+
+    #dialog = xbmcgui.Dialog()
+    #ok = dialog.ok('错误提示', rankinfojson)
     if videoelements is None:
         dialog = xbmcgui.Dialog()
         ok = dialog.ok('错误提示', '没有播放源')
@@ -74,15 +100,23 @@ def get_videos(category):
         #dialog = xbmcgui.Dialog()
         #sss = str(len(videoelements))
         #ok = dialog.ok('video数量', sss)
-
+        num = 0
         for videoelement in videoelements:
-            
+            #img = videoelement.find('img')['alt']
+            #imgcut = img.find('.png@')
+            #img = img[:imgcut] + '.png'
+            #dialog = xbmcgui.Dialog()
+            #ok = dialog.ok('错误提示', img)
+            img = j['rankList'][num]['pic']
+            img = img.encode('utf-8')
             videoitem = {}
             videoitem['name'] = videoelement.find('img')['alt']
             videoitem['href'] = videoelement.find('a')['href']
-            #videoitem['thumb'] = 'aaaa'
+            videoitem['thumb'] = img
             videoitem['genre'] = '豆瓣电影'
+            
             videos.append(videoitem)
+            num = num+1
         return videos
 
 def get_sources(url):
@@ -100,12 +134,14 @@ def get_sources(url):
       if ifbangumiurl != None:
     
         rec = requests.get('http://m'+url[11:],headers=mheaders)
+        rec.encoding = 'utf-8'
         soup = BeautifulSoup(rec.text, 'html.parser')
         htmll = soup.find_all('script')
+        rectext = rec.text
 
 
         #切出番剧信息的json
-        cutjson =str(rec.text)
+        cutjson =str(rectext.encode('utf-8'))
         str1 = cutjson.find('window.__INITIAL_STATE__=')
         str2 = cutjson.find(';(function(){var s;')
         videoinfojson = cutjson[str1+25:str2]
@@ -114,16 +150,19 @@ def get_sources(url):
         j = json.loads(videoinfojson)
         #j是字典
         k = j['epList']
-        print(len(k))
+        
+        #print(len(k))
         for index in range(len(k)):
             item = k[index]
+            title = item['long_title']
+            title = title.encode('utf-8')
             videosource = {}
             #print('视频标题：')
-            videosource['name'] = item['long_title']
+            videosource['name'] = '【P'+str(index+1)+'】'+title
             #print('视频图片：')
             videosource['thumb'] = item['cover']
             #print('视频地址：')
-            videosource['href'] = item['link']
+            videosource['href'] = plugin.url_for('play', url=item['link'])
             videosource['category'] = '番剧'
             sources.append(videosource)
         return sources
@@ -183,12 +222,13 @@ def get_sources(url):
           #dialog = xbmcgui.Dialog()
           #ok = dialog.ok('错误提示', videoimage['content'])
           videotitle = videotitle.text[:-26]
+          videoimage = videoimage['content']
           
           
 
           videosource = {}
           videosource['name'] = '【P1】' + videotitle.encode('utf-8')
-          videosource['thumb'] = videoimage['content']
+          videosource['thumb'] = videoimage.encode('utf-8')
           videosource['category'] = 'danp'
           videosource['href'] = plugin.url_for('play', url=url)
           sources.append(videosource)
@@ -206,7 +246,7 @@ def play(url):
 
 
 
-    hash = '45de7ffc02c0fdeb49263721999a5dbf'
+    hash = '05b29af8d098b8ca46bbd2d73fc52ab0'
     apilist1=['https://happyukgo.com/','https://helloacm.com/','https://steakovercooked.com/','https://anothervps.com/','https://isvbscriptdead.com/','https://zhihua-lai.com/','https://weibomiaopai.com/','https://steemyy.com/']
 
     #url = 'https://m.bilibili.com/video/av84351845'
@@ -215,10 +255,7 @@ def play(url):
     #print(apiurl)
 
     #headers = {'user-agent' : 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
-    rec = requests.get(apiurl,headers=mheaders)
-    result = eval(repr(rec.text).replace('\\', ''))
-    #print(result)
-    j = json.loads(result)
+    
 
 
     #api2
@@ -229,6 +266,9 @@ def play(url):
     #print(r.text)
     soup = BeautifulSoup(r.text, 'html.parser')
     videodown = soup.find(download='视频.mp4')
+    #bangumidown = soup.find('iframe',class_='embed-responsive-item')
+    #bangumidown = bangumidown['src']
+
     rtext = r.text
     
     cuthtml1 =str(rtext.encode('utf-8'))
@@ -257,41 +297,77 @@ def play(url):
     if ifbangumiurl or ifvideourl != None:
       if ifbangumiurl != None:
         #番剧
-        item = {'label': 'api1','path': playurl,'is_playable': True}
+        cutep = url.find('y/ep')
+        epnum = url[cutep+4:]
+        epnum = re.sub(r'\D','',epnum)
+        apiurl = 'https://api.bilibili.com/pgc/player/web/playurl/html5?ep_id='
+        rec = requests.get(apiurl+epnum,headers=mheaders)
+        #rec.encoding = 'utf-8'
+        rectext = rec.text
+        rectext = rectext.encode('utf-8')
+        j = json.loads(rec.text)
+
+
+        if j['code'] == 0:
+          k = j['result']['durl']
+
+          #dialog = xbmcgui.Dialog()
+          #ok = dialog.ok('错误提示', str(k[0]['url']))
+
+          #item = {'label': '【P】 MP4 - 由xbeibeix.com的api解析','path': videodown['href'],'is_playable': True}
+          item = {'label': '【540P】 6分钟教育片 - 本地解析 ','path': k[0]['url'],'is_playable': True}
+          items = []
+          items.append(item)
+        else:
+          if j['code'] == -10403:
+            #大会员错误码
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误提示', '此为大会员专享视频，无法解析')
+          else:
+            #
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误提示', '未知的api错误代码,可能是b站官方更改了接口')
+        
+
+
+        k = j['result']['durl']
+
+        #dialog = xbmcgui.Dialog()
+        #ok = dialog.ok('错误提示', str(k[0]['url']))
+
+        #item = {'label': '【P】 MP4 - 由xbeibeix.com的api解析','path': videodown['href'],'is_playable': True}
+        item = {'label': '【540P】 6分钟教育片 - 本地解析 ','path': k[0]['url'],'is_playable': True}
         items = []
         items.append(item)
         return items
       else:
+        
         #视频
-        item = {'label': '【1080P】 FLV - 由weibomiaopai.com的api解析','path': j['url'],'is_playable': True}
+        #api1
         items = []
-        items.append(item)
+        rec = requests.get(apiurl,headers=mheaders)
+        if rec.status_code == 200 :
+          result = eval(repr(rec.text).replace('\\', ''))
+          #print(result)
+          j = json.loads(result)
+
+          item = {'label': '【'+apiqingxidu+'P】 FLV - 由weibomiaopai.com的api解析','path': j['url'],'is_playable': True}
+          items = []
+          items.append(item)
+        else:
+          if rec.status_code == 503 :
+            item = {'label': '解析失败 ,hash失效','path': '123','is_playable': True}
+            
+            items.append(item)
+
+
+        
+        #items = []
+        
         item = {'label': '【'+apiqingxidu+'P】 MP4 - 由xbeibeix.com的api解析','path': videodown['href'],'is_playable': True}
         items.append(item)
         return items
-    #else:
-      #非法url
 
-
-
-    
-    #-----------------------------------------
-
-
-
-
-
-
-    #item = {'label': '播放','path': playurl,'is_playable': True}
-    #items = []
-    #items.append(item)
-    #return items
-    
-    # if playurl is not None:
-    #     plugin.set_resolved_url(item)
-    # else:
-    #     dialog = xbmcgui.Dialog()
-    #     ok = dialog.ok('错误提示', '没有播放源')
 
 
 @plugin.route('/sources/<url>/')
@@ -316,8 +392,8 @@ def category(url):
     items = [{
         'label': video['name'],
         'path': plugin.url_for('sources', url=video['href']),
-	#'thumbnail': video['thumb'],
-	#'icon': video['thumb'],
+	'thumbnail': video['thumb'],
+	'icon': video['thumb'],
     } for video in videos]
 
     sorted_items = items
@@ -332,9 +408,73 @@ def index():
         'label': category['name'],
         'path': plugin.url_for('category', url=category['link']),
     } for category in categories]
-
+    items.append({
+        'label': u'[COLOR yellow]搜索[/COLOR]',
+        'path': plugin.url_for('search'),
+    })
     
     return items
+
+
+@plugin.route('/search')
+def search():
+    keyboard = xbmc.Keyboard('', '请输入搜索内容')
+    xbmc.sleep(1500)
+    keyboard.doModal()
+    if (keyboard.isConfirmed()):
+        keyword = keyboard.getText()
+        #url = HOST_URL + '/index.php?m=vod-search&wd=' + keyword
+        # https://www.nfmovies.com/search.php?page=1&searchword='+keyword+'&searchtype=
+
+        videos = get_search(keyword, 1)
+        items = [{
+            'label': video['name'],
+            'path': plugin.url_for('sources', url=video['href']),
+            'thumbnail': video['thumb'],
+            'icon': video['thumb']
+        } for video in videos]
+
+        sorted_items = items
+        # sorted_items = sorted(items, key=lambda item: item['label'])
+        #nextpage = {'label': ' 下一页', 'path': plugin.url_for('searchMore', keyword=keyword, page=2)}
+        #sorted_items.append(nextpage)
+        return sorted_items
+
+
+def get_search(keyword, page):
+    # if int(page) == 1:
+    #     pageurl = category
+    # else:
+    #     pageurl = category + 'index_'+page+'.html'
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/all/v2?keyword=' + keyword + '&page=' + str(page)
+
+    r = requests.get(serachUrl, headers=headers)
+    r.encoding = 'UTF-8'
+    j = json.loads(r.text)
+    k = j['data']['result'][8]['data']
+    videos = []
+    #k = k.encode('utf-8')
+    #dialog = xbmcgui.Dialog()
+    #ok = dialog.ok('错误提示', arcurl)
+
+    for index in range(len(k)):
+        arcurl = k[index]['arcurl']
+        title = k[index]['title']
+        pic = k[index]['pic']
+        duration = k[index]['duration']
+        #清除b站api数据污染
+        title = title.replace('<em class="keyword">', '')
+        title = title.replace('</em>', '')
+        
+        videoitem = {}
+        videoitem['name'] = title
+        videoitem['href'] = arcurl
+        videoitem['thumb'] = 'http://'+pic
+        videoitem['genre'] = '喜剧片'
+        videos.append(videoitem)
+    return videos
+
+    
 
 
 @plugin.route('/labels/<label>/')
@@ -345,6 +485,7 @@ def show_label(label):
         {'label': label},
     ]
     return items
+
 
 if __name__ == '__main__':
     plugin.run()
