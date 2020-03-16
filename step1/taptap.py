@@ -86,3 +86,94 @@ for index in range(len(m3u8url)):
   print(pname[index])
   print(m3u8url[index])
   print('-----------'*30)
+
+
+
+
+
+
+
+
+
+
+  
+#排行榜
+import json 
+import requests
+from bs4 import BeautifulSoup
+
+url = 'https://www.taptap.com/top/download'
+headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
+rec = requests.get(url,headers=headers)
+#print(rec.text)
+soup = BeautifulSoup(rec.text, 'html.parser')
+rankitem = soup.find_all('div',class_='taptap-top-card')
+for index in range(len(rankitem)):
+  data = rankitem[index].find('a',class_='card-left-image')
+  img = data.find('img')
+  print(img['alt'])
+  print('http'+img['src'][5:])
+  print(data['href'])
+  print('------'*30)
+
+
+
+
+
+
+
+#游戏分类
+import json 
+import requests
+from bs4 import BeautifulSoup
+
+url = 'https://www.taptap.com/category/recommend'
+headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
+rec = requests.get(url,headers=headers)
+#print(rec.text)
+soup = BeautifulSoup(rec.text, 'html.parser')
+appitem = soup.find_all('div',class_='taptap-app-item swiper-slide')
+for index in range(len(rankitem)):
+  data = appitem[index].find('a',class_='app-item-image taptap-link')
+  img = data.find('img')
+  print(img['alt'])
+  print('http'+img['data-src'][5:])
+  print(data['href'])
+  print('------'*30)
+
+
+
+
+
+#详情获取视频
+import json 
+import requests
+from bs4 import BeautifulSoup
+
+url = 'https://www.taptap.com/app/39186/video?type=not_official'
+headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
+rec = requests.get(url,headers=headers)
+#print(rec.text)
+soup = BeautifulSoup(rec.text, 'html.parser')
+if soup.find_all('div',class_='no-content'):
+
+  print('没有视频')
+else:
+  #print('cunzai')
+  videoitem = soup.find_all('div',class_='video-item')
+  for index in range(len(videoitem)):
+    img = videoitem[index].find('div',class_='video-thumb-box')
+    img = img['style']
+    cutimg = img.split("'")
+    img = cutimg[1]
+    data = videoitem[index].find('div',class_='video-content')
+    print(data.a.text)
+    print('http' + img[5:])
+    print(data.a['href'])
+
+
+
+
+
+
+
