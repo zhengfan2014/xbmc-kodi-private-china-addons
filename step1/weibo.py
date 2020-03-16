@@ -86,3 +86,92 @@ for index in range(len(list)):
   print(title.text)
   print(img)
   print('http:' + mp4[len(mp4)-1])
+
+
+
+
+
+#排行榜
+import json 
+import requests
+import re
+from bs4 import BeautifulSoup
+import urllib
+
+url = 'https://weibo.com/tv?type=dayrank'
+cookies = dict(SUB='_2AkMpN-raf8NxqwJRmfoXxGniZIl_ygvEieKfaxsBJRMxHRl-yj92qhFTtRB6ArfENQBVM_xipNLvZYca4pNo4lw7p9Xi')
+headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'}
+rec = requests.get(url,headers=headers,cookies=cookies)
+rec.encoding = 'utf-8'
+rectext = rec.text
+#print(rectext)
+soup = BeautifulSoup(rectext, 'html.parser')
+list = soup.find_all('div',class_='V_list_a')
+for index in range(len(list)):
+  videosource = list[index]['video-sources']
+  videosource = urllib.parse.unquote(videosource,encoding='utf-8',errors='replace')
+  videosource = urllib.parse.unquote(videosource,encoding='utf-8',errors='replace')
+  videosource = videosource[8:]
+  mp4 = videosource.split('http:')
+  img = list[index].find('img')
+  img = img['src']
+  if img[0:4] == 'http':
+    img = 'http' + img[5:]
+  else:
+    img = 'http:' + img
+  title = list[index].find('h3')
+  title = title.text
+  title = title.replace(' ', '').replace('\n','')
+  if len(title) > 40:
+    title = title[:40] + '...'
+  print(title)
+  print(img)
+  print('http:' + mp4[len(mp4)-1])
+
+
+
+
+#故事
+import json 
+import requests
+import re
+from bs4 import BeautifulSoup
+import urllib
+
+url = 'https://weibo.com/tv?type=story'
+cookies = dict(SUB='_2AkMpN-raf8NxqwJRmfoXxGniZIl_ygvEieKfaxsBJRMxHRl-yj92qhFTtRB6ArfENQBVM_xipNLvZYca4pNo4lw7p9Xi')
+headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36'}
+rec = requests.get(url,headers=headers,cookies=cookies)
+rec.encoding = 'utf-8'
+rectext = rec.text
+#print(rectext)
+soup = BeautifulSoup(rectext, 'html.parser')
+list = soup.find_all('div',class_='V_list_b')
+for index in range(len(list)):
+
+  #print(list[index])
+
+  if list[index]['action-data'][:9] != 'type=live':
+
+
+    videosource = list[index]['video-sources']
+    videosource = urllib.parse.unquote(videosource,encoding='utf-8',errors='replace')
+    videosource = urllib.parse.unquote(videosource,encoding='utf-8',errors='replace')
+    videosource = videosource[8:]
+    mp4 = videosource.split('http:')
+    img = list[index].find('img')
+    img = img['src']
+    if img[0:4] == 'http':
+      img = 'http' + img[5:]
+    else:
+      img = 'http:' + img
+    like = list[index].find('div',class_='like')
+    like = like.text
+    likenum = re.findall(r'\d+',like)
+    print(str(likenum[0] + '赞'))
+    print(img)
+    print('http:' + mp4[len(mp4)-1])
+
+    
+  else:
+    index = index +1
