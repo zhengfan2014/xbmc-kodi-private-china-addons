@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.changku" name="场库" version="0.1.0" provider-name="zhengfan">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.xbmcswift2" version="2.4.0"/>
+  <import addon="script.module.beautifulsoup4" version="4.5.3"/>
+  <import addon="script.module.requests" version="2.19.1"/>
+  <import addon="script.module.html5lib" version="0.999.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language></language>
+    <description>高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
+  </extension>
+</addon>

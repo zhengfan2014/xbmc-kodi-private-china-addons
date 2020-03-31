@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.medicalvideo" name="医学微视" version="0.1.0" provider-name="zhengfan">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.xbmcswift2" version="2.4.0"/>
+  <import addon="script.module.beautifulsoup4" version="4.5.3"/>
+  <import addon="script.module.requests" version="2.19.1"/>
+  <import addon="script.module.html5lib" version="0.999.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language></language>
+    <description>医学微视是配合卫健委宣传司《全民健康素养促进活动》精神，在中华医学会科学普及分会指导下，由中国医学科学院健康科普中心监制而实施，以“让人们多了解一点医学知识，健康就多一份保障”的宗旨，团队只想把医学微视做得更好，让更多的患者能共享到医学专家们多年积累的宝贵经验和知识，能对需要的人有一点点帮助</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
+  </extension>
+</addon>
