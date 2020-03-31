@@ -12,7 +12,9 @@ import sys
 import HTMLParser
 import re
 import random
+import hashlib
  
+
 
 
 
@@ -26,11 +28,123 @@ def unescape(string):
 plugin = Plugin()
 
 
+
+apikey = plugin.get_storage('apikey',TTL=30)
+xbbxmp4 = plugin.get_storage('xbbxmp4',TTL=60)
 headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
 mheaders = {'user-agent' : 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
 
+@plugin.cached(TTL=10)
+def get_hash():
+    hashurl = 'https://weibomiaopai.com/online-video-download-helper/bilibili'
+    rec = requests.get(hashurl,headers=headers)
+    rec.encoding = 'utf-8'
+    rte = rec.text
+    str1 = rte.find('var freeservice=')
+    str2 = rte.find('var thepage="bilibili";')
+    cut = rte[str1+16:str2]
+    cut = cut.replace('\n','')
+    cut = cut.replace(';','')
+    cut = cut.split("' + '")
+    q = ''
+    i = 2
+    while (i < len(cut)):
+        q += cut[i]
+        i+=3
+    q =  base64.b64decode(q)
+    q =str(q)
+    return q
+
+@plugin.cached(TTL=60)
+def get_bangumijson(url):
+    cutep = url.find('y/ep')
+    epnum = url[cutep+4:]
+    epnum = re.sub(r'\D','',epnum)
+    apiurl = 'https://api.bilibili.com/pgc/player/web/playurl/html5?ep_id='
+    rec = requests.get(apiurl+epnum,headers=mheaders)
+    #rec.encoding = 'utf-8'
+    rectext = rec.text
+    rectext = rectext.encode('utf-8')
+    j = json.loads(rec.text)
+    return j
 
 
+
+@plugin.cached(TTL=60)
+def get_api1(url,quality):
+    bvid = re.search(r'BV[a-zA-Z0-9]+', url)
+    bvurl = 'https://api.bilibili.com/x/web-interface/view?bvid='+bvid.group()
+    r = requests.get(bvurl,headers=headers)
+    j = json.loads(r.text)
+    cid = j['data']['pages'][0]['cid']
+
+
+    entropy = 'rbMCKn@KuamXWlPMoJGsKcbiJKUfkPF_8dABscJntvqhRSETg'
+    appkey, sec = ''.join([chr(ord(i) + 2) for i in entropy[::-1]]).split(':')
+    params = 'appkey=%s&cid=%s&otype=json&qn=%s&quality=%s&type=' % (appkey, cid, quality, quality)
+    tmp = params + sec
+    tmp = tmp.encode('utf-8')
+    chksum = hashlib.md5(bytes(tmp)).hexdigest()
+    url_api = 'https://interface.bilibili.com/v2/playurl?%s&sign=%s' % (params, chksum)
+    apiheaders = {
+        'Referer': url,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
+    }
+    # print(url_api)
+    html = requests.get(url_api, headers=apiheaders).json()
+    # print(json.dumps(html))
+    video_list = []
+    for i in html['durl']:
+        video_list.append(i['url'])
+    # print(video_list)
+    return video_list[0]
+
+
+
+@plugin.cached(TTL=60)
+def get_api2(url):
+    #判断缓存是否存在
+    if ('sxe' in apikey.keys()):
+        sxe = apikey['sxe']
+    else:
+        #提取sxe值
+        r = requests.get('https://www.xbeibeix.com/api/bilibili/')
+        soup = BeautifulSoup(r.text, 'html.parser')
+        sxe = soup.find_all('input',type='hidden')
+        sxe = sxe[1]['value']
+        apikey['sxe'] = sxe
+
+
+
+    #向xbeibeix.com api发送post请求，抓出视频地址
+    payload = {'urlav': url,'sxe':sxe}
+    
+    r = requests.post("https://www.xbeibeix.com/api/bilibili/",data=payload,headers=mheaders)
+    r.encoding = 'UTF-8'
+    #print(r.text)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    videodown = soup.find_all('option')
+    rtext = r.text
+   
+
+    #cuthtml2 =str(rtext.encode('utf-8'))
+    # str1 = cuthtml2.find('封面：')
+    #str2 = cuthtml2.find('ng</p></li>')
+    #apiimage = cuthtml2[str1+3:str2] + 'ng'
+    mp4url = []
+    for index in range(len(videodown)):
+        try:
+            mp4url.append(videodown[index]['value'])
+        except KeyError:
+            qqqqqq=1
+    #dialog = xbmcgui.Dialog()
+    #ok = dialog.ok('错误提示', str(mp4url))
+
+
+
+    
+    #xbbxmp4[url] = mp4url
+    return mp4url
 
 
 
@@ -51,6 +165,7 @@ def get_categories():
             {'name':'娱乐','link':'https://www.bilibili.com/ranking/all/5/0/1'},
             {'name':'新人','link':'https://www.bilibili.com/ranking/rookie/0/0/3'}]
 
+@plugin.cached(TTL=60)
 def get_videos(category):
 #爬视频列表的
     # if int(page) == 1:
@@ -119,6 +234,7 @@ def get_videos(category):
             num = num+1
         return videos
 
+@plugin.cached(TTL=60)
 def get_sources(url):
     sources = []
     if re.match('https://',url) == None:
@@ -129,7 +245,7 @@ def get_sources(url):
         ok = dialog.ok('错误提示', '非法url')
 
     ifbangumiurl = re.match('https://www.bilibili.com/bangumi/play/ss',url)
-    ifvideourl = re.match('https://www.bilibili.com/video/av',url)
+    ifvideourl = re.match('https://www.bilibili.com/video/',url)
     if ifbangumiurl or ifvideourl != None:
       if ifbangumiurl != None:
     
@@ -162,7 +278,7 @@ def get_sources(url):
             #print('视频图片：')
             videosource['thumb'] = item['cover']
             #print('视频地址：')
-            videosource['href'] = plugin.url_for('play', url=item['link'])
+            videosource['href'] = plugin.url_for('play',name='【P'+str(index+1)+'】'+title,url=item['link'])
             videosource['category'] = '番剧'
             sources.append(videosource)
         return sources
@@ -219,8 +335,6 @@ def get_sources(url):
           videotitle = soup.find(name='title')
           videoimage = soup.find(itemprop='image')
           videodesc = soup.find(itemprop='description')
-          #dialog = xbmcgui.Dialog()
-          #ok = dialog.ok('错误提示', videoimage['content'])
           videotitle = videotitle.text[:-26]
           videoimage = videoimage['content']
           
@@ -230,144 +344,83 @@ def get_sources(url):
           videosource['name'] = '【P1】' + videotitle.encode('utf-8')
           videosource['thumb'] = videoimage.encode('utf-8')
           videosource['category'] = 'danp'
-          videosource['href'] = plugin.url_for('play', url=url)
+          videosource['href'] = plugin.url_for('play', name=videotitle.encode('utf-8'),url=url)
           sources.append(videosource)
           return sources
           #print(str(videodesc['content']))
 
 
 
-@plugin.route('/play/<url>/')
-def play(url):
-    #r = requests.get(url, headers=headers)
-    #r.encoding = 'UTF-8'
-    #pattern = re.compile("now\=unescape\(\"([^\"]*)\"\)")
-    #playurl = unescape(str(pattern.findall(r.text)[0]))
-
-
-
-    hash = '05b29af8d098b8ca46bbd2d73fc52ab0'
-    apilist1=['https://happyukgo.com/','https://helloacm.com/','https://steakovercooked.com/','https://anothervps.com/','https://isvbscriptdead.com/','https://zhihua-lai.com/','https://weibomiaopai.com/','https://steemyy.com/']
-
-    #url = 'https://m.bilibili.com/video/av84351845'
-    apiurl = apilist1[random.randint(0,7)]+'api/video/?cached&lang=ch&page=bilibili&hash='+hash+'&video='+url
-
-    #print(apiurl)
-
-    #headers = {'user-agent' : 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
-    
-
-
-    #api2
-    payload = {'urlav': url}
-
-    r = requests.post("https://www.xbeibeix.com/api/bilibili.php",data=payload,headers=mheaders)
-    r.encoding = 'UTF-8'
-    #print(r.text)
-    soup = BeautifulSoup(r.text, 'html.parser')
-    videodown = soup.find(download='视频.mp4')
-    #bangumidown = soup.find('iframe',class_='embed-responsive-item')
-    #bangumidown = bangumidown['src']
-
-    rtext = r.text
-    
-    cuthtml1 =str(rtext.encode('utf-8'))
-    str1 = cuthtml1.find('清晰度：')
-    str2 = cuthtml1.find('P</p></li>')
-    apiqingxidu = cuthtml1[str1+8:str2]
-    #print('【1080P】 FLV - 由' + j['server']+'的api解析')
-
-    #print(j['url'])
-    #print('【'+apiqingxidu+'P】 MP4 - 由xbeibeix.com的api解析')
-
-    cuthtml2 =str(rtext.encode('utf-8'))
-    str1 = cuthtml2.find('封面：')
-    str2 = cuthtml2.find('ng</p></li>')
-    apiimage = cuthtml2[str1+3:str2] + 'ng'
-    #print(apiimage)
-
-    #print('--'*100)
-    #print(videodown['href'])
-
-
-
-
+@plugin.route('/play/<name>/<url>/')
+def play(name,url):
     ifbangumiurl = re.match('https://www.bilibili.com/bangumi/play/ep',url)
-    ifvideourl = re.match('https://www.bilibili.com/video/av',url)
+    ifvideourl = re.match('https://www.bilibili.com/video/',url)
     if ifbangumiurl or ifvideourl != None:
       if ifbangumiurl != None:
         #番剧
-        cutep = url.find('y/ep')
-        epnum = url[cutep+4:]
-        epnum = re.sub(r'\D','',epnum)
-        apiurl = 'https://api.bilibili.com/pgc/player/web/playurl/html5?ep_id='
-        rec = requests.get(apiurl+epnum,headers=mheaders)
-        #rec.encoding = 'utf-8'
-        rectext = rec.text
-        rectext = rectext.encode('utf-8')
-        j = json.loads(rec.text)
-
-
-        if j['code'] == 0:
-          k = j['result']['durl']
-
-          #dialog = xbmcgui.Dialog()
-          #ok = dialog.ok('错误提示', str(k[0]['url']))
-
-          #item = {'label': '【P】 MP4 - 由xbeibeix.com的api解析','path': videodown['href'],'is_playable': True}
-          item = {'label': '【540P】 6分钟教育片 - 本地解析 ','path': k[0]['url'],'is_playable': True}
-          items = []
-          items.append(item)
-        else:
-          if j['code'] == -10403:
-            #大会员错误码
-            dialog = xbmcgui.Dialog()
-            ok = dialog.ok('错误提示', '此为大会员专享视频，无法解析')
-          else:
-            #
-            dialog = xbmcgui.Dialog()
-            ok = dialog.ok('错误提示', '未知的api错误代码,可能是b站官方更改了接口')
-        
-
-
-        k = j['result']['durl']
-
-        #dialog = xbmcgui.Dialog()
-        #ok = dialog.ok('错误提示', str(k[0]['url']))
-
-        #item = {'label': '【P】 MP4 - 由xbeibeix.com的api解析','path': videodown['href'],'is_playable': True}
-        item = {'label': '【540P】 6分钟教育片 - 本地解析 ','path': k[0]['url'],'is_playable': True}
         items = []
+        item = {'label': '6分钟试看 本地解析','path': plugin.url_for('bangumiapi', name=name,url=url)}
         items.append(item)
         return items
       else:
         
         #视频
-        #api1
         items = []
-        rec = requests.get(apiurl,headers=mheaders)
-        if rec.status_code == 200 :
-          result = eval(repr(rec.text).replace('\\', ''))
-          #print(result)
-          j = json.loads(result)
-
-          item = {'label': '【'+apiqingxidu+'P】 FLV - 由weibomiaopai.com的api解析','path': j['url'],'is_playable': True}
-          items = []
-          items.append(item)
-        else:
-          if rec.status_code == 503 :
-            item = {'label': '解析失败 ,hash失效','path': '123','is_playable': True}
-            
-            items.append(item)
-
-
-        
-        #items = []
-        
-        item = {'label': '【'+apiqingxidu+'P】 MP4 - 由xbeibeix.com的api解析','path': videodown['href'],'is_playable': True}
+        item = {'label': '【1080p】使用 b站官方api 解析（万分感谢GitHub的Henryhaohao的开源项目）','path': plugin.url_for('api1', name=name,url=url,quality=80)}
+        items.append(item)
+        item = {'label': '【720p】使用 b站官方api 解析（万分感谢GitHub的Henryhaohao的开源项目）','path': plugin.url_for('api1', name=name,url=url,quality=64)}
+        items.append(item)
+        item = {'label': '【480p】使用 b站官方api 解析（万分感谢GitHub的Henryhaohao的开源项目）','path': plugin.url_for('api1', name=name,url=url,quality=32)}
+        items.append(item)
+        item = {'label': '【320p】使用 b站官方api 解析（万分感谢GitHub的Henryhaohao的开源项目）','path': plugin.url_for('api1', name=name,url=url,quality=16)}
+        items.append(item)
+        item = {'label': '【最高清晰度】使用 xbeibeix.com 解析','path': plugin.url_for('api2', name=name,url=url)}
         items.append(item)
         return items
 
+
+@plugin.route('/bangumiapi/<name>/<url>/')
+#解析番剧地址
+def bangumiapi(name,url):
+    j = get_bangumijson(url)
+    if j['code'] == 0:
+        k = j['result']['durl']
+        item = {'label': '【540P】'+name,'path': k[0]['url'],'is_playable': True}
+        items = []
+        items.append(item)
+    else:
+        if j['code'] == -10403:
+            #大会员错误码
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误提示', '此为大会员专享视频，无法解析')
+        else:
+            #
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误提示', '未知的api错误代码,可能是b站官方更改了接口')
+    return items
+
+@plugin.route('/api1/<name>/<url>/<quality>/')
+#使用weibomiaopai api解析
+def api1(name,url,quality):
+    mp4url = get_api1(url,quality)
+    items = []
+    head = '|Referer=https://api.bilibili.com/x/web-interface/view?bvid='
+    item = {'label': '[FLV]'+name,'path': mp4url+head,'is_playable': True}
+    items.append(item)
+    return items
+
+@plugin.route('/api2/<name>/<url>/')
+def api2(name,url):
+    mp4url = get_api2(url)
+    head = '|Referer=https://api.bilibili.com/x/web-interface/view?bvid='
+    items = []
+    item = {'label': '[MP4]'+name,'path': mp4url[0],'is_playable': True}
+    items.append(item)
+    item = {'label': '[FLV]'+name,'path': mp4url[1]+head,'is_playable': True}
+    items.append(item)
+    item = {'label': '[FLV备用]'+name,'path': mp4url[2]+head,'is_playable': True}
+    items.append(item)
+    return items
 
 
 @plugin.route('/sources/<url>/')
