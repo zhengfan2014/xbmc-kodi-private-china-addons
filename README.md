@@ -20,13 +20,13 @@
 - 在 system| setting| interface| regional| language 中
 - 将语言更改为 Chinese （Simple）
 
-## kodi插件开发流程
+# kodi插件开发流程
 
 1. 用py写出爬虫代码爬出视频列表
 2. 把py爬虫代码移植到kodi插件里
 3. 缝合网上的视频解析接口到kodi插件，成品插件出炉
 
-# 处于设想阶段
+## 处于设想阶段
 - 酷安视频 - coolapk.com
 > - 显示酷安视频栏目的热门视频，最新视频
 > - 视频下面的评论以弹幕形式展示
@@ -55,7 +55,14 @@
 > - 播放全平台的直播
 > - 自定义导入想看直播的列表
 
-# 成品插件
+## 已经写出解析和取出视频mp4地址的原型python代码
+
+- 医学微视
+- 国图公开课
+- 抖音
+- 快手
+
+## 成品插件
 ### 注：github已不再上传插件zip包，成品插件统一在爱发电发布：afdian.net/@zhengfan2014
 - plugin.video.acfun        0.1.1 - 来自acfun.cn的在线视频
 - plugin.video.bilibili     0.4.0 - 来自bilibili.com的在线视频
