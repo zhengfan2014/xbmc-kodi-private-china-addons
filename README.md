@@ -63,7 +63,7 @@
 - 快手
 
 ## 成品插件
-### 注：github已不再上传插件zip包，成品插件统一在爱发电发布：afdian.net/@zhengfan2014
+>  注：github已不再上传插件zip包，成品插件统一在爱发电发布：afdian.net/@zhengfan2014
 - plugin.video.acfun        0.1.1 - 来自acfun.cn的在线视频
 - plugin.video.bilibili     0.4.0 - 来自bilibili.com的在线视频
 - plugin.video.changku      0.1.0 - 来自vmovier.com的在线视频
@@ -76,8 +76,8 @@
 - plugin.video.xigua        0.1.0 - 来自ixigua.com的在线视频
 - plugin.video.xinpianchang 0.1.0 - 来自xinpianchang.com的在线视频
 # 捐赠作者
-如果您觉得这些小作品对您有很大帮助的话，不妨给作品点一个小小的star，请作者喝一杯咖啡，您的支持也是作者维护插件库的动力
-爱发电：https://afdian.net/@zhengfan2014
+如果您觉得这些小作品对您有很大帮助的话，不妨给作品点一个小小的star，请作者喝一杯咖啡，您的支持也是作者维护插件库的动力  
+爱发电：https://afdian.net/@zhengfan2014  
 paypal：http://paypal.me/nxsoft
 
 

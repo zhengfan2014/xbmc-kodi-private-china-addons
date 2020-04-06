@@ -29,16 +29,31 @@ def unescape(string):
 
 plugin = Plugin()
 
-@plugin.cached(TTL=60*24)
+cookie = plugin.get_storage('cookie',TTL=60)
+
+#@plugin.cached(TTL=60*24)
 def cook():
-    r = requests.get('http://www.ixigua.com',headers=headers)
-    cookies = {}
-    cookies['ttwid'] = r.cookies['ttwid']
-    cookies['ttwid.sig'] = r.cookies['ttwid.sig']
-    cookies['xiguavideopcwebid'] = r.cookies['xiguavideopcwebid']
-    cookies['xiguavideopcwebid.sig'] = r.cookies['xiguavideopcwebid.sig']
-    cookies['wafid']='0aa81c31-dde3-4f40-992f-2baddd00a20e'
-    return cookies
+    if 'wafid' in cookie:
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提示', '缓存中已有wafid,跳过获取wafid', xbmcgui.NOTIFICATION_INFO, 5000)
+    else:
+
+        r = requests.get('http://www.ixigua.com',headers=headers)
+    
+        if r.cookies['wafid']:
+            cookie['wafid']=r.cookies['wafid']
+            dialog = xbmcgui.Dialog()
+            dialog.notification('提示', '成功获取wafid并存入缓存', xbmcgui.NOTIFICATION_INFO, 5000)
+        else:
+            dialog = xbmcgui.Dialog()
+            dialog.notification('提示', '未成功获取wafid，请手动导入', xbmcgui.NOTIFICATION_INFO, 5000)
+    #cookies = {}
+    #cookies['wafid']='6e14b0ba-aa44-4d57-a40a-7c71ec9b0799'
+    #dialog = xbmcgui.Dialog()
+    #ok = dialog.ok('错误提示', str(cookie['wafid']))
+    cokie = {}
+    cokie['wafid'] = cookie['wafid']
+    return cokie
 
 headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
 cookies = cook()
@@ -101,7 +116,7 @@ def get_mp4(url):
 
     return mp4list
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=60*24)
 def get_duop(url):
     videos = []
     rec = requests.get(url,headers=headers,cookies=cookies)
@@ -130,6 +145,7 @@ def get_duop(url):
 
 @plugin.cached(TTL=60)
 def get_videos(cag):
+    errornum = 0
     url = 'https://www.ixigua.com/cinema/filter/'+cag+'/'
     api11 = '[api1]'
     api11 = api11.decode('utf-8')
@@ -144,27 +160,32 @@ def get_videos(cag):
     cutjson = rectext[str1+49:str2-9]
     #print(cutjson)
     #cutjson = cutjson.encode('utf-8')
-    j = json.loads(cutjson)
-    videolist = j['AlbumInCategory'][0]['albumList']
-    xbmc.log(str(len(videolist)),debug)
-    for index in range(len(videolist)):
-        jishu = ''
-        ji = '集'
-        quan = '全'
-        gxz = '更新至'
-        ji = ji.decode('utf-8')
-        quan = quan.decode('utf-8')
-        gxz = gxz.decode('utf-8')
-        if videolist[index]['latestSeq'] != 1:
-            if videolist[index]['latestSeq'] == videolist[index]['totalEpisodes']:
-                jishu = '[' + str(videolist[index]['latestSeq'])+ji+quan+ ']'
-            else:
-                jishu = '['+gxz + str(videolist[index]['latestSeq'])+ji+ ']'
-        videoitem = {}
-        videoitem['name'] = api11+videolist[index]['title'] +  jishu 
-        videoitem['href'] = videolist[index]['shareUrl']
-        videoitem['thumb'] = videolist[index]['coverList'][0]['url']
-        videos.append(videoitem)
+    try:
+        j = json.loads(cutjson)
+        videolist = j['AlbumInCategory'][0]['albumList']
+        xbmc.log(str(len(videolist)),debug)
+        for index in range(len(videolist)):
+            jishu = ''
+            ji = '集'
+            quan = '全'
+            gxz = '更新至'
+            ji = ji.decode('utf-8')
+            quan = quan.decode('utf-8')
+            gxz = gxz.decode('utf-8')
+            if videolist[index]['latestSeq'] != 1:
+                if videolist[index]['latestSeq'] == videolist[index]['totalEpisodes']:
+                    jishu = '[' + str(videolist[index]['latestSeq'])+ji+quan+ ']'
+                else:
+                    jishu = '['+gxz + str(videolist[index]['latestSeq'])+ji+ ']'
+            videoitem = {}
+            videoitem['name'] = api11+videolist[index]['title'] +  jishu 
+            videoitem['href'] = videolist[index]['shareUrl']
+            videoitem['thumb'] = videolist[index]['coverList'][0]['url']
+            videos.append(videoitem)
+    except TypeError:
+        errornum += 1 
+    except ValueError:
+        errornum += 1 
 #api2
     url = 'https://www.ixigua.com/channel/'+cag + '/'
     rec = requests.get(url,headers=headers,cookies=cookies)
@@ -175,13 +196,21 @@ def get_videos(cag):
     cutjson = rectext[str1+57:str2-9]
     #print(cutjson)
     #xbmc.log('api2'+cutjson,debug)
-    j = json.loads(cutjson)
-    for index in range(len(j['Channel'][cag]['operationData']['list'])):
-        videoitem = {}
-        videoitem['name'] = api22+j['Channel'][cag]['operationData']['list'][index]['title']
-        videoitem['href'] = j['Channel'][cag]['operationData']['list'][index]['shareUrl']
-        videoitem['thumb'] = j['Channel'][cag]['operationData']['list'][index]['coverList'][0]['url']
-        videos.append(videoitem)  
+    try:
+        j = json.loads(cutjson)
+        for index in range(len(j['Channel'][cag]['operationData']['list'])):
+            videoitem = {}
+            videoitem['name'] = api22+j['Channel'][cag]['operationData']['list'][index]['title']
+            videoitem['href'] = j['Channel'][cag]['operationData']['list'][index]['shareUrl']
+            videoitem['thumb'] = j['Channel'][cag]['operationData']['list'][index]['coverList'][0]['url']
+            videos.append(videoitem)  
+    except TypeError:
+        errornum += 1 
+    except ValueError:
+        errornum += 1 
+    if errornum == 2:
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('错误提示', '不用看了，接口已炸')
     return videos
 
 
@@ -263,6 +292,10 @@ def ilist():
         'label': u'从网络剪贴板(netcut.cn)导入西瓜视频链接',
         'path': plugin.url_for('netcut'),
     })
+    items.append({
+        'label': u'导入西瓜视频wafid',
+        'path': plugin.url_for('wafid'),
+    })
     return items
 
 @plugin.route('/labels/<label>/')
@@ -325,6 +358,23 @@ def album():
                 'path': plugin.url_for('play', name=video['name'].encode('utf-8') , url=video['href']),
             } for video in videos]
 
+        return items
+
+@plugin.route('/wafid')
+def wafid():
+    keyboard = xbmc.Keyboard('', '请输入西瓜视频cookie里wafid的值：')
+    xbmc.sleep(1500)
+    keyboard.doModal()
+    if (keyboard.isConfirmed()):
+        keyword = keyboard.getText()
+        #url = HOST_URL + '/index.php?m=vod-search&wd=' + keyword
+        # https://www.nfmovies.com/search.php?page=1&searchword='+keyword+'&searchtype=
+                   
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('即将导入', keyword)
+        cookies['wafid'] = keyword
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提示', 'wafid已导入', xbmcgui.NOTIFICATION_INFO, 5000)
         return items
 
 @plugin.route('/ykjtb')
