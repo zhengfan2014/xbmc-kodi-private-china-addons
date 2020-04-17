@@ -11,6 +11,7 @@ import urllib2
 import sys
 import HTMLParser
 import re
+import time
 
 
 
@@ -52,8 +53,8 @@ def get_search(keyword, page):
     r.encoding = 'UTF-8'
     rtext = r.text
     j = json.loads(rtext)
-    #dialog = xbmcgui.Dialog()
-    #ok = dialog.ok('错误提示', str(j['videoList']))
+    dialog = xbmcgui.Dialog()
+    ok = dialog.ok('错误提示', str(j['videoList'][0]['id']))
     videos = []
     #videoelements = soup.find('ul', id='list1').find_all('li')
     #videoelements = contenter.find_all("a", attrs={"data-original": True})
@@ -76,7 +77,6 @@ def get_search(keyword, page):
 def get_videos(category):
 #爬视频列表的
     pageurl = category
-
     r = requests.get(pageurl, headers=headers)
     r.encoding = 'UTF-8'
     rtext= r.text
@@ -102,15 +102,15 @@ def get_videos(category):
             item = k[index]
             videoitem = {}
             videoitem['name'] = item['contentTitle']
-            videoitem['href'] = item['shareUrl']
+            videoitem['href'] = 'https://www.acfun.cn/v/ac' + item['dougaId']
             videoitem['thumb'] = item['coverUrl']
             videos.append(videoitem)
     return videos
 
 def get_sources(url):
-    ifmurl = re.match('https://m.acfun.cn',url)
-    if ifmurl != None:
-        url = 'https://www' + url[9:21] + 'ac' + url[25:]
+    #ifmurl = re.match('https://m.acfun.cn',url)
+    #if ifmurl != None:
+        #url = 'https://www' + url[9:21] + 'ac' + url[25:]
     
     sources = []
     #dialog = xbmcgui.Dialog()
@@ -128,7 +128,8 @@ def get_sources(url):
     str1 = cutjson.find('window.pageInfo = window.videoInfo = ')
     #dialog = xbmcgui.Dialog()
     #ok = dialog.ok('错误提示', str(str1))
-    if str1 != -1:
+    #if str1 != -1:
+    try:
         str2 = cutjson.find('window.qualityConfig =')
         videoinfo = cutjson[str1+37:str2-10]
     
@@ -156,7 +157,7 @@ def get_sources(url):
                  videosource['href'] = plugin.url_for('play', url=url + '_' +str(index+1))
                  sources.append(videosource)
              return sources
-    else:
+    except ValueError:
         dialog = xbmcgui.Dialog()
         ok = dialog.ok('错误提示', '错误404，咦？世界线变动了，你好像来到了奇怪的地方。看看其他内容吧~')
 
@@ -265,6 +266,7 @@ def ac():
 def play(url):
 
     rec = requests.get(url,headers=headers)
+    rec.encoding = 'utf-8'
     #print(rec.text)
     rectext = rec.text
     cutjson = rectext.encode('utf-8')
@@ -272,19 +274,58 @@ def play(url):
     str2 = cutjson.find('window.qualityConfig =')
     videoinfo = cutjson[str1+37:str2-10]
     j = json.loads(videoinfo)
+    mp4info = {}
+    mp4info['title'] = j['title']
+
+    #简介 plot
+    #ac = ac.encode('utf-8')
+    uptime = str(j['createTimeMillis'])
+    uptime = uptime[:-3]
+    uptime = int(uptime)
+    #转换成localtime
+    time_local = time.localtime(uptime)
+    #转换成新的时间格式(2016-05-05 20:28:54)
+    uptime = time.strftime("%Y-%m-%d %H:%M:%S",time_local)
+    data = time.strftime("%Y-%m-%d",time_local)
 
 
-    #print(j['title'])
-    #print(j['description'])
+    jianjie =  j['viewCountShow'].encode('utf-8') + '播放 | ' + j['danmakuCountShow'].encode('utf-8') + '弹幕 | ' + j['commentCountShow'].encode('utf-8') +'评论\n'
+    jianjie += str(j['likeCount']).encode('utf-8') + '赞 | ' + j['stowCountShow'].encode('utf-8') + '收藏 | ' + j['bananaCountShow'].encode('utf-8')  + '香蕉'
+    jianjie += '\n--------------------------\n'
+    jianjie += '发布时间：' + uptime +' \nac号：ac' +j['dougaId'].encode('utf-8')
+    jianjie += '\n--------------------------\n'
+    try:
+        mp4info['plot'] = jianjie + '\n' + j['description'].encode('utf-8')
+    except AttributeError:
+        mp4info['plot'] = jianjie 
+
+    #分类 genre	
+    genre = [j['channel']['parentName'],j['channel']['name']]
+    mp4info['genre'] = genre
+    
+    #发布时间
+    mp4info['aired'] = data
+    #up主 cast
+    fan = str(j['user']['fanCount'].encode('utf-8')) + '粉丝'
+    fan = fan.decode('utf-8')
+    mp4info['cast'] = [(j['user']['name'],fan)]
+    #tag
+    tag = []
+    if 'tagList' in j:
+        for index in range(len(j['tagList'])):
+            tag.append(j['tagList'][index]['name'])
+    mp4info['tag'] = tag
+    #设置类型
+    mp4info['mediatype'] = 'video'
     videojson =j ['currentVideoInfo']['ksPlayJson']
     j2 = json.loads(videojson)
 
 
     items = []
     if len(j2['adaptationSet']['representation']) == 1 :
-        title = j2['adaptationSet']['representation'][0]['qualityType']
+        title = j2['adaptationSet']['representation'][0]['qualityType'] + ' - ' + j['title']
         path = j2['adaptationSet']['representation'][0]['url']
-        item = {'label': title,'path':path,'is_playable': True}
+        item = {'label': title,'path':path,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': j['coverCdnUrls'][0]['url'],'icon': j['coverCdnUrls'][0]['url']}
         
         items.append(item)
         return items
@@ -292,12 +333,13 @@ def play(url):
         for index in range(len(j2['adaptationSet']['representation'])):
             #print(j2['adaptationSet']['representation'][index]['qualityType'])
             #print(j2['adaptationSet']['representation'][index]['url'])
-            title = j2['adaptationSet']['representation'][index]['qualityType']
+            title = j2['adaptationSet']['representation'][index]['qualityType'] + ' - ' + j['title']
             path = j2['adaptationSet']['representation'][index]['url']
-            item = {'label': title,'path':path,'is_playable': True}
+            item = {'label': title,'path':path,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': j['coverCdnUrls'][0]['url'],'icon': j['coverCdnUrls'][0]['url']}
         
             items.append(item)
-        return items
+
+    return items
      
 
 
