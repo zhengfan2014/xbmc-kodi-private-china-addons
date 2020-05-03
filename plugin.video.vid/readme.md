@@ -2,6 +2,8 @@
 ## 简介
 - vid插件是一个模块化，方便不是很懂kodi的python新手快速开发的插件，python新手无需知道kodi相关知识，只需知道一点python知识和遵循一定规则，即可为本插件增加和维护网站  
 ## 入门
+ > 备注：如果下面的图片显示不出来可以去 [CSDN](https://blog.csdn.net/zhengfan2014/article/details/105908999) 那里的镜像文章
+
 为vid新增网站非常简单，只需要在get_categories函数中添加相关信息，并创建三个函数，并按规则return出对应结果即可  
 
 我们以环球网为例子，演示为vid插件编写观看环球网网站视频的功能 
