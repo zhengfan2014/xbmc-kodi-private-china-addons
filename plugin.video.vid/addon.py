@@ -590,7 +590,6 @@ def get_huanqiu_mp4info(url):
     return mp4info
 
 def get_huanqiu_mp4(url):
-    videos = []
     r = get_html(url)
     soup = BeautifulSoup(r, "html5lib")
     mp4 = soup.find('video')

@@ -445,4 +445,93 @@ ctrl+f调出网页内搜索，搜索之前的mp4
 逼乎Crossin（上海交通大学 计算机应用技术硕士）写的 ：干了这碗“美丽汤”，网页解析倍儿爽 | [逼乎的教程，简单易懂，新手推荐](https://zhuanlan.zhihu.com/p/58445021)
  美丽汤中文文档| [美丽汤中文文档，推荐有点基础的阅读](https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/)
 
+先搜一下 <video ，确认video标签是否唯一，如果唯一，就可以直接找video标签来定位，如果非唯一，还需要依据其他条件来定位我们要找的标签
 
+![](https://pic.downk.cc/item/5eaebda7c2a9a83be5c0407c.png)
+
+先get网页
+
+```python
+    r = get_html(url)
+```
+用美丽汤解析网页，用美丽汤前一定要用到这句
+
+```python
+    soup = BeautifulSoup(r, "html5lib")
+```
+
+在网页里定位video标签
+
+```python
+    mp4 = soup.find('video')
+```
+最后，取出video标签 src里的视频地址
+```python
+    return mp4['src']
+```
+
+完成效果
+```python
+def get_huanqiu_mp4(url):
+    r = get_html(url)
+    soup = BeautifulSoup(r, "html5lib")
+    mp4 = soup.find('video')
+    return mp4['src']
+```
+完成这步之后，你可以试着用kodi打开之前的视频列表了，不出意外的话，应该可以正常显示一个有电影图表的选项，点开他就可以正常播放视频
+
+
+
+### 附 kodi setinfo 支持参数
+
+Info label |	Description
+---- | ---
+genre |	string (Comedy) or list of strings (["Comedy", "Animation", "Drama"])
+country |	string (Germany) or list of strings (["Germany", "Italy", "France"])
+year |	integer (2009)
+episode |	integer (4)
+season |	integer (1)
+sortepisode |	integer (4)
+sortseason |	integer (1)
+episodeguide |	string (Episode guide)
+showlink |	string (Battlestar Galactica) or list of strings (["Battlestar Galactica", "Caprica"])
+top250 |	integer (192)
+setid |	integer (14)
+tracknumber |	integer (3)
+rating |	float (6.4) - range is 0..10
+userrating |	integer (9) - range is 1..10 (0 to reset)
+watched |	depreciated - use playcount instead
+playcount |	integer (2) - number of times this item has been played
+overlay |	integer (2) - range is 0..7. See Overlay icon types for values
+cast |	list (["Michal C. Hall","Jennifer Carpenter"]) - if provided a list of tuples cast will be interpreted as castandrole
+castandrole |	list of tuples ([("Michael C. Hall","Dexter"),("Jennifer Carpenter","Debra")])
+director |	string (Dagur Kari) or list of strings (["Dagur Kari", "Quentin Tarantino", "Chrstopher Nolan"])
+mpaa |	string (PG-13)
+plot |	string (Long Description)
+plotoutline |	string (Short Description)
+title |	string (Big Fan)
+originaltitle |	string (Big Fan)
+sorttitle |	string (Big Fan)
+duration |	integer (245) - duration in seconds
+studio |	string (Warner Bros.) or list of strings (["Warner Bros.", "Disney", "Paramount"])
+tagline |	string (An awesome movie) - short description of movie
+writer |	string (Robert D. Siegel) or list of strings (["Robert D. Siegel", "Jonathan Nolan", "J.K. Rowling"])
+tvshowtitle |	string (Heroes)
+premiered |	string (2005-03-04)
+status |	string (Continuing) - status of a TVshow
+set |	string (Batman Collection) - name of the collection
+setoverview |	string (All Batman movies) - overview of the collection
+tag |	string (cult) or list of strings (["cult", "documentary", "best movies"]) - movie tag
+imdbnumber |	string (tt0110293) - IMDb code
+code |	string (101) - Production code
+aired |	string (2008-12-07)
+credits |	string (Andy Kaufman) or list of strings (["Dagur Kari", "Quentin Tarantino", "Chrstopher Nolan"]) - writing credits
+lastplayed |	string (Y-m-d h:m:s = 2009-04-05 23:16:04)
+album |	string (The Joshua Tree)
+artist |	list (['U2'])
+votes |	string (12345 votes)
+path |	string (/home/user/movie.avi)
+trailer |	string (/home/user/trailer.avi)
+dateadded |	string (Y-m-d h:m:s = 2009-04-05 23:16:04)
+mediatype |	string - "video", "movie", "tvshow", "season", "episode" or "musicvideo"
+dbid |	integer (23) - Only add this for items which are part of the local db. You also need to set the correct 'mediatype'!
