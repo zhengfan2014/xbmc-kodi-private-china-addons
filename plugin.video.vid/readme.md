@@ -388,8 +388,12 @@ get_html(url)是我写的函数，功能和requests.get(url,headers=headers)一�
 '' 前加u是让字符串变成utf-8的编码，如果你遇到ascll错误，试试在中文字符串前加u  
 
 unix_to_data()是一个神奇的把158xxxxx的10或者13位数字转成日期时间的神奇函数，你只需要传入158xxx的数字和'%Y-%m-%d %H:%M:%S'格式即可  
+（目前仅支持10位数字，13位数字请手动删除最后三位数）
+
 想输出2018-1-11 11:12:13 格式的日期传入 ：'%Y-%m-%d %H:%M:%S'
 只要2018-1-11 的传入 ：'%Y-%m-%d'
+
+完成效果：
 
 ```python
 def get_huanqiu_videos(page):
@@ -411,3 +415,34 @@ def get_huanqiu_videos(page):
 
     return videos
 ```
+### 6.完善get_huanqiu_mp4(url) 函数
+
+接下来，我们就得找出环球网mp4视频的真实地址了，不过由于环球网视频过于简单，就不在colab上测试了，直接在kodi上调试好了
+
+首先，我们随便打开一个环球网视频，对准视频右键检查
+
+![](https://pic.downk.cc/item/5eaea82dc2a9a83be5ab8611.png)
+
+很幸运，我们直接找到mp4的url
+
+![](https://pic.downk.cc/item/5eaea91ac2a9a83be5ac5704.png)
+
+但是，不要高兴的太早，说不定视频url是js动态生成的呢？  
+
+右键 - 查看网页源代码
+
+![](https://pic.downk.cc/item/5eaea94ac2a9a83be5ac7af9.png)
+
+ctrl+f调出网页内搜索，搜索之前的mp4
+
+![](https://pic.downk.cc/item/5eaea96bc2a9a83be5ac8f89.png)
+
+找到了，在html文档里，我们可以直接用美丽汤来开搞
+
+关于美丽汤的用法，可以参考:  
+有关美丽汤的教程 | 网址 
+--- | --- 
+逼乎Crossin（上海交通大学 计算机应用技术硕士）写的 ：干了这碗“美丽汤”，网页解析倍儿爽 | [逼乎的教程，简单易懂，新手推荐](https://zhuanlan.zhihu.com/p/58445021)
+ 美丽汤中文文档| [美丽汤中文文档，推荐有点基础的阅读](https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/)
+
+
