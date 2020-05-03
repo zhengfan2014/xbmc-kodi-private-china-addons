@@ -1,4 +1,4 @@
-# VID for kodi
+# VID for kodi 0.1.0(说明还没有写好)
 ## 简介
 - vid插件是一个模块化，方便不是很懂kodi的python新手快速开发的插件，python新手无需知道kodi相关知识，只需知道一点python知识和遵循一定规则，即可为本插件增加和维护网站  
 ## 入门
