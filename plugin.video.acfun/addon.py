@@ -55,7 +55,7 @@ def get_categories():
             {'name':'体育','link':'https://www.acfun.cn/rest/pc-direct/rank/channel?channelId=69&subChannelId=&rankLimit=100&rankPeriod=WEEK'},
             {'name':'鱼塘','link':'https://www.acfun.cn/rest/pc-direct/rank/channel?channelId=125&subChannelId=&rankLimit=100&rankPeriod=WEEK'}]
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 def get_search(keyword, page):
     serachUrl = 'https://www.acfun.cn/rest/pc-direct/search/video?keyword=' + keyword + '&pCursor=' + str(page)
 
@@ -80,9 +80,9 @@ def get_search(keyword, page):
         ok = dialog.ok('错误提示', '搜索结果为空')
     return videos
 
-@plugin.cached(TTL=60)
-def get_bgm_search(keyword):
-    serachUrl = 'https://www.acfun.cn/search?type=bgm&keyword=' + keyword
+@plugin.cached(TTL=2)
+def get_bgm_search(keyword,page):
+    serachUrl = 'https://www.acfun.cn/search?type=bgm&keyword=' + keyword + '&pCursor=' +str(page)
     videos = []
     r = requests.get(serachUrl, headers=headers)
     r.encoding = 'UTF-8'
@@ -104,7 +104,7 @@ def get_bgm_search(keyword):
         videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 def get_up(uid,page):
     videos = []
     apiurl = 'https://www.acfun.cn/space/next?uid='+str(uid)+'&type=video&orderBy=2&pageNo=' +str(page)
@@ -126,7 +126,7 @@ def get_up(uid,page):
         videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 def get_comm(val,st):
     url = 'https://www.acfun.cn/rest/pc-direct/comment/list?sourceId=' + val + '&sourceType=' + st + '&page=1&pivotCommentId=&newPivotCommentId=&t=' +str(time.time())
     rec = requests.get(url,headers=headers)
@@ -170,7 +170,7 @@ def get_comm(val,st):
                 text +='-----'*30 +n
     return text
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 def get_bangumi(page):
     url = 'https://www.acfun.cn/bangumilist?pageNum=' + str(page)
     videos = []
@@ -189,7 +189,7 @@ def get_bangumi(page):
         videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 def get_videos(category):
 #爬视频列表的
     pageurl = category
@@ -210,7 +210,7 @@ def get_videos(category):
             videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 def get_sources(url):
     #ifmurl = re.match('https://m.acfun.cn',url)
     #if ifmurl != None:
@@ -233,9 +233,10 @@ def get_sources(url):
         str1 = cutjson.find('window.pageInfo = window.videoInfo = ')
 
         try:
-            str2 = cutjson.find('window.qualityConfig =')
+            str2 = cutjson.find('window.videoResource =')
             videoinfo = cutjson[str1+37:str2-10]
-    
+            # dialog = xbmcgui.Dialog()
+            # dialog.textviewer('错误提示', videoinfo)
             j = json.loads(videoinfo)
             if len(j['videoList']) == 1:
                 videosource = {}
@@ -258,6 +259,7 @@ def get_sources(url):
         except ValueError:
             dialog = xbmcgui.Dialog()
             ok = dialog.ok('错误提示', '错误404，咦？世界线变动了，你好像来到了奇怪的地方。看看其他内容吧~')
+            
     if cutjson.find('window.pageInfo = window.bangumiData = ') != -1:
         #番剧
         str1 = cutjson.find('window.bangumiList')
@@ -320,11 +322,6 @@ def bangumi(page):
 	'icon': video['thumb'],
     } for video in videos]
     num = len(items)
-    if page != 1:
-        items.append({
-        'label': u'[COLOR yellow]上一页[/COLOR]',
-        'path': plugin.url_for('bangumi',page=str(int(page)-1)),
-    })
     if num == 42:
         items.append({
         'label': u'[COLOR yellow]下一页[/COLOR]',
@@ -361,20 +358,19 @@ def index():
 
 @plugin.route('/search/<value>/<page>/')
 def search(value,page):
-    if value == 'null':
+    if value != 'null' and int(page) != 1:
+        keyword = value
+    else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
-        keyboard.doModal()
         hi = his['search']
+        if value != 'null':
+            keyboard.setDefault(value)
+        keyboard.doModal()
         if (keyboard.isConfirmed()):
             keyword = keyboard.getText()
             if keyword != '':
                 hi[keyword] = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
-
-        #url = HOST_URL + '/index.php?m=vod-search&wd=' + keyword
-        # https://www.nfmovies.com/search.php?page=1&searchword='+keyword+'&searchtype=
-    else:
-        keyword = value
     videos = get_search(keyword, page)
     items = [{
         'label': video['name'],
@@ -383,43 +379,38 @@ def search(value,page):
         'icon': video['thumb']
     } for video in videos]
 
-    sorted_items = items
-    # sorted_items = sorted(items, key=lambda item: item['label'])
-    if int(page) != 1:
-        lastpage = {'label': ' 上一页', 'path': plugin.url_for('search', value=keyword, page=str(int(page)-1))}
-        sorted_items.append(lastpage)
+    
     if len(videos) == 30:
         nextpage = {'label': ' 下一页', 'path': plugin.url_for('search', value=keyword, page=str(int(page)+1))}
-        sorted_items.append(nextpage)
-    return sorted_items
+        items.append(nextpage)
+    return items
 
-@plugin.route('/bgmsearch/<value>/')
-def bgmsearch(value):
-    if value == 'null':
+@plugin.route('/bgmsearch/<value>/<page>/')
+def bgmsearch(value,page):
+    if value != 'null' and int(page) != 1:
+        keyword = value
+    else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
-        keyboard.doModal()
         hi = his['bgmsearch']
+        if value != 'null':
+            keyboard.setDefault(value)
+        keyboard.doModal()
         if (keyboard.isConfirmed()):
             keyword = keyboard.getText()
             if keyword != '':
                 hi[keyword] = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
-
-        #url = HOST_URL + '/index.php?m=vod-search&wd=' + keyword
-        # https://www.nfmovies.com/search.php?page=1&searchword='+keyword+'&searchtype=
-    else:
-        keyword = value
-    videos = get_bgm_search(keyword)
+    videos = get_bgm_search(keyword,page)
     items = [{
         'label': video['name'],
         'path': plugin.url_for('sources', url=video['href']),
         'thumbnail': video['thumb'],
         'icon': video['thumb']
     } for video in videos]
-
-    sorted_items = items
-    # sorted_items = sorted(items, key=lambda item: item['label'])
-    return sorted_items
+    if len(videos) == 30:
+        nextpage = {'label': ' 下一页', 'path': plugin.url_for('bgmsearch', value=keyword, page=str(int(page)+1))}
+        items.append(nextpage)
+    return items
 
 def get_key (dict, value):
   return [k for k, v in dict.items() if v == value]
@@ -427,7 +418,7 @@ def get_key (dict, value):
 @plugin.route('/history/<name>/<url>/')
 def history(name,url):
     items = []
-    if url == 'search':
+    if url == 'search' or url == 'bgmsearch':
         items.append({
             'label': '[COLOR yellow]'+ name +'[/COLOR]',
             'path': plugin.url_for(url,value='null',page=1),
@@ -450,7 +441,7 @@ def history(name,url):
         val = list(hi.values())
         val = sorted(val,reverse=True)
         for index in range(len(val)):
-            if url == 'search':
+            if url == 'search' or url == 'bgmsearch':
                 items.append({
                     'label': name+ ':' +get_key(hi,val[index])[0] + ' - [查询时间：' + val[index] +']',
                     'path': plugin.url_for(url,value=get_key(hi,val[index])[0],page=1),
@@ -518,7 +509,7 @@ def cleanhis(url):
     dialog = xbmcgui.Dialog()
     ok = dialog.ok('提示', '清理历史记录成功')
 
-@plugin.cached(TTL=60)
+@plugin.cached(TTL=2)
 @plugin.route('/play/<url>/')
 def play(url):
 
@@ -529,7 +520,7 @@ def play(url):
     cutjson = rectext.encode('utf-8')
     if cutjson.find('window.pageInfo = window.videoInfo = ') != -1:
         str1 = cutjson.find('window.pageInfo = window.videoInfo = ')
-        str2 = cutjson.find('window.qualityConfig =')
+        str2 = cutjson.find('window.videoResource =')
         videoinfo = cutjson[str1+37:str2-10]
         j = json.loads(videoinfo)
         mp4info = {}
@@ -688,11 +679,6 @@ def up(uid,page):
 	'thumbnail': video['thumb'],
 	'icon': video['thumb'],
     } for video in videos]
-    if int(page) != 1:
-        items.append({
-            'label': '[COLOR yellow]上一页[/COLOR]  ',
-            'path': plugin.url_for(up,uid=uid,page=int(page)-1),
-        })
     if len(videos) == 20:
         items.append({
             'label': '[COLOR yellow]下一页[/COLOR]  ',
