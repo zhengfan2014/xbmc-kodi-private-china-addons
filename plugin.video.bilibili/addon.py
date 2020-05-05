@@ -1024,9 +1024,6 @@ def get_api3(url, quality):
         for i in html['data']['durl']:
             video_list.append(i['url'])
         video_list = video_list[0]
-        if int(quality) != int(html['data']['quality']):
-            dialog = xbmcgui.Dialog()
-            dialog.notification('提示', '您的SESSDATA可能已过期，请更换新的SESSDATA', xbmcgui.NOTIFICATION_INFO, 5000,False)
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok('提示','无法解析视频')
@@ -1546,14 +1543,12 @@ def play(name,url):
         items = []
         item = {'label': '[1080p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=80)}
         items.append(item)
-        if sessdata() != '':
-            item = {'label': '[1080p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=80)}
-            items.append(item)
+        item = {'label': '[1080p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=80)}
+        items.append(item)
         item = {'label': '[720p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=64)}
         items.append(item)
-        if sessdata() != '':
-            item = {'label': '[720p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=64)}
-            items.append(item)
+        item = {'label': '[720p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=64)}
+        items.append(item)
         item = {'label': '[480p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=32)}
         items.append(item)
         item = {'label': '[480p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=32)}
@@ -1594,7 +1589,7 @@ def api1(name,url,quality):
     mp4info = get_mp4info(url)
     img = mp4info['img']
     items = []
-    head = '|Referer=https://api.bilibili.com/x/web-interface/view?bvid='
+    head = '|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36&Referer=https://www.bilibili.com'
     item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': mp4url+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
     items.append(item)
     face = mp4info['face']
@@ -1621,7 +1616,7 @@ def api3(name,url,quality):
     
     img = mp4info['img']
     items = []
-    head = '|Referer=https://api.bilibili.com/x/web-interface/view?bvid='
+    head = '|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36&Referer=https://www.bilibili.com'
     item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': str(mp4url)+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
     items.append(item)
     if ifvideourl != None:
