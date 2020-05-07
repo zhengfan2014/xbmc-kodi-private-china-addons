@@ -19,7 +19,7 @@
 
 ## 开发文档
 
-假设你想为本插件编写一个 hellobangumi网站的番剧模块，供所有使用该插件的人可以轻松浏览，搜索该网站的番剧
+假设你想为本插件编写一个 hellobangumi网站的番剧插件，供所有使用该插件的人可以轻松浏览，搜索该网站的番剧
 
 你需要在👇
 
@@ -27,30 +27,107 @@
 
 ```python
 def get_categories():
-    return [{'id':1,'name':'哔咪哔咪(bimibimi.tv)','link':'bimibimi','videos':24,'search':24},
-            {'id':2,'name':'樱花动漫(yhdm.tv)','link':'yhdm','videos':15,'search':20},
-            {'id':3,'name':'Age动漫(agefans.tw)','link':'age','videos':24,'search':15},
-            {'id':4,'name':'嘶哩嘶哩(silisili.me)','link':'sili','videos':10,'search':20},
-            {'id':5,'name':'八重樱动漫(iafuns.com)','link':'8','videos':0,'search':0},
-            {'id':6,'name':'番組計劃(anime.srsg.moe)','link':'srsg','videos':0,'search':0},
-            {'id':7,'name':'Qinmei(qinmei.video)','link':'qm','videos':20,'search':0},
-            {'id':8,'name':'柠萌瞬间(ningmoe.com)','link':'nm','videos':10,'search':10}]
+    return [{'id':1,'name':'哔咪哔咪(bimibimi.tv)','link':'bimibimi','author':'zhengfan2014','upload':'2020-5-6','videos':24,'search':24,'plot':'更新速度比樱花稍慢，但是总体画质比樱花高'}]
 ```
-在最后一行加上 你的 浏览helloworld网站
+在最后一行加上 你的 浏览helloworld网站插件
 
 ```python
-{'id':9,'name':'我的helloworld','link':'helloworld','videos':0,'search':0}
+{'id':2,'name':'我的helloworld','link':'helloworld','author':'zhengfan2014','upload':'2020-5-6'}
 ```
-参数  |	格式
-:---- | :----
-id |	整数(int),值必须且为非0的正值，大小不限，甚至可以重复，第一次列表排序根据此值从小到大来排序
-name |	字符串(str),值必须但不限制，用来在首页显示你编写的网站的名字
-link |	字符串(str),值必须且唯一，不得与get_categories函数中其他link的值重复，是你网站在bangumi插件中的唯一标识符
+必填参数：
+必填参数  |	格式
+:----: | :----
+id |	整数(int)，值必须且为非0的正值，大小不限，甚至可以重复，第一次列表排序根据此值从小到大来排序
+name |	字符串(str)，值必须但不限制，用来在首页显示你编写的网站的名字
+link |	字符串(str)，值必须且唯一，不得与get_categories函数中其他link的值重复，是你网站在bangumi插件中的唯一标识符
+author | 字符串(str)，插件作者
+upload | 字符串(str)，y-m-d格式，用来表示插件最后更新时间
+
+可选参数：
+
+可选参数  |	格式
+:----: | :----
 videos | 整数(int)，可选参数，用来表示网页视频列表每页显示的最大视频数，插件根据这个判断是否显示下一页的按钮，如果对应的网站没有下一页（比如八重樱动漫），可不设置
 search | 整数(int)，用来表示搜索的视频列表每页显示的最大视频数，插件根据这个判断是否显示下一页的按钮，如果对应的网站没有下一页（比如八重樱动漫），可不设置
+plot | 字符串(str)，对插件的说明，你可以简单介绍下这个网站的优缺点，方便用户选择
 
-### 创建所需模块
+### 创建所需函数
 
+xxx 由 你注册时link的值决定
+
+必须函数：
+
+必须函数  |	格式
+:---- | :----
+get_xxx_categories() | 显示对应网站分类的函数
+get_xxx_videos(url,page) | 输出视频列表的函数
+get_xxx_source(url) | 输出视频多条播放线路列表和选集列表的函数
+get_xxx_mp4(url) | 输出视频地址的函数
+
+可选函数
+
+可选函数  |	格式
+:---- | :----
+get_xxx_search(keyword,page) | 输出搜索视频列表的函数
+get_xxx_mp4info(url) | 输出刮削的视频信息的函数
+
+### get_xxx_categories() 函数
+ > 输出一个列表套娃字典的内容。当用户选择了一个分类后，字典内的对应分类的link值将传递给下一个函数get_xxx_videos(url,page)中的 url
+
+### get_xxx_videos(url,page) 函数
+ > 输出一个列表套娃字典的内容。当用户选择了一个视频后，字典内的对应视频的href值将传递给下一个函数get_xxx_source(url)中的 url
+
+必须参数
+
+字典参数 |	格式
+:---- | :----
+name | 视频名字
+thumb | 视频图片地址
+href | 视频url地址，传递给下一个函数get_xxx_source(url)中的 url
+
+可选参数
+字典参数 |	格式
+:---- | :----
+info | 字典，比如{'plot':'123'}具体参数参见kodi 的setinfo
+
+ 输出示例：
+ ```python
+[{'name':'视频1','thumb':'http://123.com/1.jpg','href':'http://123.com/videos1/'},{'name':'视频2','thumb':'http://123.com/2.jpg','href':'http://123.com/videos2/'}]
+ ```
+
+  > 注意：  
+ > 1.输出的内容编码建议为utf-8，使用ascll可能会出问题
+---
+
+### get_xxx_source(url) 函数
+ > 输出一个列表套娃字典套娃字符串化字典的内容。当用户选择了一个视频后，字典内的对应视频的href值将传递给下一个函数get_xxx_mp4(url)中的 url
+
+输出树：
+ - [
+   - {
+     - name : 线路名字
+     - href : 字符串化的字典,字典内容为 {'第x集':'第x集对应的url地址' }
+   - }
+ - ]
+
+ > 注意：  
+ > 1.href的内容必须为str处理过的字典！  
+ > 2.输出的内容编码建议为utf-8，使用ascll可能会出问题
+
+ 输出示例：
+ ```python
+[{'name':'播放线路1','href':"{'第一集':'http://baidu.com/videos/1/1','第二集':'http://baidu.com/videos/1/2'}"},
+{'name':'播放线路2','href':"{'第一集':'http://baidu.com/videos/2/1','第二集':'http://baidu.com/videos/2/2'}"}]
+ ```
+---
+### get_xxx_mp4(url) 函数
+ > 输出视频的地址
+
+ 输出示例：
+```python
+http://gss3.baidu.com/shaufbwdusaf.mp4
+```
+---
 ## 内置函数
 
 ### get_html()
@@ -65,6 +142,8 @@ get_html(url,ua)
 ---- | ----
 url | 字符串(str)，必填参数，为要访问的url
 ua | 字符串(str)，可选参数，不填默认为pc的ua。
+cf | 整数(int)，可选参数，cf=1时启用绕过cloudflare 5秒盾功能。不填默认不启用
+mode | 字符串(str)，可选参数，当mode='url'时，返回的不是网页源代码而是request请求后的url。适合对付那些需要302跳转才能获取真实视频地址的
 
 ua可传入的值：
 
@@ -77,7 +156,7 @@ ipad | ipad的ua
 mac | 苹果电脑的ua
 
 #### 返回值：
-函数返回url的网页源代码
+函数返回url的网页源代码，编码为utf-8
 #### 实例：
 
 以下展示了使用 get_html() 方法的实例：
