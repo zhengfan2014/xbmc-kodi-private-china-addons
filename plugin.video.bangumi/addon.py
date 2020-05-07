@@ -53,7 +53,7 @@ def chushihua(key,default):
     return value
 
 @plugin.cached(TTL=2)
-def get_html(url,ua='pc',cf=''):
+def get_html(url,ua='pc',cf='',mode='html'):
     if cf == '':
         if ua == 'pc':
             r = requests.get(url,headers=headers)
@@ -66,27 +66,54 @@ def get_html(url,ua='pc',cf=''):
         if ua == 'mac':
             r = requests.get(url,headers=macheaders)
         r.encoding = 'utf-8'
-        html = r.text
+        if mode == 'url':
+            html = r.url
+        else:
+            html = r.text
     else:
         scraper = cfscrape.create_scraper()
-        html = scraper.get(url).content
+        if ua == 'pc':
+            s = scraper.get_tokens(url,headers=headers)
+            r = requests.get(url,headers=headers,cookies=s[0])
+        if ua == 'mobile':
+            s = scraper.get_tokens(url,headers=mheaders)
+            r = requests.get(url,headers=mheaders,cookies=s[0])
+        if ua == 'iphone':
+            s = scraper.get_tokens(url,headers=iphoneheaders)
+            r = requests.get(url,headers=iphoneheaders,cookies=s[0])
+        if ua == 'ipad':
+            s = scraper.get_tokens(url,headers=ipadheaders)
+            r = requests.get(url,headers=ipadheaders,cookies=s[0])
+        if ua == 'mac':
+            s = scraper.get_tokens(url,headers=macheaders)
+            r = requests.get(url,headers=macheaders,cookies=s[0])
+        r.encoding = 'utf-8'
+        if mode == 'url':
+            html = r.url
+        else:
+            html = r.text
     return html
 
 @plugin.cached(TTL=2)
-def post_html(url,data,ua='pc'):
+def post_html(url,data,ua='pc',cf=''):
     data =eval(data)
-    if ua == 'pc':
-        r = requests.post(url,headers=headers,data=data)
-    if ua == 'mobile':
-        r = requests.post(url,headers=mheaders,data=data)
-    if ua == 'iphone':
-        r = requests.post(url,headers=iphoneheaders,data=data)
-    if ua == 'ipad':
-        r = requests.post(url,headers=ipadheaders,data=data)
-    if ua == 'mac':
-        r = requests.post(url,headers=macheaders,data=data)
-    r.encoding = 'utf-8'
-    return r.text
+    if cf == '':
+        if ua == 'pc':
+            r = requests.post(url,headers=headers,data=data)
+        if ua == 'mobile':
+            r = requests.post(url,headers=mheaders,data=data)
+        if ua == 'iphone':
+            r = requests.post(url,headers=iphoneheaders,data=data)
+        if ua == 'ipad':
+            r = requests.post(url,headers=ipadheaders,data=data)
+        if ua == 'mac':
+            r = requests.post(url,headers=macheaders,data=data)
+        r.encoding = 'utf-8'
+        html = r.text
+    else:
+        scraper = cfscrape.create_scraper()
+        html = scraper.post(url,data).content
+    return html
 
 def unix_to_data(uptime,format='data'):
     if len(str(uptime)) > 10:
@@ -136,16 +163,27 @@ def get_search_mode(keyword,page,mode):
     item = eval('get_' + mode + '_search')(keyword,page)
     return item
 
+##########################################################
+###主入口
+##########################################################
 
 def get_categories():
-    return [{'id':1,'name':'哔咪哔咪(bimibimi.tv)','link':'bimibimi','videos':24,'search':24},
-            {'id':2,'name':'樱花动漫(yhdm.tv)','link':'yhdm','videos':15,'search':20},
-            {'id':3,'name':'Age动漫(agefans.tw)','link':'age','videos':24,'search':15},
-            {'id':4,'name':'嘶哩嘶哩(silisili.me)','link':'sili','videos':10,'search':20},
-            {'id':5,'name':'八重樱动漫(iafuns.com)','link':'8','videos':0,'search':0},
-            {'id':6,'name':'番組計劃(anime.srsg.moe)','link':'srsg','videos':0,'search':0},
-            {'id':7,'name':'Qinmei(qinmei.video)','link':'qm','videos':20,'search':0},
-            {'id':8,'name':'柠萌瞬间(ningmoe.com)','link':'nm','videos':10,'search':10}]
+    return [{'id':1,'name':'哔咪哔咪(bimibimi.tv)','link':'bimibimi','author':'zhengfan2014','upload':'2020-5-6','videos':24,'search':24,'plot':'更新速度比樱花稍慢，但是总体画质比樱花高'},
+            {'id':2,'name':'樱花动漫(yhdm.tv)','link':'yhdm','author':'zhengfan2014','upload':'2020-5-6','videos':15,'search':20,'plot':'昨晚b站23点发布的BNA，今天早上就可以在樱花看了,更新速度杠杠滴'},
+            {'id':3,'name':'Age动漫(agefans.tw)','link':'agefans','author':'zhengfan2014','upload':'2020-5-6','videos':24,'search':15,'plot':'更新速度一般'},
+            {'id':4,'name':'嘶哩嘶哩(silisili.me)','link':'silisili','author':'zhengfan2014','upload':'2020-5-6','videos':10,'search':20,'plot':'大部分有1080p，但是番剧收录少，居然没有4月新番bna'},
+            {'id':5,'name':'八重樱动漫(iafuns.com)','link':'iafuns','author':'zhengfan2014','upload':'2020-5-6','plot':'更新速度一般'},
+            {'id':6,'name':'番組計劃(anime.srsg.moe)','link':'srsg','author':'zhengfan2014','upload':'2020-5-6','plot':'更新很不及时'},
+            {'id':7,'name':'Qinmei(qinmei.video)','link':'qinmei','author':'zhengfan2014','upload':'2020-5-6','videos':20,'search':20,'plot':'站长是酷安的，现在网站好像半凉了'},
+            {'id':8,'name':'柠萌瞬间(ningmoe.com)','link':'ningmoe','author':'zhengfan2014','upload':'2020-5-6','videos':10,'search':10,'plot':'还不错，大部分有1080p，但是番剧收录少，bna木有'},
+            {'id':9,'name':'吐槽弹幕网(tucao.one)','link':'tucao','author':'zhengfan2014','upload':'2020-5-6','videos':24,'search':12,'plot':'正版c站，11年到现在，现在除了番剧区的，其他区的视频基本凉凉放不了。更新快，还是1080p的，但是里面有些无修的黄番，未成年的朋友可以打开黑名单屏蔽功能，加 无修 和 BD 这两个关键词加以屏蔽'},
+            {'id':10,'name':'clicli弹幕网(clicli.me)','link':'cliclime','author':'zhengfan2014','upload':'2020-5-6','plot':'“新”c站，最近频繁被攻击，不知道招惹到谁了'},
+            {'id':11,'name':'五弹幕(5dm.tv)','link':'5dmtv','author':'zhengfan2014','upload':'2020-5-6','videos':32,'search':32,'plot':'新番看不了的，可能得注册会员才能看，我没注册过，注册会员20大洋，现在这么多网站白嫖，愿意出20块的算是真爱粉了哈哈'},
+            {'id':12,'name':'clicli弹幕网(clicli.co)','link':'cliclico','author':'zhengfan2014','upload':'2020-5-6','plot':'山寨的山寨c站，和clicli.me互掐'}]
+
+##########################################################
+###以下是模块，网站模块请粘贴在这里面
+##########################################################
 
 #bimibimi
 def get_bimibimi_categories():
@@ -412,12 +450,11 @@ def get_yhdm_search(keyword,page):
     return videos
 
 #agefan.tw
-def get_age_categories():
+def get_agefans_categories():
     return [{'name':'每日推荐','link':'https://agefans.tw/recommend'},
-            {'name':'最近更新','link':'https://agefans.tw/update'},
-            {'name':'目录','link':'https://agefans.tw/update'}]
+            {'name':'最近更新','link':'https://agefans.tw/update'}]
 
-def get_age_videos(url,page):
+def get_agefans_videos(url,page):
     #爬视频列表的
     videos = []
     html = get_html(url,cf=1)
@@ -434,34 +471,33 @@ def get_age_videos(url,page):
         except KeyError:
             img = imgs['data-src']
         videoitem = {}
-        videoitem['name'] =  title.text
+        videoitem['name'] =  title.text.strip()
         videoitem['thumb'] =  'http:' + img
         videoitem['href'] = 'https://agefans.tw' + title['href']
         videos.append(videoitem)
     return videos
 
-def get_age_source(url):
+def get_agefans_source(url):
     #爬视频列表的
     videos = []
-    bak = url
-    url = url.replace('detail','play')
-    aid = re.search('[0-9]+',url).group()
+    #bak = url
+    #url = url.replace('detail','play')
+    #aid = re.search('[0-9]+',url).group()
     html = get_html(url,cf=1)
-    #print(r.text)
     soup = BeautifulSoup(html, 'html.parser')
-    base = soup.find('div',class_='baseblock2')
-    sourcelist = base.find_all('div',class_='blockcontent')
-    #print(len(sourcelist))
+    #base = soup.find('div',class_='baseblock2')
+    base = soup.find('section',class_='mb-4')
+    #sourcelist = base.find_all('div',class_='blockcontent')
+    sourcelist = base.find_all('ul',class_='row list-unstyled my-gutters-2')
     sclist = []
     for index in range(len(sourcelist)):
-        alist = sourcelist[index].find_all('a',class_='episode')
-        #print('在線播放'+str(alist[0]['routeidx']))
+        #alist = sourcelist[index].find_all('a',class_='episode')
+        alist = sourcelist[index].find_all('a')
         duopdict = {}
         for index in range(len(alist)):
-            uri = 'https://agefans.tw/_getplay_2?animeid='+ str(aid)+ '&routeidx='+ str(alist[index]['routeidx'])+ '&episodeidx='+ str(alist[index]['episodeidx'])+ '&lhf='+ str(alist[index]['lhf'])+ '&sign='+ alist[index]['sign']+ '&num='+ str(random.random())
-            duopdict[alist[index].text] = uri
+            #uri = 'https://agefans.tw/_getplay_2?animeid='+ str(aid)+ '&routeidx='+ str(alist[index]['routeidx'])+ '&episodeidx='+ str(alist[index]['episodeidx'])+ '&lhf='+ str(alist[index]['lhf'])+ '&sign='+ alist[index]['sign']+ '&num='+ str(random.random())
+            duopdict[alist[index].text.strip()] = 'https://agefans.tw' + alist[index]['href']
         sclist.append(duopdict)
-    #print('------------'*30)
     
 
     
@@ -473,51 +509,97 @@ def get_age_source(url):
     tmp['bghtml'] = html
     return videos
 
-def get_age_mp4info(url):
+def get_agefans_mp4info(url):
     rtext = tmp['bghtml']
     infodict={}
-    
     soup = BeautifulSoup(rtext, 'html.parser')
-    table = soup.find('table')
+    # table = soup.find('table')
+    # li = table.find_all('li')
+    table = soup.find('ul',class_='list-unstyled mb-0')
     li = table.find_all('li')
 
     for index in range(len(li)):
-        text = li[index].find('span',class_='play_imform_tag').text.strip() + li[index].find('span',class_='play_imform_val').text.strip()
-        text = text.encode('utf-8')
-        text = text.split('：')
-        text[0] = text[0].replace('地區','country')
-        text[0] = text[0].replace('標簽','tag')
-        text[0] = text[0].replace('原版名稱','originaltitle')
-        text[0] = text[0].replace('原作','writer')
-        text[0] = text[0].replace('制作公司','studio')
-        text[0] = text[0].replace('首播時間','premiered')
-        text[0] = text[0].replace('播放狀態','status')
-        text[0] = text[0].replace('劇情類型','genre')
-        text[0] = text[0].replace('官方網站','showlink')
+        #text = li[index].find('span',class_='play_imform_tag').text.strip() + li[index].find('span',class_='play_imform_val').text.strip()
+        #text = text.encode('utf-8')
+        span = li[index].find_all('span')
+        text = [span[0].text.strip(),span[1].text.strip()]
+        #text = text.split('：')
+        text[0] = text[0].replace(u'地區','country')
+        text[0] = text[0].replace(u'標簽','tag')
+        text[0] = text[0].replace(u'原版名稱','originaltitle')
+        text[0] = text[0].replace(u'原作','writer')
+        text[0] = text[0].replace(u'制作公司','studio')
+        text[0] = text[0].replace(u'首播時間','premiered')
+        text[0] = text[0].replace(u'播放狀態','status')
+        text[0] = text[0].replace(u'劇情類型','genre')
+        text[0] = text[0].replace(u'官方網站','showlink')
         if text[1]:
-            if text[1].find(',') != -1:
-                text[1] = text[1].split(',')
+            if text[1].find(u',') != -1:
+                text[1] = text[1].split(u',')
             infodict[text[0]] = text[1]
-    pinfo = soup.find('div',class_='play_desc')
-    infodict['plot'] =pinfo.p.text.strip()
-    #dialog = xbmcgui.Dialog()
-    #dialog.textviewer('错误提示',str(infodict))
+    pinfo = soup.find('p',class_='small')
+    infodict['plot'] =pinfo.text.strip()
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示',str(infodict))
     return infodict
 
-@plugin.cached(TTL=60)
-def get_age_mp4(url):
-    scraper = cfscrape.create_scraper()
-    html = scraper.get(url).content
-    mp4 = unescape(html)
-    if mp4[:2] == '//':
-        mp4 = 'http:' + mp4
-    if mp4.find('baidu.com') != -1:
-        mp4 = re.search('https?:\/\/..+\.mp4',mp4).group()
-    
+def get_agefans_mp4(url):
+    r = get_html(url,cf=1)
+    soup = BeautifulSoup(r, 'html.parser')
+    video = soup.find('div',id='play')
+    vid = str(video)
+    if vid.find('<script type="text/javascript">') != -1:
+        str1 = vid.find('$.get(')
+        str2 = vid.find('function')
+        url1 = vid.strip()[str1+7:str2-3]
+        r1 = get_html('https://agefans.tw' + url1,cf=1)
+        j = json.loads(r1)
+        mp4 = j['result']['url']
+        if not re.search('https?://',mp4):
+            if re.search('//',mp4):
+                mp4 = 'https:' + mp4
+        # dialog = xbmcgui.Dialog()
+        # dialog.textviewer('错误提示', str(url1) + '\n' + str(mp4))
+    else:
+        iframe = video.find('iframe')
+        mp4 = re.search('https?:\/\/..+\.mp4',iframe['src']).group()
+        #mp4 = iframe['src']
+    # mp4 = unescape(html)
+    # if mp4[:2] == '//':
+    #     mp4 = 'http:' + mp4
+    # if mp4.find('baidu.com') != -1:
+    #     mp4 = re.search('https?:\/\/..+\.mp4',mp4).group()
     return mp4
 
+def get_agefans_search(keyword,page):
+    videos = []
+    if int(page) == 1:
+        url = 'https://agefans.tw/search?q=' +keyword
+    else:
+        url = 'https://agefans.tw/search?q=' +keyword + '&page=' +str(page)
+    html = get_html(url,cf=1)
+    soup = BeautifulSoup(html,'html.parser')
+    base = soup.find('section',id='search_list')
+    li = base.find_all('li',class_='card')
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(li[1]))
+    for index in range(len(li)):
+        title = li[index].find('h5')
+        imgs = li[index].find('img')
+        link = li[index].find('a')
+        try:
+            img = imgs['src']
+        except KeyError:
+            img = imgs['data-src']
+        videoitem = {}
+        videoitem['name'] =  title.text.strip()
+        videoitem['thumb'] =  'http:' + img
+        videoitem['href'] = 'https://agefans.tw' + link['href']
+        videos.append(videoitem)
+    return videos
+
 #qinmei
-def get_qm_categories():
+def get_qinmei_categories():
     return [{'name':'新番','link':'https://qinmei.video/api/v2/animates?sortBy=updatedAt&sortOrder=-1&size=20&page='},
             {'name':'剧场版','link':'https://qinmei.video/api/v2/animates?sortBy=updatedAt&sortOrder=-1&size=20&kind=5e359428d1f1dc2e17f84fd4&page='},
             {'name':'战斗','link':'https://qinmei.video/api/v2/animates?sortBy=updatedAt&sortOrder=-1&size=20&kind=5e341fc1d1f1dc2e17f84fae&page='},
@@ -527,7 +609,7 @@ def get_qm_categories():
             {'name':'致郁','link':'https://qinmei.video/api/v2/animates?sortBy=updatedAt&sortOrder=-1&size=20&kind=5e341fe7d1f1dc2e17f84fb0&page='},
             {'name':'异界','link':'https://qinmei.video/api/v2/animates?sortBy=updatedAt&sortOrder=-1&size=20&kind=5e341feed1f1dc2e17f84fb1&page='}]
 
-def get_qm_videos(url,page):
+def get_qinmei_videos(url,page):
     #爬视频列表的
     videos = []
     r = get_html(url + str(page))
@@ -547,7 +629,7 @@ def get_qm_videos(url,page):
         videos.append(videoitem)
     return videos
 
-def get_qm_source(url):
+def get_qinmei_source(url):
     #爬视频列表的
     videos = []
     url = 'https://qinmei.video/api/v2/animates/' + url
@@ -567,7 +649,7 @@ def get_qm_source(url):
     tmp['bghtml'] = r
     return videos
 
-def get_qm_mp4info(url):
+def get_qinmei_mp4info(url):
     rtext = tmp['bghtml']
 
     #t = json.dumps(r.text, ensure_ascii=False)  
@@ -610,7 +692,7 @@ def get_qm_mp4info(url):
 
     return infodict
 
-def get_qm_mp4(url):
+def get_qinmei_mp4(url):
     url = 'https://qinmei.video/api/v2/animates/' + url + '/play'
     r = get_html(url)
     #soup = BeautifulSoup(r, 'html.parser')
@@ -618,12 +700,33 @@ def get_qm_mp4(url):
     mp4 = j['data']['link'][0]['value']
     return mp4
 
+def get_qinmei_search(keyword,page):
+    #爬视频列表的
+    videos = []
+    url = 'https://qinmei.video/api/v2/animates?type=queryAnimate&title='+keyword+'&page='+ str(page) + '&size=20&sortBy=updatedAt&sortOrder=-1'
+    r = get_html(url)
+    j = json.loads(r)
+    vlist = j['data']['list']
+    for index in range(len(vlist)):
+        img = vlist[index]['coverVertical']
+        if img[:2] != 'ht':
+            if img[:2] == '//':
+                img = 'http:'+img
+            else:
+                img = 'http://qinmei.video' +img
+        videoitem = {}
+        videoitem['name'] =  vlist[index]['title']
+        videoitem['href'] =  vlist[index]['slug']
+        videoitem['thumb'] = img
+        videos.append(videoitem)
+    return videos
+
 #柠檬瞬间
-def get_nm_categories():
+def get_ningmoe_categories():
     return [{'name':'本月热门','link':'https://www.ningmoe.com/api/get_hot_bangumi'}]
 
 
-def get_nm_videos(url,page):
+def get_ningmoe_videos(url,page):
     #爬视频列表的
     videos = []
     data = str({'page': page, 'limit': 10})
@@ -642,15 +745,13 @@ def get_nm_videos(url,page):
         videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=60)
-def get_nm_source(url):
+def get_ningmoe_source(url):
     #爬视频列表的
     videos = []
     apiurl = 'https://www.ningmoe.com/api/get_bangumi'
-    data = {'bangumi_id':url}
-    r = requests.post(apiurl,headers=headers,data=data)
-    r.encoding = ('utf-8')
-    j = json.loads(r.text)
+    data = str({'bangumi_id':url})
+    r = post_html(apiurl,data)
+    j = json.loads(r)
     vlist = j['data']['posts']
     sourcelist = []
     s1dict = {}
@@ -670,10 +771,10 @@ def get_nm_source(url):
     videoitem['name'] = '播放线路2'
     videoitem['href'] = str(sourcelist[1])
     videos.append(videoitem)
-    tmp['bghtml'] = r.text
+    tmp['bghtml'] = r
     return videos
 
-def get_nm_mp4info(url):
+def get_ningmoe_mp4info(url):
     rtext = tmp['bghtml']
     infodict={}
     
@@ -687,14 +788,12 @@ def get_nm_mp4info(url):
 
     return infodict
 
-@plugin.cached(TTL=60)
-def get_nm_mp4(url):
+def get_ningmoe_mp4(url):
     if url.find('kingsnug.cn') != -1:
         apiurl = 'https://www.ningmoe.com/api/get_real_yun_url'
-        data = {'url':url}
-        r = requests.post(apiurl,headers=headers,data=data)
-        r.encoding = ('utf-8')
-        j = json.loads(r.text)
+        data = str({'url':url})
+        r = post_html(apiurl,data=data)
+        j = json.loads(r)
         try:
             mp4 = j['data']['yun_url']
         except KeyError:
@@ -704,7 +803,7 @@ def get_nm_mp4(url):
         mp4 = url
     return mp4
 
-def get_nm_search(keyword,page):
+def get_ningmoe_search(keyword,page):
     #爬视频列表的
     videos = []
     url = 'https://www.ningmoe.com/api/search'
@@ -725,11 +824,11 @@ def get_nm_search(keyword,page):
     return videos
 
     #8chongying
-def get_8_categories():
+def get_iafuns_categories():
     return [{'name':'2020新番','link':'http://iafuns.com/catalog?year=2020'},
             {'name':'2019新番','link':'http://iafuns.com/catalog?year=2019'}]
 
-def get_8_videos(url,page):
+def get_iafuns_videos(url,page):
     #爬视频列表的
     videos = []
     r = get_html(url)
@@ -743,7 +842,7 @@ def get_8_videos(url,page):
         videos.append(videoitem)
     return videos
 
-def get_8_source(url):
+def get_iafuns_source(url):
     #爬视频列表的
     videos = []
     r = get_html(url)
@@ -771,7 +870,7 @@ def get_8_source(url):
     tmp['bghtml'] = r
     return videos
 
-def get_8_mp4info(url):
+def get_iafuns_mp4info(url):
     rtext = tmp['bghtml']
     infodict={}
 
@@ -803,7 +902,7 @@ def get_8_mp4info(url):
     return infodict
 
 
-def get_8_mp4(url):
+def get_iafuns_mp4(url):
     url = url.split(':')
     if url[0][:2].find('qz') != -1:
         apiurl = 'http://iafuns.com/_get_e_i?url=' + url + '&quote=1'
@@ -836,7 +935,7 @@ def get_8_mp4(url):
     #dialog.textviewer('错误提示', mp4)
     return mp4
 
-def get_8_search(keyword,page):
+def get_iafuns_search(keyword,page):
     #爬视频列表的
     videos = []
     url = 'http://iafuns.com/search?q=' + keyword
@@ -852,12 +951,12 @@ def get_8_search(keyword,page):
     return videos
 
 #silisili
-def get_sili_categories():
+def get_silisili_categories():
     return [{'name':'最新更新','link':'http://www.silisili.me/zxgx.html'},
             {'name':'日本动漫','link':'http://www.silisili.me/riyu/'},
             {'name':'国产动漫','link':'http://www.silisili.me/guoyu/'}]
 
-def get_sili_videos(url,page):
+def get_silisili_videos(url,page):
     videos = []
     if int(page) != 1 and url != 'http://www.silisili.me/zxgx.html':
         url = url + 'index_'+str(page)+'.html'
@@ -874,8 +973,8 @@ def get_sili_videos(url,page):
             videos.append(videoitem)
     else:
         base = soup.find('div',class_='anime_list')
-        dialog = xbmcgui.Dialog()
-        dialog.textviewer('评论区',str(url))
+        # dialog = xbmcgui.Dialog()
+        # dialog.textviewer('评论区',str(url))
         li = base.find_all('dl')
         for index in range(len(li)):
             videoitem = {}
@@ -886,7 +985,7 @@ def get_sili_videos(url,page):
     
     return videos
 
-def get_sili_source(url):
+def get_silisili_source(url):
     #爬视频列表的
     videos = []
     r = get_html(url)
@@ -906,7 +1005,7 @@ def get_sili_source(url):
     tmp['bghtml'] = r
     return videos
 
-def get_sili_mp4info(url):
+def get_silisili_mp4info(url):
     rtext = tmp['bghtml']
     infodict={}
     soup = BeautifulSoup(rtext, 'html.parser')
@@ -945,14 +1044,14 @@ def get_sili_mp4info(url):
 
     return infodict
 
-def get_sili_mp4(url):
+def get_silisili_mp4(url):
     r = get_html(url)
     soup = BeautifulSoup(r, 'html.parser')
     mp4 = soup.find('iframe')
     mp4 = mp4['src'].split('?')
     return mp4[1]
 
-def get_sili_search(keyword,page):
+def get_silisili_search(keyword,page):
     videos = []
     if int(page) == 1:
         url = 'http://www.silisili.me/e/search/index.php'
@@ -1059,14 +1158,317 @@ def get_srsg_mp4(url):
     mp4 = 'https://cdn-animetv-sgp.srsg.moe/' + j['parts'][0]['resources']['path'][:-3]+ 'm3u8'
     return mp4
 
+#tucao.one
+def get_tucao_categories():
+    return [{'name':'连载新番','link':'http://www.tucao.one/list/11/'},
+            {'name':'OAD·OVA·剧场版','link':'http://www.tucao.one/list/26/'},
+            {'name':'完结番组','link':'http://www.tucao.one/list/10/'}]
+
+def get_tucao_videos(url,page):
+    #爬视频列表的
+    videos = []
+    if int(page) != 1:
+        url = url + 'index_' + str(page) + '.html'
+    html = get_html(url,cf=1)
+    soup = BeautifulSoup(html,'html.parser')
+    
+    ullist = soup.find('div',class_='list')
+    videolist = ullist.find_all('li')
+    for index in range(len(videolist)):
+        a = videolist[index].find('a',class_='pic')
+        videoitem = {}
+        videoitem['name'] =  a.img['alt']
+        videoitem['thumb'] =  a.img['src']
+        videoitem['href'] = a['href']
+        videos.append(videoitem)
+    return videos
+
+def get_tucao_source(url):
+    videos = []
+    html = get_html(url,cf=1)
+    
+    sclist = []
+
+    str1 = html.find('<li>type=video')
+    str2 = html.find('<script language="javascript">$(document).ready(function(){$("#shadow")')
+    tmpstr = html[str1:str2]
+    str3 = tmpstr.find('</li><li>')
+    duopstr = tmpstr[4:str3]
+    duoplist = duopstr.split('**')
+    try:
+        duopdict = {}
+        for index in range(len(duoplist)):
+            info = duoplist[index].split('|')
+            duopdict[info[1].decode('utf-8')] = info[0][16:]
+        sclist.append(duopdict)
+    except IndexError:
+        pass
+    
+    videoitem = {}
+    videoitem['name'] = '播放线路1'
+    videoitem['href'] = str(sclist[0])
+    videos.append(videoitem)
+
+    tmp['bghtml'] = html
+    return videos
+
+def get_tucao_mp4info(url):
+    rtext = tmp['bghtml']
+    infodict={}
+    soup = BeautifulSoup(rtext, 'html.parser')
+    plot = soup.find('div',class_='show_content')
+    infodict['plot'] = re.sub('\n\n\n\n','',plot.text)
+    return infodict
+
+def get_tucao_mp4(url):
+    mp4 = url
+    return mp4
+
+def get_tucao_search(keyword,page):
+    videos = []
+    if int(page) == 1:
+        url = 'https://www.tucao.one/index.php?m=search&c=index&a=init2&catid=&time=&order=&username=&tag=&q=' +keyword
+    else:
+        url = 'https://www.tucao.one/index.php?m=search&c=index&a=init2&catid=&time=&order=&username=&tag=&q=' +keyword + '&page=' +str(page)
+    html = get_html(url,cf=1)
+    soup = BeautifulSoup(html,'html.parser')
+    
+    videolist = soup.find_all('div',class_='list')
+    for index in range(len(videolist)):
+        img = videolist[index].find('div',class_='pic')
+        videoitem = {}
+        videoitem['name'] =  img.a.img['alt']
+        videoitem['thumb'] =  img.a.img['src']
+        videoitem['href'] = img.a['href']
+        videos.append(videoitem)
+    return videos
+
+#clicli.me
+def get_cliclime_categories():
+    return [{'name':'编辑推荐','link':'https://api.clicli.us/posts?status=public&sort=&tag=%E6%8E%A8%E8%8D%90&uid=&page=1&pageSize=10'},
+            {'name':'新番表','link':'https://api.clicli.us/posts?status=nowait&sort=%E6%96%B0%E7%95%AA&tag=&uid=&page=1&pageSize=100'},
+            {'name':'排行','link':'https://api.clicli.us/rank'},
+            {'name':'最近更新','link':'https://api.clicli.us/posts?status=public&sort=bgm&tag=&uid=&page=1&pageSize=30'}]
+
+def get_cliclime_videos(url,page):
+    #爬视频列表的
+    videos = []
+    html = get_html(url,cf=1)
+    try:
+        j = json.loads(html)
+        for index in range(len(j['posts'])):
+            con = j['posts'][index]['content']
+            img = re.search('!\\[[^\\]]+\\]\\([^\\)]+\\)', con)
+            videoitem = {}
+            videoitem['name'] = u'[' + j['posts'][index]['sort'] + u']' + j['posts'][index]['title']
+            videoitem['href'] = j['posts'][index]['id']
+            videoitem['thumb'] = img.group()[7:-1]
+            videos.append(videoitem)  
+    except ValueError:
+        pass
+    return videos
+
+def get_cliclime_source(url):
+    videos = []
+    html = get_html('https://api.clicli.us/videos?pid=' + str(url) +'&page=1&pageSize=150',cf=1)
+    
+    sclist = []
+
+
+    try:
+        duopdict = {}
+        j = json.loads(html)
+        pnum = 1
+        for index in range(len(j['videos'])):
+            pp = str(pnum)
+            #pp = pp.encode('utf-8')
+            duopdict[u'[' + pp + u']' + j['videos'][index]['title']] = j['videos'][index]['content']
+            pnum += 1  
+        sclist.append(duopdict)
+    except IndexError:
+        pass
+    except TypeError:
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('错误提示', '这个不是视频哦')
+    
+    videoitem = {}
+    videoitem['name'] = '播放线路1'
+    videoitem['href'] = str(sclist[0])
+    videos.append(videoitem)
+
+    tmp['bghtml'] = html
+    return videos
+
+def get_cliclime_mp4(url):
+    url = 'https://jx.clicli.us/jx?url=' + url
+    html = get_html(url,cf=1)
+    try:
+        j = json.loads(html)
+        mp4 = j['url'] 
+    except ValueError:
+        pass
+    return mp4
+
+#5dm.tv
+def get_5dmtv_categories():
+    return [{'name':'新番时间表','link':'https://www.5dm.tv/timeline'},
+            {'name':'连载新番','link':'https://www.5dm.tv/video/bangumi'},
+            {'name':'完结番组','link':'https://www.5dm.tv/video/end'},
+            {'name':'剧场•OVA','link':'https://www.5dm.tv/video/bgm/ova'}]
+
+def get_5dmtv_videos(url,page):
+    #爬视频列表的
+    videos = []
+    if int(page) != 1:
+        url = url + '/page/' +str(page)
+    html = get_html(url,cf=1)
+    soup = BeautifulSoup(html, 'html.parser')
+    vids = soup.find_all('div',class_='item-thumbnail')
+    for index in range(len(vids)):
+        videoitem = {}
+        title = vids[index].a.img['alt']
+        if vids[index].span:
+            title += u' - ' + vids[index].span.text
+        videoitem['name'] = title
+        videoitem['href'] = vids[index].a['href']
+        videoitem['thumb'] = 'https://www.5dm.tv' + vids[index].a.img['data-original']
+        videos.append(videoitem)  
+    return videos
+
+def get_5dmtv_source(url):
+    videos = []
+    html = get_html(url,cf=1)
+    soup = BeautifulSoup(html, 'html.parser')
+    #sclist = []
+    duopdict = {}
+    if soup.find('iframe',id='player'):
+        sourcelist = soup.find_all('tr')
+        for index in range(len(sourcelist)):
+            duopname = sourcelist[index].find('td',class_='multilink-title')
+            duoplist = sourcelist[index].find_all('a',class_='multilink-btn')
+            for index in range(len(duoplist)):
+                duopdict[duoplist[index].text] = duoplist[index]['href']
+            #sclist.append(duopdict)
+    
+            videoitem = {}
+            videoitem['name'] = duopname.text
+            videoitem['href'] = str(duopdict)
+            videos.append(videoitem)
+
+        tmp['bghtml'] = html
+    else:
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('错误提示', '视频不存在！404！AWSL！')
+    return videos
+
+def get_5dmtv_mp4(url):
+    html = get_html(url,cf=1)
+    soup = BeautifulSoup(html, 'html.parser')
+    if soup.find('iframe',id='player'):
+        apiurl = soup.find('iframe',id='player')
+        mp4api = apiurl['src']
+        html1 = get_html(mp4api,cf=1)
+        mp4 = re.search('https?:\/\/..+\.mp4',html1).group()
+        mp4 = get_html(mp4,mode='url')
+        # str1 = html1.find('srcUrl={')
+        # str2 = html1.find('window.cid=')
+        # mp4 = html1[str1+15:str2-4]
+        # dialog = xbmcgui.Dialog()
+        # ok = dialog.ok('错误提示', mp4)
+    else:
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('错误提示', '视频不存在！404！AWSL！')
+    return mp4
+
+#clicli.co
+def get_cliclico_categories():
+    return [{'name':'番剧','link':'https://clicli.co/anime/'},
+            {'name':'电影','link':'https://clicli.co/pd/2'},
+            {'name':'美剧','link':'https://clicli.co/pd/3'},
+            {'name':'国漫','link':'https://clicli.co/pd/4'}]
+
+def get_cliclico_videos(url,page):
+    #爬视频列表的
+    videos = []
+    html = get_html(url)
+    soup = BeautifulSoup(html,'html.parser')
+    
+    ullist = soup.find('div',class_='anime-list')
+    videolist = ullist.find_all('a')
+    for index in range(len(videolist)):
+        videoitem = {}
+        videoitem['name'] =  videolist[index].li.p.text
+        videoitem['thumb'] =  videolist[index].li.img['data-echo']
+        videoitem['href'] = 'https://clicli.co' + videolist[index]['href']
+        videos.append(videoitem)
+    return videos
+
+def get_cliclico_source(url):
+    videos = []
+    av = re.search('av\d+',url).group()
+    data = str({'av':av,'uas':'no'})
+    html = post_html('https://api.clicli.co/anime/index',data)
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(av) + '\n' + str(html.encode('utf-8')))
+    sclist = []
+
+    j = json.loads(html)
+    try:
+        duopdict = {}
+        for index in range(len(j['epi'])):
+            title = j['epi'][index]['title']
+            if j['epi'][index]['name'] != '':
+                title += ' - '+j['epi'][index]['name']
+            duopdict[title] = 'https://clicli.co/player/anime.php?av=' + av + '&num=' + str(j['epi'][index]['num'])
+        sclist.append(duopdict)
+    except IndexError:
+        pass
+    
+    videoitem = {}
+    videoitem['name'] = '播放线路1'
+    videoitem['href'] = str(sclist[0])
+    videos.append(videoitem)
+
+    tmp['bghtml'] = html
+    return videos
+
+def get_cliclico_mp4(url):
+    r = get_html(url)
+    soup = BeautifulSoup(r,'html.parser')
+    mp4 = soup.find('e-player')
+    return mp4['src']
+
+def get_cliclico_search(keyword,page):
+    videos = []
+    url = 'https://clicli.co/search?key=' +keyword
+    html = get_html(url)
+    soup = BeautifulSoup(html,'html.parser')
+    
+    ullist = soup.find('div',class_='cards')
+    videolist = ullist.find_all('a')
+    for index in range(len(videolist)):
+        videoitem = {}
+        videoitem['name'] =  videolist[index].li.p.text
+        videoitem['thumb'] =  videolist[index].li.img['data-echo']
+        videoitem['href'] = 'https://clicli.co' + videolist[index]['href']
+        videos.append(videoitem)
+    return videos
+
+##########################################################
+###以下是核心代码区，看不懂的请勿修改
+##########################################################
+
 @plugin.route('/play/<name>/<url>/<mode>/')
 def play(name,url,mode):
     items = []
     mp4 = get_mp4_mode(url,mode)
-    mp4info = get_mp4info_mode(url,mode)
-    mp4info['mediatype'] = 'video'
-    mp4info['title'] = name
-    item = {'label': name,'path':mp4,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
+    try:
+        mp4info = get_mp4info_mode(url,mode)
+        mp4info['mediatype'] = 'video'
+        mp4info['title'] = name
+        item = {'label': name,'path':mp4,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
+    except NameError:
+        item = {'label': name,'path':mp4,'is_playable': True,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
     items.append(item)
     return items
 
@@ -1138,12 +1540,12 @@ def category(name,url,mode,page):
     categories = get_categories()
     for index in range(len(categories)):
         if mode == categories[index]['link']:
-            maxcount = int(categories[index]['videos'])
-    if maxcount == len(videos):
-        items.append({
-            'label': '[COLOR yellow]下一页[/COLOR]',
-            'path': plugin.url_for('category',name=name,url=url,mode=mode,page=int(int(page)+1)),
-        })
+            if 'videos' in categories[index]:
+                if int(categories[index]['videos']) == len(videos):
+                    items.append({
+                        'label': '[COLOR yellow]下一页[/COLOR]',
+                        'path': plugin.url_for('category',name=name,url=url,mode=mode,page=int(int(page)+1)),
+                    })
     return items
 
 
@@ -1201,10 +1603,10 @@ def search(value,page,mode):
     categories = get_categories()
     for index in range(len(categories)):
         if mode == categories[index]['link']:
-            maxcount = int(categories[index]['search'])
-    if maxcount == len(videos):
-        nextpage = {'label': '[COLOR yellow]下一页[/COLOR]', 'path': plugin.url_for('search', value=keyword,mode=mode,page=str(int(page)+1))}
-        items.append(nextpage)
+            if 'search' in categories[index]:
+                if int(categories[index]['search']) == len(videos):
+                    nextpage = {'label': '[COLOR yellow]下一页[/COLOR]', 'path': plugin.url_for('search', value=keyword,mode=mode,page=str(int(page)+1))}
+                    items.append(nextpage)
     return items
 
 def get_key (dict, value):
@@ -1281,17 +1683,38 @@ def index():
                 vlist['id'] = get_categories()[index]['id']
                 vlist['name'] = get_categories()[index]['name']
                 vlist['link'] = get_categories()[index]['link']
+                vlist['author'] = get_categories()[index]['author']
+                vlist['upload'] = get_categories()[index]['upload']
+                if 'plot' in get_categories()[index]:
+                    vlist['plot'] = get_categories()[index]['plot']
                 for i in range(len(storage['homesort'])):
                     if storage['homesort'][i]['link'] == get_categories()[index]['link']:
                         vlist['id'] = storage['homesort'][i]['id']
-                        vlist['name'] = storage['homesort'][i]['name']
-                        vlist['link'] = storage['homesort'][i]['link']
+                        #vlist['name'] = storage['homesort'][i]['name']
+                        #vlist['link'] = storage['homesort'][i]['link']
                 newhomesort.append(vlist)
             storage['homesort'] = newhomesort
             categories = sorted(newhomesort,key=lambda k:k.get('id'))
             dialog = xbmcgui.Dialog()
             dialog.notification('首页已更新', h +'个网站', xbmcgui.NOTIFICATION_INFO, 5000)
         else:
+            newhomesort = []
+            for index in range(len(get_categories())):
+                vlist = {}
+                vlist['id'] = get_categories()[index]['id']
+                vlist['name'] = get_categories()[index]['name']
+                vlist['link'] = get_categories()[index]['link']
+                vlist['author'] = get_categories()[index]['author']
+                vlist['upload'] = get_categories()[index]['upload']
+                if 'plot' in get_categories()[index]:
+                    vlist['plot'] = get_categories()[index]['plot']
+                for i in range(len(storage['homesort'])):
+                    if storage['homesort'][i]['link'] == get_categories()[index]['link']:
+                        vlist['id'] = storage['homesort'][i]['id']
+                        #vlist['name'] = storage['homesort'][i]['name']
+                        #vlist['link'] = storage['homesort'][i]['link']
+                newhomesort.append(vlist)
+            storage['homesort'] = newhomesort
             categories = sorted(storage['homesort'],key=lambda k:k.get('id'))
     else:
         storage['homesort'] = get_categories()
@@ -1300,10 +1723,18 @@ def index():
     items = []
     for category in categories:
         if category['id'] != 0:
-            items.append({
-            'label': category['name'],
-            'path': plugin.url_for('home',mode=category['link']),
-            })
+            if 'plot' in category:
+                items.append({
+                'label': category['name'],
+                'path': plugin.url_for('home',mode=category['link']),
+                'info': {'plot':'@[COLOR blue]' + category['author'] + '[/COLOR]'  + ':\n\n    ' + category['plot'],'status':category['upload']+ ' 更新','cast':[(category['author'],'插件作者')],'mediatype':'video'},
+                })
+            else:
+                items.append({
+                    'label': category['name'],
+                    'path': plugin.url_for('home',mode=category['link']),
+                    'info': {'status':category['upload']+ '更新','cast':[(category['author'],'插件作者')],'mediatype':'video'},
+                })
     items.append({
         'label': u'[COLOR yellow]设置[/COLOR]',
         'path': plugin.url_for('setting'),
