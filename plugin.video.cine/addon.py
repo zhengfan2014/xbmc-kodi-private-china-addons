@@ -148,7 +148,7 @@ def get_categories_mode(mode):
     item = eval('get_' + mode + '_categories')()
     return item
 def get_videos_mode(url,mode,page):
-    item = eval('get_' + mode + '_videos')(url,page)
+    item = eval('get_' + mode + '_videos')(url,int(page))
     return item
 def get_source_mode(url,mode):
     item = eval('get_' + mode + '_source')(url)
@@ -160,7 +160,7 @@ def get_mp4_mode(url,mode):
     item = eval('get_' + mode + '_mp4')(url)
     return item
 def get_search_mode(keyword,page,mode):
-    item = eval('get_' + mode + '_search')(keyword,page)
+    item = eval('get_' + mode + '_search')(keyword,int(page))
     return item
 
 ##########################################################
@@ -168,7 +168,9 @@ def get_search_mode(keyword,page,mode):
 ##########################################################
 
 def get_categories():
-    return [{'id':1,'name':'喜欢看影视(138vcd.com)','link':'138vcd','author':'zhengfan2014','upload':'2020-5-7','videos':48}]
+    return [{'id':1,'name':'喜欢看影视(138vcd.com)','link':'138vcd','author':'zhengfan2014','upload':'2020-5-7','videos':48,'search':36},
+            {'id':2,'name':'片库(pianku.tv)','link':'pianku','author':'zhengfan2014','upload':'2020-5-7','videos':42,'search':10},
+            {'id':3,'name':'老豆瓣(laodouban.com)','link':'laodouban','author':'zhengfan2014','upload':'2020-5-7','videos':12,'search':10}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -189,8 +191,8 @@ def get_138vcd_videos(url,page):
     else:
         r = get_html(url + '/page/' +str(page) +'.html')
     soup = BeautifulSoup(r, "html5lib")
-    linelist = soup.find('ul',class_='myui-vodlist clearfix')
-    alist = linelist.find_all('a',class_='myui-vodlist__thumb lazyload')
+    ul = soup.find('ul',class_='myui-vodlist clearfix')
+    alist = ul.find_all('a',class_='myui-vodlist__thumb lazyload')
     for i in range(len(alist)):
         videoitem = {}
         videoitem['name'] =  alist[i]['title'] 
@@ -235,8 +237,8 @@ def get_138vcd_search(keyword,page):
     else:
         r = get_html('https://www.138vcd.com/vodsearch/page/'+str(page)+'/wd/'+keyword+'.html')
     soup = BeautifulSoup(r, "html5lib")
-    linelist = soup.find('ul',id='searchList')
-    alist = linelist.find_all('a',class_='myui-vodlist__thumb img-lg-150 img-md-150 img-sm-150 img-xs-100 lazyload')
+    ul = soup.find('ul',id='searchList')
+    alist = ul.find_all('a',class_='myui-vodlist__thumb img-lg-150 img-md-150 img-sm-150 img-xs-100 lazyload')
     for i in range(len(alist)):
         videoitem = {}
         videoitem['name'] =  alist[i]['title'] 
@@ -245,7 +247,207 @@ def get_138vcd_search(keyword,page):
         videos.append(videoitem)
     return videos
 
+#pianku
+def get_pianku_categories():
+    return [{"name": "电影", "link": "https://www.pianku.tv/mv/-----1-"},
+          {"name": "剧集", "link": "https://www.pianku.tv/tv/-----1-"}, 
+          {"name": "动漫", "link": "https://www.pianku.tv/ac/-----1-"}]
 
+def get_pianku_videos(url,page):
+    videos = []
+    if page == 1:
+        r = get_html(url + '1.html')
+    else:
+        r = get_html(url + str(page) +'.html')
+    soup = BeautifulSoup(r, "html5lib")
+    ul = soup.find('ul',class_='content-list')
+    ilist = ul.find_all('div',class_='li-img')
+    for i in range(len(ilist)):
+        videoitem = {}
+        videoitem['name'] =  ilist[i].a['title'] 
+        videoitem['href'] =  'https://www.pianku.tv' + ilist[i].a['href']
+        videoitem['thumb'] = ilist[i].a.img['src']
+        videos.append(videoitem)
+    return videos
+
+def get_pianku_source(url):
+    videos = []
+    r1 = get_html(url)
+    vtype = re.search('(?<=pianku.tv\/)[a-zA-Z]+(?=\/)',url).group()
+    vid = re.search('[a-zA-Z]+(?=.html)',url).group()
+    apiurl = 'https://www.pianku.tv/ajax/downurl/'+vid+'_'+vtype+'/'
+    r = get_html(apiurl)
+    
+    soup = BeautifulSoup(r, 'html.parser')
+    ul = soup.find('ul',class_='py-tabs')
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(r.encode('utf-8')))
+    li = ul.find_all('li')
+    vlist =soup.find_all('ul',class_='player ckp')
+    
+    for index in range(len(li)):
+        duopname = li[index].text
+        alist = vlist[index].find_all('a')
+        duopdict = {}
+        for i in range(len(alist)):
+            duopdict[alist[i].text] = 'https://www.pianku.tv' + alist[i]['href']
+        
+        videoitem = {}
+        videoitem['name'] = duopname
+        videoitem['href'] = str(duopdict)
+        videos.append(videoitem)
+    tmp['bghtml'] = r1
+    return videos
+
+def get_pianku_mp4(url):
+    r = get_html(url)
+    str1 = r.find('new DPlayer({')
+    cut = r[str1:]
+    mp4 = re.search('https?:..+\.m3u8',cut).group()
+    mp4 = mp4.replace('\\','')
+    # dialog = xbmcgui.Dialog()
+    # ok = dialog.ok('错误提示', mp4)
+    return mp4
+
+def get_pianku_search(keyword,page):
+    videos = []
+    
+    if page == 1:
+        url = get_html('https://www.pianku.tv/s/go.php?q='+keyword,mode='url')
+        tmp['piankusearch'] = url
+    else:
+        url = tmp['piankusearch'][:-5] + '-' + str(page) + '.html'
+    r = get_html(url)
+
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', r.encode('utf-8'))
+    soup = BeautifulSoup(r, "html5lib")
+    ul = soup.find('div',class_='sr_lists')
+    vlist = ul.find_all('dl')
+    for i in range(len(vlist)):
+        img = vlist[i].find('img')
+        a = vlist[i].dd.find('a')
+        videoitem = {}
+        videoitem['name'] =  a.text
+        videoitem['href'] =  'https://www.pianku.tv' + a['href']
+        videoitem['thumb'] = img['src']
+        videos.append(videoitem)
+    return videos
+
+#老豆瓣
+def get_laodouban_categories():
+    return [{"name": "电影", "link": "https://www.laodouban.com/dianying/"},
+          {"name": "电视剧", "link": "https://www.laodouban.com/dianshiju/"}, 
+          {"name": "动漫", "link": "https://www.laodouban.com/dongman/"},
+          {"name": "综艺", "link": "https://www.laodouban.com/zongyi/"}]
+
+def get_laodouban_videos(url,page):
+    videos = []
+    if page != 1:
+        url += str(page)
+    r = get_html(url)
+    soup = BeautifulSoup(r, "html5lib")
+    ul = soup.find('div',class_='tubiao row no-gutters')
+    ilist = ul.find_all('div',class_='zu d-flex flex-column col-4 col-sm-3 col-md-3 col-lg-3 col-xl-3 mb-4')
+    for i in range(len(ilist)):
+        img = ilist[i].find('img')
+        a = ilist[i].find('a',class_='text-secondary')
+        videoitem = {}
+        videoitem['name'] =  a.text
+        videoitem['href'] =  'https://www.laodouban.com' + a['href']
+        videoitem['thumb'] = img['src']
+        videos.append(videoitem)
+    return videos
+
+def get_laodouban_source(url):
+    videos = []
+    if re.match('https?',url):
+        r = get_html(url)
+        soup = BeautifulSoup(r, 'html.parser')
+        ul = soup.find('ul',class_='nav nav-tabs mt-3')
+    
+        li = ul.find_all('li')
+        vlist =soup.find_all('div',class_='tab-pane')
+    
+
+        #dialog = xbmcgui.Dialog()
+        #dialog.textviewer('错误提示', str(vlist[0].encode('utf-8')))
+        for index in range(len(li)):
+            duopname = li[index].a.text.strip()
+            if li[index].find('span'):
+                duopname = duopname[:-1]
+                duopname += u' · [COLOR red]' + li[index].span.text + u'[/COLOR]'
+            blist = vlist[index].find_all('button')
+            duopdict = {}
+            for i in range(len(blist)):
+                duopdict[blist[i].text.strip()] = 'https://www.laodouban.com/b?h=' + blist[i]['ldb-bianhao'] + '&y=' + blist[i]['ldb-suoyin']
+        
+            videoitem = {}
+            videoitem['name'] = duopname.strip()
+            videoitem['href'] = str(duopdict)
+            videos.append(videoitem)
+        tmp['bghtml'] = r
+    else:
+        ddict = eval(url)
+        for k,i in ddict.items():
+            duopname = k
+            vlist = eval(i)
+            duopdict = {}
+            for index in range(len(vlist)):
+                duopdict[vlist[index]['biaoji']] = vlist[index]['dizhi']
+            videoitem = {}
+            videoitem['name'] = duopname
+            videoitem['href'] = str(duopdict)
+            videos.append(videoitem)
+    
+    return videos
+
+def get_laodouban_mp4(url):
+    if re.search('https?:..+\.m3u8',url):
+        mp4 = url
+    else:
+        r = get_html(url)
+        str1 = r.find('var videoObject = {')
+        cut = r[str1:]
+        mp4 = re.search('https?:..+\.m3u8',cut).group()
+        mp4 = mp4.replace('\\','')
+    # dialog = xbmcgui.Dialog()
+    # ok = dialog.ok('错误提示', mp4)
+    return mp4
+
+def get_laodouban_search(keyword,page):
+    videos = []
+    
+    # if page == 1:
+    #     url = 'https://www.laodouban.com/s?c=' + keyword
+    #     r = get_html(url)
+    url = 'https://www.laodouban.com/api/sousuo/'
+    data = {'guanjianzi':keyword,'yeshu':page}
+    r = post_html(url,str(data))
+    j = json.loads(r)
+    for index in range(len(j)):
+        videoitem = {}
+        videoitem['name'] = j[index]['mingcheng']
+        videoitem['thumb'] = j[index]['jietu']
+        videoitem['href'] = str({j[index]['bofangdizhi']['mingcheng']:str(j[index]['bofangdizhi']['dizhizu'])})
+        videos.append(videoitem)
+    # # dialog = xbmcgui.Dialog()
+    # # dialog.textviewer('错误提示', r.encode('utf-8'))
+    # soup = BeautifulSoup(r, "html5lib")
+    # ul = soup.find('div',class_='zuoce col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8')
+    # li1 = ul.find('div',class_='tuwenbiao row no-gutters mb-4')
+
+
+    # vlist1 = li1.find_all('div',class_='col-12 d-flex pt-3 pb-4')
+    # for i in range(len(vlist1)):
+    #     img = vlist1[i].find('img')
+    #     a = vlist1[i].find('a',class_='text-info')
+    #     videoitem = {}
+    #     videoitem['name'] =  a.text
+    #     videoitem['href'] =  'https://www.laodouban.com' + a['href']
+    #     videoitem['thumb'] = img['src']
+    #     videos.append(videoitem)
+    return videos
 
 ##########################################################
 ###以下是核心代码区，看不懂的请勿修改
