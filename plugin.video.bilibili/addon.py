@@ -920,9 +920,15 @@ def get_api1(url,quality):
         aid = aid.group()
         aid = aid[2:]
         vurl = 'https://api.bilibili.com/x/web-interface/view?aid='+aid
+    
+    if '?p=' in url:
+        # 单独下载分P视频中的一集
+        p = int(re.search(r'\?p=(\d+)',url).group(1)) -1
+    else:
+        p = 0
     r = requests.get(vurl,headers=headers)
     j = json.loads(r.text)
-    cid = j['data']['pages'][0]['cid']
+    cid = j['data']['pages'][int(p)]['cid']
 
 
     entropy = 'rbMCKn@KuamXWlPMoJGsKcbiJKUfkPF_8dABscJntvqhRSETg'
@@ -1005,7 +1011,12 @@ def get_api3(url, quality):
             r = requests.get(vurl,headers=headers)
             j = json.loads(r.text)
             #bvid = j['data']['pages'][0]['bvid']
-            cid = j['data']['pages'][0]['cid']
+            if '?p=' in url:
+                # 单独下载分P视频中的一集
+                p = int(re.search(r'\?p=(\d+)',url).group(1)) -1
+            else:
+                p = 0
+            cid = j['data']['pages'][p]['cid']
     
     if bvid != '':
         url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&bvid={}&qn={}'.format(cid, bvid, quality)
