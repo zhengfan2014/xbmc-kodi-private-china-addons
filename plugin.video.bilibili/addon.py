@@ -949,8 +949,54 @@ def get_api1(url,quality):
     for i in html['durl']:
         video_list.append(i['url'])
     # print(video_list)
-    return video_list[0]
+    return video_list
 
+@plugin.cached(TTL=10)
+def get_api2(url):
+    mp4 = ''
+    if re.match('https://',url) == None:
+        if re.match('http://',url) != None:
+            url = 'https://'+url[7:]
+        else:
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误提示', '非法url')
+    ifvideourl = re.match('https://www.bilibili.com/video/',url)
+    if ifvideourl != None:
+        bvid = ''
+        aid = ''
+        if re.search(r'[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', url):
+            bvid = re.search(r'[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', url)
+            bvid = bvid.group()
+            vurl = 'https://api.bilibili.com/x/web-interface/view?bvid='+bvid
+        if re.search('[aA]{1}[vV]{1}[0-9]+', url):
+            aid = re.search(r'[aA]{1}[vV]{1}[0-9]+', url)
+            aid = aid.group()
+            aid = aid[2:]
+            vurl = 'https://api.bilibili.com/x/web-interface/view?aid='+aid
+        r = requests.get(vurl,headers=headers)
+        j = json.loads(r.text)
+        aid = j['data']['aid']
+        if '?p=' in url:
+            # 单独下载分P视频中的一集
+            p = int(re.search(r'\?p=(\d+)',url).group(1)) -1
+        else:
+            p = 0
+        cid = j['data']['pages'][p]['cid']
+
+        apiurl = 'https://www.xbeibeix.com/api/bilibiliapi.php?url=https://www.bilibili.com/&aid='+str(aid)+'&cid=' + str(cid)
+        r = requests.get(apiurl,headers=headers)
+        j = json.loads(r.text)
+        if str(j['url']) != 'null':
+            mp4 = j['url']
+            dialog = xbmcgui.Dialog()
+            dialog.textviewer('错误提示', str(mp4))
+        else:
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误提示', '视频不存在')
+    else:
+        dialog = xbmcgui.Dialog()
+        ok = dialog.ok('错误提示', '不支持的url格式')
+    return mp4
 
 @plugin.cached(TTL=10)
 def get_api3(url, quality):
@@ -1030,11 +1076,10 @@ def get_api3(url, quality):
     html = requests.get(url_api, headers=apiheaders).json()
     video_list = []
     #dialog = xbmcgui.Dialog()
-    #dialog.textviewer('评论区',str(html))
+    #dialog.textviewer('评论区',str(html['data']['durl']))
     if 'data' in html:
         for i in html['data']['durl']:
             video_list.append(i['url'])
-        video_list = video_list[0]
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok('提示','无法解析视频')
@@ -1556,6 +1601,8 @@ def play(name,url):
         items.append(item)
         item = {'label': '[1080p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=80)}
         items.append(item)
+        item = {'label': '[原画]使用 xbeibeix.com api 解析','path': plugin.url_for('api2', name=name,url=url)}
+        items.append(item)
         item = {'label': '[720p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=64)}
         items.append(item)
         item = {'label': '[720p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=64)}
@@ -1568,8 +1615,7 @@ def play(name,url):
         items.append(item)
         item = {'label': '[320p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=16)}
         items.append(item)
-        #item = {'label': '[最高清晰度]使用 xbeibeix.com 解析','path': plugin.url_for('api2', name=name,url=url)}
-        #items.append(item)
+        
         return items
 
 
@@ -1600,8 +1646,29 @@ def api1(name,url,quality):
     mp4info = get_mp4info(url)
     img = mp4info['img']
     items = []
+    head = '|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36&Referer=https://www.bilibili.com&Range=bytes=0-&Connection=keep-alive&Origin=https://www.bilibili.com&Accept-Encoding=gzip, deflate, br'
+    for index in range(len(mp4url)):
+        item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': mp4url[index]+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
+        items.append(item)
+    face = mp4info['face']
+    item = {'label': '查看 [COLOR yellow]'+mp4info['upname'].encode('utf-8') +'[/COLOR] 的主页','path': plugin.url_for('up',uid=mp4info['uid'],page=1),'thumbnail': face,'icon': face}
+    items.append(item)
+    item = {'label': '评论区 [COLOR yellow]' + mp4info['reply'] + '[/COLOR]','path': plugin.url_for('conn',url=url)}
+    items.append(item)
+    
+    return items
+
+@plugin.route('/api2/<name>/<url>/')
+#使用api2
+def api2(name,url):
+    mp4url = get_api2(url)
+    dialog = xbmcgui.Dialog()
+    dialog.textviewer('错误提示', str(mp4url))
+    mp4info = get_mp4info(url)
+    img = mp4info['img']
+    items = []
     head = '|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36&Referer=https://www.bilibili.com'
-    item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': mp4url+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
+    item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': str(mp4url)+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
     items.append(item)
     face = mp4info['face']
     item = {'label': '查看 [COLOR yellow]'+mp4info['upname'].encode('utf-8') +'[/COLOR] 的主页','path': plugin.url_for('up',uid=mp4info['uid'],page=1),'thumbnail': face,'icon': face}
@@ -1628,8 +1695,9 @@ def api3(name,url,quality):
     img = mp4info['img']
     items = []
     head = '|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36&Referer=https://www.bilibili.com'
-    item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': str(mp4url)+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
-    items.append(item)
+    for index in range(len(mp4url)):
+        item = {'label': name+' - '+mp4info['title'].encode('utf-8'),'path': mp4url[index]+head,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
+        items.append(item)
     if ifvideourl != None:
         face = mp4info['face']
         item = {'label': '查看 [COLOR yellow]'+mp4info['upname'].encode('utf-8') +'[/COLOR] 的主页','path': plugin.url_for('up',uid=mp4info['uid'],page=1),'thumbnail': face,'icon': face}
