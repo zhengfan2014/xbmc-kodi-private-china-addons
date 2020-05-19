@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.audio.jsososo" name="Jsososo" version="0.1.0" provider-name="zhengfan">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.xbmcswift2" version="2.4.0"/>
+  <import addon="script.module.beautifulsoup4" version="4.5.3"/>
+  <import addon="script.module.requests" version="2.19.1"/>
+  <import addon="script.module.html5lib" version="0.999.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>audio</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language></language>
+    <description>网易云音乐，QQ音乐，咪咕音乐聚合插件，API 1000%使用music.jsososo.com的服务</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
+  </extension>
+</addon>
