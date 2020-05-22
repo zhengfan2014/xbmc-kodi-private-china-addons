@@ -7,6 +7,17 @@
 [![爱发电本月收入][mon]](https://afdian.net/@zhengfan2014)
 [![爱发电发电人数][once]](https://afdian.net/@zhengfan2014)
 
+----
+
+ > PS : 如果你不能看见上面的小牌子或者github的图片无法正常显示，请在hosts中加入如下一行，不出意外，应该可以正常显示 
+ ```
+192.30.253.112 github.com
+ ```
+[引用自csdn评论区](https://blog.csdn.net/qq_38232598/article/details/91346392)
+
+----
+
+  > PS2 : 上面的小牌子你也想整一个？ 请戳这里 ☛ [用 Substats 和 Shields.io 为你的个人主页定制动态数据小牌子](https://sspai.com/post/59593) 我也是从这里学来的😂
 ## 介绍
 
 > 关于[dev]:dev tag是指插件处于开发者预览版，非最终成品，有许多核心功能无法使用，仅供体验。
