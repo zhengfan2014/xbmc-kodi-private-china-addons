@@ -7,6 +7,16 @@
 [![爱发电本月收入][mon]](https://afdian.net/@zhengfan2014)
 [![爱发电发电人数][once]](https://afdian.net/@zhengfan2014)
 
+----
+
+ > PS : 如果你不能看见上面的小牌子或者github的图片无法正常显示，可以尝试如下方法
+  1. 访问 ipaddress.com 
+  2. 获取 githubusercontent.com 的ip地址
+  3. 假设你获取的ip地址为199.232.68.133 ，在你的 hosts 下加入如下一行
+ ```
+199.232.68.133 githubusercontent.com
+ ```
+参考自：[ioiox博客](https://www.ioiox.com/archives/62.html)
 
 ----
 
