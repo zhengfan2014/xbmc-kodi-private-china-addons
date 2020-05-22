@@ -1,11 +1,11 @@
 # zhengfan2014的kodi插件仓库
-![](https://img.shields.io/github/stars/zhengfan2014/xbmc-kodi-private-china-addons)
-![](https://img.shields.io/github/forks/zhengfan2014/xbmc-kodi-private-china-addons)
-![](https://img.shields.io/github/issues/zhengfan2014/xbmc-kodi-private-china-addons?color=%232E8B57)
-![](https://img.shields.io/badge/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83-kodi%2018-green)
-[![酷安][coolapk]](http://www.coolapk.com/u/2864549) [![b站][bilibili]](https://space.bilibili.com/25818910)
-[![爱发电][mon]](https://afdian.net/@zhengfan2014)
-[![爱发电][once]](https://afdian.net/@zhengfan2014)
+![星星数](https://img.shields.io/github/stars/zhengfan2014/xbmc-kodi-private-china-addons)
+![叉子数](https://img.shields.io/github/forks/zhengfan2014/xbmc-kodi-private-china-addons)
+![问题数](https://img.shields.io/github/issues/zhengfan2014/xbmc-kodi-private-china-addons?color=%232E8B57)
+![kodi18测试通过](https://img.shields.io/badge/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83-kodi%2018-green)
+[![酷安粉丝][coolapk]](http://www.coolapk.com/u/2864549) [![b站粉丝][bilibili]](https://space.bilibili.com/25818910)
+[![爱发电本月收入][mon]](https://afdian.net/@zhengfan2014)
+[![爱发电发电人数][once]](https://afdian.net/@zhengfan2014)
 
 ## 介绍
 
