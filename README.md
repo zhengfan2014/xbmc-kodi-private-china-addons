@@ -83,7 +83,7 @@ Age动漫 | https://agefans.tw/
 番組計劃 | https://anime.srsg.moe/
 Qinmei | https://qinmei.video/
 柠萌瞬间 | https://ningmoe.com/
-吐槽弹幕网 | https://ningmoe.com/
+吐槽弹幕网 | https://tucao.one/
 clicli弹幕网 | https://clicli.me/
 五弹幕 | https://5dm.tv/
 clicli弹幕网 | https://clicli.co/
