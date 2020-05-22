@@ -55,21 +55,85 @@
  plugin.video.weibotv | 微博视频 | 0.1.1 | 2020-03-16 | 随时随地发现新鲜事！微博带你欣赏世界上每一个精彩瞬间，了解每一个幕后故事。
  plugin.video.kaiyan | 开眼 | 0.1.0 | 2020-03-10 | 精选视频推荐，每日大开眼界
  
+ ----
+
 ### 音乐插件
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | ---- | ---- | ---- | ---- 
  plugin.audio.jsososo | jsososo | 0.1.0 | 2020-05-15 |music.jsososo.com的音乐插件，播放你自己的网易云和QQ音乐歌单和日推
 
+----
+
 ### 原创插件
 
- - bangumi插件 - 模块化的小众番剧网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配番剧网站
+#### 番剧聚合
+
+插件目录              | 插件名 | 版本 | 最后更新 | 简介
+ :------------------ | ---- | ---- | ---- | ---- 
+ plugin.video.bangumi | bangumi | 0.1.0 | 2020-05-15 |模块化的小众番剧网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配番剧网站
+
+ 适配网站 | 网址
+---- | ---- 
+哔咪哔咪 | https://bimibimi.tv/
+樱花动漫 | https://yhdm.tv/
+Age动漫 | https://agefans.tw/
+嘶哩嘶哩 | https://silisili.me/
+八重樱动漫 | http://iafuns.com/
+番組計劃 | https://anime.srsg.moe/
+Qinmei | https://qinmei.video/
+柠萌瞬间 | https://ningmoe.com/
+吐槽弹幕网 | https://ningmoe.com/
+clicli弹幕网 | https://clicli.me/
+五弹幕 | https://5dm.tv/
+clicli弹幕网 | https://clicli.co/
+
+----
+
+#### 电影聚合
 
 - cine插件 - 模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
 
+适配网站 | 网址
+---- | ---- 
+喜欢看影视 | https://138vcd.com/
+片库 | https://pianku.tv/
+老豆瓣 | https://laodouban.com/
+
+----
+
+#### 新闻/自媒体聚合
+
 - vid插件 - 模块化的新闻/自媒体等单一视频网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配新闻/自媒体等网站
 
+适配网站 | 网址
+---- | ---- 
+虎嗅视频 | https://www.huxiu.com/channel/10.html
+机核视频 | https://www.gcores.com/videos
+穷游视频 | https://www.qyer.com/video/
+ZEALER视频 | https://www.zealer.com/video/list?id=0
+澎湃视频 | https://www.thepaper.cn/channel_26916
+新京报视频 | http://www.bjnews.com.cn/video/   http://www.bjnews.com.cn/wevideo/
+界面视频 | https://www.jiemian.com/video/lists/index_1.html
+36KR视频 | https://36kr.com/video
+环球网视频频道 | https://v.huanqiu.com/
+
+----
+
+#### 直播聚合
+
 - reallive插件 - 模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
+
+适配网站 | 网址
+---- | ---- 
+虎牙直播 | https://www.huya.com/
+斗鱼直播 | https://www.douyu.com/
+触手直播 | https://chushou.tv/
+企鹅电竞 | https://egame.qq.com/
+龙珠直播 | http://longzhu.com/
+bilibili直播 | https://live.bilibili.com/
+YY直播 | https://www.yy.com/
+快手直播 | https://live.kuaishou.com/
 
 # 捐赠作者
 如果您觉得这些小作品对您有很大帮助的话，不妨给作品点一个小小的star，请作者喝一杯咖啡，您的支持也是作者维护插件库的动力  
