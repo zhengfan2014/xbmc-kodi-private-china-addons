@@ -75,14 +75,14 @@
 
  适配网站 | 网址
 ---- | ---- 
-哔咪哔咪 | https://bimibimi.tv/
-樱花动漫 | https://yhdm.tv/
+哔咪哔咪 | http://bimibimi.tv/
+樱花动漫 | http://yhdm.tv/
 Age动漫 | https://agefans.tw/
-嘶哩嘶哩 | https://silisili.me/
+嘶哩嘶哩 | http://silisili.me/
 八重樱动漫 | http://iafuns.com/
 番組計劃 | https://anime.srsg.moe/
 Qinmei | https://qinmei.video/
-柠萌瞬间 | https://ningmoe.com/
+柠萌瞬间 | http://ningmoe.com/
 吐槽弹幕网 | https://tucao.one/
 clicli弹幕网 | https://clicli.me/
 五弹幕 | https://5dm.tv/
