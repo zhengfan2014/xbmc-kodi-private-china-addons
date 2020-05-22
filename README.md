@@ -7,13 +7,6 @@
 [![爱发电本月收入][mon]](https://afdian.net/@zhengfan2014)
 [![爱发电发电人数][once]](https://afdian.net/@zhengfan2014)
 
-----
-
- > PS : 如果你不能看见上面的小牌子或者github的图片无法正常显示，请在hosts中加入如下一行，不出意外，应该可以正常显示 
- ```
-192.30.253.112 github.com
- ```
-[引用自csdn评论区](https://blog.csdn.net/qq_38232598/article/details/91346392)
 
 ----
 
