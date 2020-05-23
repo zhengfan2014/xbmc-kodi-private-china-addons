@@ -76,7 +76,7 @@
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ----
- plugin.video.bilibili | <img src="icons/bilibili.png" width = "50" height = "50"/>bilibili | 0.5.3 | 2020-05-10 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
+ plugin.video.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/>bilibili | 0.5.3 | 2020-05-10 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
  plugin.video.acfun | <img src="icons/acfun.png" width = "50" height = "50"/>acfun | 0.2.1 | 2020-05-05 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
  plugin.video.changku | <img src="icons/changku.png" width = "50" height = "50"/>场库 | 0.1.0 | 2020-03-29 | 高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影
  plugin.video.huanxi | <img src="icons/huanxi.png" width = "50" height = "50"/>欢喜首映 | 0.1.0 | 2020-03-29 | 欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影
@@ -92,7 +92,7 @@
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.audio.jsososo | <img src="icons/jsososo.png" width = "50" height = "50"/><br>jsososo | 0.1.0 | 2020-05-15 |music.jsososo.com的音乐插件，播放你自己的网易云和QQ音乐歌单和日推
+ plugin.audio.jsososo | <img width = "200" height = "0"/><img src="icons/jsososo.png" width = "50" height = "50"/><br>jsososo | 0.1.0 | 2020-05-15 |music.jsososo.com的音乐插件，播放你自己的网易云和QQ音乐歌单和日推
 
 ----
 
@@ -102,7 +102,7 @@
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.bangumi | <img src="icons/bangumi.png" width = "50" height = "50"/>bangumi | 0.1.0 | 2020-05-07 |模块化的小众番剧网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配番剧网站
+ plugin.video.bangumi | <img width = "200" height = "0"/><img src="icons/bangumi.png" width = "50" height = "50"/>bangumi | 0.1.0 | 2020-05-07 |模块化的小众番剧网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配番剧网站
 
  适配网站 | 网址
 ---- | ---- 
@@ -125,7 +125,7 @@ clicli弹幕网 | https://clicli.co/
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.cine | <img src="icons/cine.png" width = "50" height = "50"/>cine | 0.1.0 | 2020-05-09 |模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
+ plugin.video.cine | <img width = "200" height = "0"/><img src="icons/cine.png" width = "50" height = "50"/><br>cine | 0.1.0 | 2020-05-09 |模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
 
 适配网站 | 网址
 ---- | ---- 
@@ -139,7 +139,7 @@ clicli弹幕网 | https://clicli.co/
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.vid | <img src="icons/vid.png" width = "50" height = "50"/>vid | 0.1.0 | 2020-05-03 |模块化的新闻/自媒体等单一视频网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配新闻/自媒体等网站
+ plugin.video.vid | <img width = "200" height = "0"/><img src="icons/vid.png" width = "50" height = "50"/><br>vid | 0.1.0 | 2020-05-03 |模块化的新闻/自媒体等单一视频网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配新闻/自媒体等网站
 
 适配网站 | 网址
 ---- | ---- 
@@ -159,7 +159,7 @@ ZEALER视频 | https://www.zealer.com/video/list?id=0
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.reallive | <img src="icons/reallive.png" width = "50" height = "50"/>reallive | 0.1.0 | 2020-05-17 |模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
+ plugin.video.reallive | <img width = "200" height = "0"/><img src="icons/reallive.png" width = "50" height = "50"/><br>reallive | 0.1.0 | 2020-05-17 |模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
 
 适配网站 | 网址
 ---- | ---- 
