@@ -9,10 +9,19 @@
 
 ----
 
- > PS : 如果你不能看见上面的小牌子或者github的图片无法正常显示，可以尝试如下方法
-  1. 访问 ipaddress.com 
-  2. 获取 githubusercontent.com 的ip地址
-  3. 假设你获取的ip地址为199.232.68.133 ，在你的 hosts 下加入如下一行
+ > PS : 如果你不能看见上面的小牌子或者github的图片无法正常显示，可以尝试如下方法  
+ 
+### 有翻墙软件  
+  1. 那再简单不过了，直接把如下域名加入强制走代理名单
+```
+  githubusercontent.com
+  shields.io
+  spencerwoo.com
+ ```
+### 无翻墙软件  
+ 1. 访问 [ipaddress.com](https://www.ipaddress.com/)
+ 2. 获取 githubusercontent.com,shields.io,spencerwoo.com 的ip地址
+ 3. 假设你获取的ip地址为199.232.68.133 ，在你的 hosts 下加入如下一行,其他以此类推
  ```
 199.232.68.133 githubusercontent.com
  ```
