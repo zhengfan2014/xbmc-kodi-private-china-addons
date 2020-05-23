@@ -77,11 +77,11 @@
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ----
  plugin.video.bilibili | <img src="http://ww1.sinaimg.cn/large/007nvHctgy1gf2b322k48j30qo0qoqv5.jpg" width = "50" height = "50"/>bilibili | 0.5.3 | 2020-05-10 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
- plugin.video.acfun | <img src="icons/acfun.png" width = "50" height = "50"/>acfun | 0.2.1 | 2020-05-05 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
- plugin.video.changku | <img src="icons/changku.png" width = "50" height = "50"/>场库 | 0.1.0 | 2020-03-29 | 高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影
- plugin.video.huanxi | <img src="icons/huanxi.png" width = "50" height = "50"/>欢喜首映 | 0.1.0 | 2020-03-29 | 欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影
- plugin.video.skypixel | <img src="icons/skypixel.png" width = "50" height = "50"/>天空之城 | 0.1.0 | 2020-03-29 | 世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中
- plugin.video.taptap | <img src="icons/taptap.png" width = "50" height = "50"/>Taptap | 0.1.0 | 2020-03-29 | TapTap是一个推荐高品质手游的手游分享社区，实时同步全球各大应用市场游戏排行榜，与全球玩家共同交流并发掘高品质手游。每一款推荐游戏，都是由专业的测评团队从全球海量的游戏中精选而出，只为你提供好玩的手机游戏。
+ plugin.video.acfun | <img src="http://ww1.sinaimg.cn/large/007nvHctgy1gf2b6fge8vj30qo0qoqv5.jpg" width = "50" height = "50"/>acfun | 0.2.1 | 2020-05-05 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
+ plugin.video.changku | <img src="http://ww1.sinaimg.cn/large/007nvHctgy1gf2b6rwg5vj30qo0qo7kv.jpg" width = "50" height = "50"/>场库 | 0.1.0 | 2020-03-29 | 高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影
+ plugin.video.huanxi | <img src="http://ww1.sinaimg.cn/large/007nvHctgy1gf2b782vy4j30qo0qob29.jpg" width = "50" height = "50"/>欢喜首映 | 0.1.0 | 2020-03-29 | 欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影
+ plugin.video.skypixel | <img src="http://ww1.sinaimg.cn/large/007nvHctgy1gf2b7ma4ttj30qo0qox3w.jpg" width = "50" height = "50"/>天空之城 | 0.1.0 | 2020-03-29 | 世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中
+ plugin.video.taptap | <img src="http://ww1.sinaimg.cn/large/007nvHctgy1gf2b890uwcj30qo0qoqv5.jpg" width = "50" height = "50"/>Taptap | 0.1.0 | 2020-03-29 | TapTap是一个推荐高品质手游的手游分享社区，实时同步全球各大应用市场游戏排行榜，与全球玩家共同交流并发掘高品质手游。每一款推荐游戏，都是由专业的测评团队从全球海量的游戏中精选而出，只为你提供好玩的手机游戏。
  plugin.video.xinpianchang | <img src="icons/xinpianchang.png" width = "50" height = "50"/>新片场 | 0.1.0 | 2020-03-29 | 新片场汇聚全球原创优质视频及创作人，提供4K、无广告、无水印视频观看，专业的视频艺术学习教程，正版视觉素材交易等，与数百万创作人一起用作品打动世界
  plugin.video.weibotv | <img src="icons/weibo.png" width = "50" height = "50"/>微博视频 | 0.1.1 | 2020-03-16 | 随时随地发现新鲜事！微博带你欣赏世界上每一个精彩瞬间，了解每一个幕后故事。
  plugin.video.kaiyan | <img src="icons/kaiyan.png" width = "50" height = "50"/>开眼 | 0.1.0 | 2020-03-10 | 精选视频推荐，每日大开眼界
