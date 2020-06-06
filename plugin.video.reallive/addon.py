@@ -52,7 +52,7 @@ def chushihua(key,default):
     return value
 
 @plugin.cached(TTL=2)
-def get_html(url,ua='pc',mode='html'):
+def get_html(url,ua='pc',mode='html',encode='utf-8'):
     if ua == 'pc':
         r = requests.get(url,headers=headers)
     if ua == 'mobile':
@@ -65,7 +65,10 @@ def get_html(url,ua='pc',mode='html'):
         r = requests.get(url,headers=macheaders)
     if ua != 'pc' and ua != 'mobile' and ua != 'iphone' and ua != 'ipad' and ua != 'mac':
         r = requests.get(url,headers=eval(ua))
-    r.encoding = 'utf-8'
+    if encode == 'utf-8':
+        r.encoding = 'utf-8'
+    if encode == 'gbk':
+        r.encoding = 'gbk'
     if mode == 'url':
         html = r.url
     else:
@@ -73,7 +76,7 @@ def get_html(url,ua='pc',mode='html'):
     return html
 
 @plugin.cached(TTL=2)
-def post_html(url,data,json='off',ua='pc',mode='html'):
+def post_html(url,data,json='off',ua='pc',mode='html',encode='utf-8'):
     data = eval(data)
     if json == 'off':
         if ua == 'pc':
@@ -97,7 +100,10 @@ def post_html(url,data,json='off',ua='pc',mode='html'):
             r = requests.post(url,json=data,headers=ipadheaders)
         if ua == 'mac':
             r = requests.post(url,json=data,headers=macheaders)
-    r.encoding = 'utf-8'
+    if encode == 'utf-8':
+        r.encoding = 'utf-8'
+    if encode == 'gbk':
+        r.encoding = 'gbk'
     if mode == 'url':
         html = r.url
     else:
@@ -173,7 +179,8 @@ def get_categories():
             {'id':5,'name':'龙珠直播','link':'longzhu','author':'zhengfan2014','upload':'2020-5-17'},
             {'id':6,'name':'Bilibili直播','link':'bilibili','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
             {'id':7,'name':'YY直播','link':'yy','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
-            {'id':8,'name':'快手直播','link':'kuaishou','author':'zhengfan2014','upload':'2020-5-18','rooms':60}]
+            {'id':8,'name':'快手直播','link':'kuaishou','author':'zhengfan2014','upload':'2020-5-18','rooms':60},
+            {'id':9,'name':'ac直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -809,6 +816,31 @@ def get_kuaishou_roomid(rid):
         # real_url = soup.find('video')['src']
     
     return i.encode('utf-8')
+
+#acfun
+def get_acfun_categories():
+    return []
+def get_acfun_roomid(url):
+    if 'm.acfun.com' in url:
+        if 'live/detail' in url:
+            room_id = re.search('(?<=detail/)[0-9]+',url).group()
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提取成功','房间号：' + str(room_id), xbmcgui.NOTIFICATION_INFO, 5000)
+    else:
+        room_id = url
+    data = {'authorId':room_id,'pullStreamType':'SINGLE_HLS'}
+    r = post_html('https://api.kuaishouzt.com/rest/zt/live/web/startPlay?subBiz=mainApp&kpn=ACFUN_APP&kpf=OUTSIDE_ANDROID_H5&userId=1000000039258966&did=H5_838414230312ED6F&acfun.api.visitor_st=ChRhY2Z1bi5hcGkudmlzaXRvci5zdBJwe85FKluHmFKAbPx7tfh-zqLMs8HoVSVOW_nTwPGM-t00Ka_kd7ZQp_rofsYJvMM3I9wrdTIcPbXkb7yunw4gYC2ZbB11Go6OVAaETEuDzPYnLdd1Go2JrpvmsQ9O5ZuhKbapThOUkwirpO2UEMe2ZxoSVVXIQ734h7MpAYWDHy8uAC9cIiDMon1x1tPW2KP3glAjYExkYDzqEYKPoQaLbOpwcONucSgFMAE',str(data),ua='mobile')
+    
+    j = json.loads(r)
+    if j['result'] == 1:
+        live = j['data']['videoPlayRes']
+        live = re.search('http[\S]+m3u8',live).group()
+        if '_sd1000' in live:
+            live = live.replace('_sd1000','')
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提取直播间地址失败','可能未开播', xbmcgui.NOTIFICATION_INFO, 5000)
+    return live
 ##########################################################
 ###以下是核心代码区，看不懂的请勿修改
 ##########################################################
