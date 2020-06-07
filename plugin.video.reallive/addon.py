@@ -173,7 +173,7 @@ def get_roomid_mode(url,mode):
 
 def get_categories():
     return [{'id':1,'name':'虎牙直播','link':'huya','author':'zhengfan2014','upload':'2020-5-13','rooms':120},
-            {'id':2,'name':'斗鱼直播','link':'douyu','author':'zhengfan2014','upload':'2020-5-13'},
+            {'id':2,'name':'斗鱼直播','link':'douyu','author':'zhengfan2014','upload':'2020-5-13','rooms':120},
             {'id':3,'name':'触手直播','link':'chushou','author':'zhengfan2014','upload':'2020-5-13','rooms':20},
             {'id':4,'name':'企鹅电竞','link':'egame','author':'zhengfan2014','upload':'2020-5-17'},
             {'id':5,'name':'龙珠直播','link':'longzhu','author':'zhengfan2014','upload':'2020-5-17'},
@@ -272,7 +272,33 @@ def get_huya_roomid(url):
 
 #斗鱼直播
 def get_douyu_categories():
-    return []
+    return [{'name':'CF手游','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_178/'},
+            {'name':'文化','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_195/'},
+            {'name':'中国象棋','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_543/'},
+            {'name':'使命召唤','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_472/'},
+            {'name':'逆战','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_46/'},
+            {'name':'热门网游','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_203/'},
+            {'name':'颜值','link':'https://www.douyu.com/gapi/rknc/directory/yzRec/'},
+            {'name':'陪玩','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_1015/'},
+            {'name':'英雄联盟','link':'https://www.douyu.com/gapi/rkc/directory/mixList/2_1/'}]
+
+def get_douyu_rooms(url,page):
+    rooms = []
+    
+    r = get_html(url +str(page))
+    j = json.loads(r)
+    rlist = j['data']['rl']
+    for i in range(len(rlist)):
+        roomitem = {}
+        roomitem['name'] = rlist[i]['rn']
+        roomitem['href'] =  rlist[i]['rid']
+        roomitem['thumb'] = rlist[i]['rs16']
+        roomitem['info'] = {'plot' : zh(rlist[i]['ol']) + u' 人气 · 房间号 ' + str(rlist[i]['rid']) + u'\n\n','cast':[(rlist[i]['nn'],u'主播')]}
+        if rlist[i]['od'] != '':
+            roomitem['info']['plot'] += u'[COLOR orange]官方认证：' + rlist[i]['od'] + '[/COLOR]'
+        rooms.append(roomitem)
+    return rooms
+
 def get_douyu_roomid(url):
     if 'douyu.com' in url:
         if '?rid=' in url:
@@ -288,8 +314,8 @@ def get_douyu_roomid(url):
     live = j['Rendata']['link']
     live = re.search('douyucdn.cn/live/[a-zA-Z0-9]+',live).group()
     live = 'http://tx2play1.' + live + '.m3u8'
-    dialog = xbmcgui.Dialog()
-    dialog.textviewer('1',str(live))
+    #dialog = xbmcgui.Dialog()
+    #dialog.textviewer('1',str(live))
     return live
 
 #触手
@@ -779,8 +805,9 @@ def get_kuaishou_rooms(url,page):
 @plugin.cached(TTL=1)
 def get_kuaishou_roomidinfo(rid):
     di = {}
-    room_url = 'https://m.gifshow.com/fw/live/' + str(rid)
-    r = requests.get(room_url,headers=mheaders,cookies={'did':'web_c613143f98204d43a31bd72afef990fc'})
+    ah = mheaders
+    ah['cookie'] = 'did=web_c613143f98204d43a31bd72afef990fc'
+    r = requests.get('https://m.gifshow.com/fw/live/'+ str(rid),headers=ah)
     r.encoding = 'utf-8'
     r = r.text
     soup = BeautifulSoup(r,'html.parser')
@@ -791,19 +818,22 @@ def get_kuaishou_roomidinfo(rid):
     return di
 @plugin.cached(TTL=1)
 def get_kuaishou_roomid(rid):
-    ah = headers
-    ah['cookie'] = 'did=web_523eb6dbd2eff00944e95725acc8ef4c; needLoginToWatchHD=1'
-    r = requests.get('https://live.kuaishou.com/u/'+ str(rid),headers=ah)
+    ah = mheaders
+    ah['cookie'] = 'did=web_c613143f98204d43a31bd72afef990fc'
+    r = requests.get('https://m.gifshow.com/fw/live/'+ str(rid),headers=ah)
     r.encoding = 'utf-8'
-    r = r.text
-    str1 = r.find('window.__APOLLO_STATE__={')
-    str2 = r.find(';(function()')
+    #r = r.text
+    #str1 = r.find('window.__APOLLO_STATE__={')
+    #str2 = r.find(';(function()')
     
-    cut = r[str1+24:str2]
-    #dialog = xbmcgui.Dialog()
-    #dialog.textviewer('获取', str(cut.encode('utf-8')))
-    j = json.loads(cut)
-    i = j['clients']['graphqlServerClient']['$ROOT_QUERY.webLiveDetail({"principalId":"'+rid+'"})']['liveStream']['json']['playUrls'][0]['url']
+    #cut = r[str1+24:str2]
+    i = re.search('https?://\S+m3u8',r.text).group()
+    i = re.sub('_sd1000tp','',i)
+    dialog = xbmcgui.Dialog()
+    dialog.textviewer('获取', str(i.encode('utf-8')))
+    return i
+    #j = json.loads(cut)
+    #i = j['clients']['graphqlServerClient']['$ROOT_QUERY.webLiveDetail({"principalId":"'+rid+'"})']['liveStream']['json']['playUrls'][0]['url']
     #dialog = xbmcgui.Dialog()
     #dialog.textviewer('获取', str(i.encode('utf-8')))
 
@@ -815,7 +845,7 @@ def get_kuaishou_roomid(rid):
         # soup = BeautifulSoup(r.text,'html.parser')
         # real_url = soup.find('video')['src']
     
-    return i.encode('utf-8')
+    #return i.encode('utf-8')
 
 #acfun
 def get_acfun_categories():
