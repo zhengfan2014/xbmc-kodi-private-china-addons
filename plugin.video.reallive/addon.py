@@ -181,8 +181,8 @@ def get_categories():
             {'id':7,'name':'YY直播','link':'yy','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
             {'id':8,'name':'快手直播','link':'kuaishou','author':'zhengfan2014','upload':'2020-5-18','rooms':60},
             {'id':9,'name':'ac直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
-            {'id':10,'name':'it之家直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
-            {'id':11,'name':'央视频(非永久)','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-08','roomid':'false'}]
+            {'id':10,'name':'it之家直播','link':'ithome','author':'zhengfan2014','upload':'2020-6-8','rooms':20},
+            {'id':11,'name':'央视频(非永久)','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -898,6 +898,64 @@ def get_yangshipin_roomid(url):
         dialog = xbmcgui.Dialog()
         dialog.notification('提取直播间地址失败','可能未开播', xbmcgui.NOTIFICATION_INFO, 5000)
     return live
+#it之家    
+def get_ithome_categories():
+    return [{'name':'直播列表','link':'https://www.ithome.com/live/'}]
+
+def get_ithome_rooms(url,page):
+    rooms = []
+    if page == 1:
+        r = get_html(url,encode='gbk')
+    else:
+        data = str({'domain':'live','type':'collectionpage','ot':str(tmp['ithomeot'])})
+        r = post_html('https://www.ithome.com/ithome/getajaxdata.aspx',data)
+    
+    soup = BeautifulSoup(r,'html.parser')
+    if page == 1:
+        ul = soup.find('ul',class_='ulcl')
+        rlist = ul.find_all('li')
+        for i in range(len(rlist)):
+            roomitem = {}
+            roomitem['name'] = rlist[i].find('h2').a.text + rlist[i].find('h2').span.text
+            roomitem['href'] =  rlist[i].a['href']
+            roomitem['thumb'] = 'http:' + rlist[i].find('img')['data-original']
+            roomitem['info'] = {'plot' : rlist[i].find('div',class_='memo').p.text,'genre':[rlist[i].find('span',class_='tags').a.text]}
+            ts = time.strptime(rlist[i].find('div',class_='block')['data-ot'], "%Y/%m/%d %H:%M:%S")
+            # 格式化时间转时间戳
+            tmp['ithomeot'] = int(time.mktime(ts)*1000)
+            rooms.append(roomitem)
+    else:
+        rlist = soup.find_all('li')
+        for i in range(len(rlist)):
+            roomitem = {}
+            roomitem['name'] = rlist[i].find('h2').a.text + rlist[i].find('h2').span.text
+            roomitem['href'] =  rlist[i].a['href']
+            roomitem['thumb'] = rlist[i].find('img')['src']
+            roomitem['info'] = {'plot' : rlist[i].find('div',class_='memo').p.text,'genre':[rlist[i].find('span',class_='tags').a.text]}
+            ts = time.strptime(rlist[i].find('div',class_='block')['data-ot'], "%Y/%m/%d %H:%M:%S")
+            # 格式化时间转时间戳
+            tmp['ithomeot'] = int(time.mktime(ts)*1000)
+            if i == 19:
+                dialog = xbmcgui.Dialog()
+                ok = dialog.ok('提取成功',str(tmp['ithomeot']))
+            rooms.append(roomitem)
+
+    return rooms
+def get_ithome_roomid(url):
+    if 'ithome.com' in url:
+        if re.search('(?<=live.ithome.com/item/)[0-9]+',url):
+            room_id = re.search('(?<=live.ithome.com/item/)[0-9]+',url).group()
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提取成功','房间号：' + str(room_id), xbmcgui.NOTIFICATION_INFO, 5000)
+    else:
+        room_id = url
+    r = get_html('https://live.ithome.com/item/' + room_id + '.htm')
+    str1 = r.find('var flvUrl = ')
+    str2 = r.find('var player = videojs(')
+    rt = r[str1+13:str2].strip()[+1:-2]
+    #dialog = xbmcgui.Dialog()
+    #dialog.textviewer('获取', str(rt))
+    return rt
 ##########################################################
 ###以下是核心代码区，看不懂的请勿修改
 ##########################################################
@@ -948,6 +1006,10 @@ def home(mode):
         'label': category['name'],
         'path': plugin.url_for('rooms', url=category['link'],mode=mode,page=1),
     })
+    if len(items) == 1:
+        items = get_rooms(categories[0]['link'],mode,1)
+        return items
+        
     try:
         eval('get_' + mode + '_search')
         items.append({
@@ -975,8 +1037,7 @@ def home(mode):
             })
     except NameError:
         pass
-    if len(items) == 1:
-        items = get_rooms(categories[0]['link'],mode,1)
+    
     return items
 
 @plugin.route('/search/<value>/<page>/<mode>/')
