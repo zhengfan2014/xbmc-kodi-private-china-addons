@@ -180,7 +180,9 @@ def get_categories():
             {'id':6,'name':'Bilibili直播','link':'bilibili','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
             {'id':7,'name':'YY直播','link':'yy','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
             {'id':8,'name':'快手直播','link':'kuaishou','author':'zhengfan2014','upload':'2020-5-18','rooms':60},
-            {'id':9,'name':'ac直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'}]
+            {'id':9,'name':'ac直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
+            {'id':10,'name':'it之家直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
+            {'id':11,'name':'央视频(非永久)','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-08','roomid':'false'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -871,13 +873,36 @@ def get_acfun_roomid(url):
         dialog = xbmcgui.Dialog()
         dialog.notification('提取直播间地址失败','可能未开播', xbmcgui.NOTIFICATION_INFO, 5000)
     return live
+
+#央视频
+def get_yangshipin_categories():
+    return []
+def get_yangshipin_roomid(url):
+    if 'm.acfun.com' in url:
+        if 'live/detail' in url:
+            room_id = re.search('(?<=detail/)[0-9]+',url).group()
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提取成功','房间号：' + str(room_id), xbmcgui.NOTIFICATION_INFO, 5000)
+    else:
+        room_id = url
+    data = {'authorId':room_id,'pullStreamType':'SINGLE_HLS'}
+    r = post_html('https://api.kuaishouzt.com/rest/zt/live/web/startPlay?subBiz=mainApp&kpn=ACFUN_APP&kpf=OUTSIDE_ANDROID_H5&userId=1000000039258966&did=H5_838414230312ED6F&acfun.api.visitor_st=ChRhY2Z1bi5hcGkudmlzaXRvci5zdBJwe85FKluHmFKAbPx7tfh-zqLMs8HoVSVOW_nTwPGM-t00Ka_kd7ZQp_rofsYJvMM3I9wrdTIcPbXkb7yunw4gYC2ZbB11Go6OVAaETEuDzPYnLdd1Go2JrpvmsQ9O5ZuhKbapThOUkwirpO2UEMe2ZxoSVVXIQ734h7MpAYWDHy8uAC9cIiDMon1x1tPW2KP3glAjYExkYDzqEYKPoQaLbOpwcONucSgFMAE',str(data),ua='mobile')
+    
+    j = json.loads(r)
+    if j['result'] == 1:
+        live = j['data']['videoPlayRes']
+        live = re.search('http[\S]+m3u8',live).group()
+        if '_sd1000' in live:
+            live = live.replace('_sd1000','')
+    else:
+        dialog = xbmcgui.Dialog()
+        dialog.notification('提取直播间地址失败','可能未开播', xbmcgui.NOTIFICATION_INFO, 5000)
+    return live
 ##########################################################
 ###以下是核心代码区，看不懂的请勿修改
 ##########################################################
 
-
-@plugin.route('/category/<url>/<mode>/<page>/')
-def category(url,mode,page):
+def get_rooms(url,mode,page):
     videos = get_rooms_mode(url,mode,page)
     items = []
     if 'info' in videos[0]:
@@ -905,17 +930,24 @@ def category(url,mode,page):
                 if int(categories[index]['rooms']) == len(videos):
                     items.append({
                         'label': '[COLOR yellow]下一页[/COLOR]',
-                        'path': plugin.url_for('category',url=url,mode=mode,page=int(int(page)+1)),
+                        'path': plugin.url_for('rooms',url=url,mode=mode,page=int(int(page)+1)),
                     })
+    return items
+
+@plugin.route('/rooms/<url>/<mode>/<page>/')
+def rooms(url,mode,page):
+    items = get_rooms(url,mode,page)
     return items
 
 @plugin.route('/home/<mode>/')
 def home(mode):
     categories = get_categories_mode(mode)
-    items = [{
+    items = []
+    for category in categories:
+        items.append({
         'label': category['name'],
-        'path': plugin.url_for('category', url=category['link'],mode=mode,page=1),
-    } for category in categories]
+        'path': plugin.url_for('rooms', url=category['link'],mode=mode,page=1),
+    })
     try:
         eval('get_' + mode + '_search')
         items.append({
@@ -925,13 +957,26 @@ def home(mode):
     except NameError:
         pass
     try:
+        ri = 'n'
         eval('get_' + mode + '_roomid')
-        items.append({
-            'label': '[COLOR yellow]复制粘贴链接或者输入房间号进入直播[/COLOR]',
-            'path': plugin.url_for('history',name='复制粘贴链接或者输入房间号进入直播',url=mode + 'roomid',mode=mode),
-        })
+        cate = get_categories()
+        for i in range(len(cate)):
+            if cate[i]['link'] == mode:
+                if 'roomid' in cate[i]:
+                    if cate[i]['roomid'] != 'false':
+                        ri = 'y'
+                else:
+                    ri = 'y'
+
+        if ri == 'y':
+            items.append({
+                'label': '[COLOR yellow]复制粘贴链接或者输入房间号进入直播[/COLOR]',
+                'path': plugin.url_for('history',name='复制粘贴链接或者输入房间号进入直播',url=mode + 'roomid',mode=mode),
+            })
     except NameError:
         pass
+    if len(items) == 1:
+        items = get_rooms(categories[0]['link'],mode,1)
     return items
 
 @plugin.route('/search/<value>/<page>/<mode>/')
