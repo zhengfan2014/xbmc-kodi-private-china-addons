@@ -159,7 +159,7 @@ ZEALER视频 | https://www.zealer.com/video/list?id=0
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.reallive | <img width = "200" height = "0"/><img src="icons/reallive.png" width = "50" height = "50"/><br>reallive | 0.1.0 | 2020-05-17 |模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
+ plugin.video.reallive | <img width = "200" height = "0"/><img src="icons/reallive.png" width = "50" height = "50"/><br>reallive | 0.1.1 | 2020-06-09 |模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
 
 适配网站 | 网址
 ---- | ---- 
@@ -171,6 +171,12 @@ ZEALER视频 | https://www.zealer.com/video/list?id=0
 bilibili直播 | https://live.bilibili.com/
 YY直播 | https://www.yy.com/
 快手直播 | https://live.kuaishou.com/
+Acfun直播 | http://acfun.cn/
+it之家直播 | https://www.ithome.com/live/
+央视频 | https://www.yangshipin.cn/
+直播中国 | https://livechina.cctv.com/
+熊猫频道 | http://www.ipanda.com/
+
 
 # 捐赠作者
 如果您觉得这些小作品对您有很大帮助的话，不妨给作品点一个小小的star，请作者喝一杯咖啡，您的支持也是作者维护插件库的动力  
