@@ -180,9 +180,11 @@ def get_categories():
             {'id':6,'name':'Bilibili直播','link':'bilibili','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
             {'id':7,'name':'YY直播','link':'yy','author':'zhengfan2014','upload':'2020-5-18','rooms':30},
             {'id':8,'name':'快手直播','link':'kuaishou','author':'zhengfan2014','upload':'2020-5-18','rooms':60},
-            {'id':9,'name':'ac直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
+            {'id':9,'name':'Acfun直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
             {'id':10,'name':'it之家直播','link':'ithome','author':'zhengfan2014','upload':'2020-6-8','rooms':20},
-            {'id':11,'name':'央视频(非永久)','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'}]
+            {'id':11,'name':'央视频(非永久)','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'},
+            {'id':12,'name':'直播中国','link':'livechina','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'},
+            {'id':13,'name':'熊猫频道','link':'ipanda','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -249,21 +251,10 @@ def get_huya_roomid(url):
     else:
         room_id = url
     room_url = 'https://m.huya.com/' + str(room_id)
-    # header = {
-    #     'Content-Type': 'application/x-www-form-urlencoded',
-    #     'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) '
-    #                   'Chrome/75.0.3770.100 Mobile Safari/537.36 '
-    # }
     r = get_html(room_url,'mobile')
-    pattern = r"src=\"([\s\S]*)\" data-setup"
-    pattern2 = r"replay"  # 判断是否是回放
-    result = re.findall(pattern, r, re.I)
-    if re.search(pattern2, r):
-        return result[0]
-    if result:
-        url = re.sub(r'_[\s\S]*.m3u8', '.m3u8', result[0])  # 修改了正则留下了密钥和时间戳
-        url = re.sub(r'hw.hls', 'al.hls', url)  # 华为的源好像比阿里的卡
-        url = 'https:' + url
+    if re.search(r'//[\S]*.m3u8',r):
+        url = 'https:' + re.search(r'//[\S]*.m3u8',r).group()
+        url = re.sub(r'_[\S]*.m3u8','.m3u8',url)
     else:
         url = ''
         dialog = xbmcgui.Dialog()
@@ -876,28 +867,196 @@ def get_acfun_roomid(url):
 
 #央视频
 def get_yangshipin_categories():
-    return []
-def get_yangshipin_roomid(url):
-    if 'm.acfun.com' in url:
-        if 'live/detail' in url:
-            room_id = re.search('(?<=detail/)[0-9]+',url).group()
-        dialog = xbmcgui.Dialog()
-        dialog.notification('提取成功','房间号：' + str(room_id), xbmcgui.NOTIFICATION_INFO, 5000)
-    else:
-        room_id = url
-    data = {'authorId':room_id,'pullStreamType':'SINGLE_HLS'}
-    r = post_html('https://api.kuaishouzt.com/rest/zt/live/web/startPlay?subBiz=mainApp&kpn=ACFUN_APP&kpf=OUTSIDE_ANDROID_H5&userId=1000000039258966&did=H5_838414230312ED6F&acfun.api.visitor_st=ChRhY2Z1bi5hcGkudmlzaXRvci5zdBJwe85FKluHmFKAbPx7tfh-zqLMs8HoVSVOW_nTwPGM-t00Ka_kd7ZQp_rofsYJvMM3I9wrdTIcPbXkb7yunw4gYC2ZbB11Go6OVAaETEuDzPYnLdd1Go2JrpvmsQ9O5ZuhKbapThOUkwirpO2UEMe2ZxoSVVXIQ734h7MpAYWDHy8uAC9cIiDMon1x1tPW2KP3glAjYExkYDzqEYKPoQaLbOpwcONucSgFMAE',str(data),ua='mobile')
+    return [{'name':'直播列表','link':'x'}]
     
-    j = json.loads(r)
-    if j['result'] == 1:
-        live = j['data']['videoPlayRes']
-        live = re.search('http[\S]+m3u8',live).group()
-        if '_sd1000' in live:
-            live = live.replace('_sd1000','')
-    else:
-        dialog = xbmcgui.Dialog()
-        dialog.notification('提取直播间地址失败','可能未开播', xbmcgui.NOTIFICATION_INFO, 5000)
-    return live
+def get_yangshipin_rooms(url,page):
+    m3u = '''超高清 4K,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000266303.m3u8
+CCTV 1,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000210103.m3u8
+CCTV 2,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203603.m3u8
+CCTV 3,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203803.m3u8
+CCTV 4,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204803.m3u8
+CCTV 5,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000205103.m3u8
+CCTV 5+,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204503.m3u8
+CCTV 6,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203303.m3u8
+CCTV 7,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000510003.m3u8
+CCTV 8,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203903.m3u8
+CCTV 9,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000499403.m3u8
+CCTV 10,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203503.m3u8
+CCTV 11,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204103.m3u8
+CCTV 12,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000202603.m3u8
+CCTV 13,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204603.m3u8
+CCTV 14,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204403.m3u8
+CCTV 15,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000205003.m3u8
+CCTV 17,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204203.m3u8
+CGTN,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2001656801.m3u8
+湖南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000296203.m3u8
+东方卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292403.m3u8
+黑龙江卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000293903.m3u8
+广东卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292703.m3u8
+深圳卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292203.m3u8
+江苏卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295603.m3u8
+浙江卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295503.m3u8
+江苏卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295603.m3u8
+深圳卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292201.m3u8
+北京卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000272101.m3u8
+海南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000291501.m3u8
+山东卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294801.m3u8
+江西卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294101.m3u8
+湖北卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294501.m3u8
+河南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000296101.m3u8
+河北卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000293401.m3u8
+贵州卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000293301.m3u8
+东南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292501.m3u8
+广西卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294201.m3u8
+四川卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295001.m3u8
+辽宁卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000281301.m3u8
+重庆卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000297801.m3u8
+安徽卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000298001.m3u8'''
+    rooms = []
+    rlist = m3u.split('\n')
+    for i in range(len(rlist)):
+        roomitem = {}
+        rr = rlist[i].split(',')
+        roomitem['name'] = rr[0]
+        roomitem['href'] =  rr[1]
+        roomitem['thumb'] = ''
+        roomitem['info'] = {}
+        rooms.append(roomitem)
+    return rooms
+
+def get_yangshipin_roomid(url):
+    return url
+
+#直播中国
+def get_livechina_categories():
+    return [{'name':'直播列表','link':'x'}]
+    
+def get_livechina_rooms(url,page):
+    m3u = '''西藏珠峰观景台,https://gcalic.v.myalicdn.com/gc/bgwn10_1/index.m3u8
+远眺珠峰,https://gctxyc.liveplay.myqcloud.com/gc/tyhjrys_1/index.m3u8
+贵州省遵义市枫香镇花茂村,https://gcksc.v.kcdnvip.com/gc/dxssyt_1/index.m3u8
+甘肃省定西市渭源县元古堆村,https://gcalic.v.myalicdn.com/gc/lhssjzd_1/index.m3u8
+甘肃省武威市古浪县黄花滩生态移民区富民新村,https://gcalic.v.myalicdn.com/gc/hsxkssqdzrqj_1/index.m3u8
+宁夏固原市原州区彭堡镇姚磨村,https://gctxyc.liveplay.myqcloud.com/gc/ztb_1/index.m3u8
+宁夏固原市泾源县大湾乡杨岭村,https://gcksc.v.kcdnvip.com/gc/ztn_1/index.m3u8
+甘肃省临夏回族自治州东乡族自治县布楞沟村,https://gcksc.v.kcdnvip.com/gc/hsxkscj_1/index.m3u8
+河北省张家口市张北县小二台镇德胜村,https://gctxyc.liveplay.myqcloud.com/gc/pygc01_1/index.m3u8
+山西省忻州市岢岚县宋家沟乡宋家沟村,https://gctxyc.liveplay.myqcloud.com/gc/wysdhpcy_1/index.m3u8
+安徽省六安市金寨县花石乡大湾村,https://gcalic.v.myalicdn.com/gc/szgk01_1/index.m3u8
+重庆市石柱县中益乡华溪村,https://gcalic.v.myalicdn.com/gc/jsh02_1/index.m3u8
+湖北荆门樱花部落,https://gcksc.v.kcdnvip.com/gc/jyg04_1/index.m3u8
+鼋头渚赏樱阁,https://gctxyc.liveplay.myqcloud.com/gc/pshdxg01_1/index.m3u8
+鼋头渚长春桥,https://gcksc.v.kcdnvip.com/gc/dlst02_1/index.m3u8
+北京南宫温泉休闲度假区-五洲植物乐园,https://gcksc.v.kcdnvip.com/gc/tyhjntyz_1/index.m3u8
+四川省阿坝州金川县世外梨园景区,https://gctxyc.liveplay.myqcloud.com/gc/hnttlhzjd_1/index.m3u8
+云栖小镇,https://gccncc.v.wscdns.com/gc/hnttpgsz_1/index.m3u8
+江西省井冈山市茅坪乡神山村,https://gcalic.v.myalicdn.com/gc/wysyxdhp_1/index.m3u8
+天山（海西平台）,https://gcalic.v.myalicdn.com/gc/xjtchxpt_1/index.m3u8
+天山（定海神针）,https://gctxyc.liveplay.myqcloud.com/gc/xjtcdhsz_1/index.m3u8
+天山（马牙山）,https://gcalic.v.myalicdn.com/gc/xjtcmys_1/index.m3u8
+天山（灯杆山）,https://gccncc.v.wscdns.com/gc/xjtcdgs_1/index.m3u8
+重庆轨道交通2号线李子坝站,https://gccncc.v.wscdns.com/gc/gccntv240-lzb01_1/index.m3u8
+国家游泳中心（水立方）,https://gcalic.v.myalicdn.com/gc/gccntv241-slf01_1/index.m3u8'''
+
+    # rinfo = [{'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/04/24/2020042414461116536.jpg','info':{'plot':'西藏珠峰观景台','genre':'西藏珠峰观景台'}},
+    #          {'thumb':'https://p3.img.cctvpic.com/photoworkspace/2020/04/22/2020042219054892015.jpg','info':{'plot':'远眺珠峰','genre':'西藏珠峰观景台'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2020/04/12/2020041200492825759.jpg','info':{'plot':'贵州省遵义市枫香镇花茂村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p3.img.cctvpic.com/photoworkspace/2020/04/12/2020041200495613473.jpg','info':{'plot':'甘肃省定西市渭源县元古堆村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p3.img.cctvpic.com/photoworkspace/2020/04/12/2020041200502074107.jpg','info':{'plot':'甘肃省武威市古浪县黄花滩生态移民区富民新村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/04/14/2020041409250316875.jpg','info':{'plot':'宁夏固原市原州区彭堡镇姚磨村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p4.img.cctvpic.com/photoworkspace/2020/04/14/2020041409272290684.jpg','info':{'plot':'宁夏固原市泾源县大湾乡杨岭村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p4.img.cctvpic.com/photoworkspace/2020/04/12/2020041200505363218.jpg','info':{'plot':'甘肃省临夏回族自治州东乡族自治县布楞沟村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/12/09/2019120912101082657.jpg','info':{'plot':'河北省张家口市张北县小二台镇德胜村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p4.img.cctvpic.com/photoworkspace/2019/12/09/2019120912233447088.jpg','info':{'plot':'山西省忻州市岢岚县宋家沟乡宋家沟村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/04/12/2020041200483967841.jpg','info':{'plot':'安徽省六安市金寨县花石乡大湾村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p5.img.cctvpic.com/photoworkspace/2020/04/12/2020041200490210564.jpg','info':{'plot':'重庆市石柱县中益乡华溪村','genre':'扶贫足迹'}},
+    #          {'thumb':'https://p3.img.cctvpic.com/photoworkspace/2020/03/20/2020032015394958429.jpg','info':{'plot':'荆门樱花部落','genre':'湖北荆门樱花部落'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/20/2020032015301459754.jpg','info':{'plot':'鼋头渚赏樱阁','genre':'无锡鼋头渚'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2020/03/20/2020032015310841622.jpg','info':{'plot':'鼋头渚长春桥','genre':'无锡鼋头渚'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2020/03/03/2020030313154858134.jpg','info':{'plot':'四川省阿坝州金川县世外梨园景区','genre':'四川金川县梨花花海'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2019/12/16/2019121617173198872.jpg','info':{'plot':'云栖小镇','genre':'浙江杭州云栖小镇'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p2.img.cctvpic.com/photoworkspace/2019/10/12/2019101218001699134.jpg','info':{'plot':'天山（海西平台）','genre':'北京南宫温泉休闲度假区'}},
+    #          {'thumb':'https://p1.img.cctvpic.com/photoworkspace/2020/03/10/2020031010193055329.jpg','info':{'plot':'北京南宫温泉休闲度假区-五洲植物乐园','genre':'北京南宫温泉休闲度假区'}}]
+    # tmp['livechinaroomsinfo'] = rinfo
+    rooms = []
+    rlist = m3u.split('\n')
+    for i in range(len(rlist)):
+        roomitem = {}
+        rr = rlist[i].split(',')
+        roomitem['name'] = rr[0]
+        roomitem['href'] =  rr[1]
+        roomitem['thumb'] = '' #rinfo[i]['thumb']
+        roomitem['info'] = {} #rinfo[i]['info']
+        rooms.append(roomitem)
+    return rooms
+
+def get_livechina_roomid(url):
+    return url
+
+#熊猫频道
+def get_ipanda_categories():
+    return [{'name':'直播列表','link':'x'}]
+    
+def get_ipanda_rooms(url,page):
+    m3u = '''【成都】24H高清,http://gcalic.v.myalicdn.com/gc/ipanda_1/index.m3u8
+【都江堰】24H高清,http://gcalic.v.myalicdn.com/gc/ipanda1000_1/index.m3u8
+【都江堰】泰山,http://gcalic.v.myalicdn.com/gc/xiongmao13_1/index.m3u8
+【都江堰】青青,http://gcksc.v.kcdnvip.com/gc/xiongmao20_1/index.m3u8
+【神树坪】神树坪幼儿园A,http://gctxyc.liveplay.myqcloud.com/gc/xiongmao25_1/index.m3u8
+【都江堰】京宝+离堆,http://gcalic.v.myalicdn.com/gc/xiongmao15_1/index.m3u8
+【都江堰】晔晔,http://gcalic.v.myalicdn.com/gc/xiongmao11_1/index.m3u8
+【都江堰】英英,http://gcdnc.v.dwion.com/gc/xiongmao16_1/index.m3u8
+【神树坪】神树坪幼儿园B,http://gctxyc.liveplay.myqcloud.com/gc/xiongmao26_1/index.m3u8
+【都江堰】兴安+玉垒,http://gctxyc.liveplay.myqcloud.com/gc/xiongmao12_1/index.m3u8
+【都江堰】酋酋+华鸿,http://gcalic.v.myalicdn.com/gc/xiongmao14_1/index.m3u8
+【神树坪】神树坪幼儿园C,http://gcalic.v.myalicdn.com/gc/xiongmao22_1/index.m3u8
+【成都】幼年园A,http://gctxyc.liveplay.myqcloud.com/gc/xiongmao03_1/index.m3u8
+【成都】幼年园B,http://gctxyc.liveplay.myqcloud.com/gc/xiongmao04_1/index.m3u8
+【成都】幼儿园A,http://gcksc.v.kcdnvip.com/gc/xiongmao05_1/index.m3u8
+【成都】幼儿园B,http://gcalic.v.myalicdn.com/gc/xiongmao06_1/index.m3u8
+【成都】成年园A,http://gccncc.v.wscdns.com/gc/xiongmao01_1/index.m3u8
+【成都】成年园B,http://gctxyc.liveplay.myqcloud.com/gc/xiongmao02_1/index.m3u8
+【成都】一号别墅A,http://gcalic.v.myalicdn.com/gc/xiongmao09_1/index.m3u8
+【成都】一号别墅B,http://gcksc.v.kcdnvip.com/gc/xiongmao10_1/index.m3u8
+【成都】母子园A,http://gccncc.v.wscdns.com/gc/xiongmao07_1/index.m3u8
+【成都】母子园B,http://gcksc.v.kcdnvip.com/gc/xiongmao08_1/index.m3u8
+【卧龙】臭水,http://gcksc.v.kcdnvip.com/gc/xiongmao17_1/index.m3u8'''
+    rooms = []
+    rlist = m3u.split('\n')
+    for i in range(len(rlist)):
+        roomitem = {}
+        rr = rlist[i].split(',')
+        roomitem['name'] = rr[0]
+        roomitem['href'] =  rr[1]
+        roomitem['thumb'] = ''
+        roomitem['info'] = {}
+        rooms.append(roomitem)
+    return rooms
+
+def get_ipanda_roomid(url):
+    return url
 #it之家    
 def get_ithome_categories():
     return [{'name':'直播列表','link':'https://www.ithome.com/live/'}]
