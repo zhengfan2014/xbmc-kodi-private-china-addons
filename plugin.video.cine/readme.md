@@ -150,6 +150,14 @@ http://gss3.baidu.com/shaufbwdusaf.mp4
 ---
 ## 	:rocket: 快速适配支持maccms采集的网站 `即将上线`
 
+### get_maccms_xml(api,url,keyword,page,banid,debug)
+
+> 对接支持maccms采集站的xml接口
+
+必须参数
+参数 |	格式
+:---- | :----
+api | 采集站接口的地址
 
 
 ---
