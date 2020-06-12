@@ -4,17 +4,17 @@
 
 ---
 ## :book: 目录
- * [开始使用](#开始使用)
+ * [:beginner: 开始使用](#beginner-开始使用)
    * [下载依赖](#下载依赖)
- * [开发文档](#开发文档)
+ * [:moyai: 开发文档](#moyai-开发文档)
    * [get_categories()函数中注册](#get_categories函数中注册)
    * [创建所需函数](#创建所需函数)
    * [get_xxx_categories()函数](#get_xxx_categories函数)
    * [get_xxx_videos(url,page)函数](#get_xxx_videosurlpage-函数)
    * [get_xxx_source(url)函数](#get_xxx_sourceurl-函数)
    * [get_xxx_mp4(url)函数](#get_xxx_mp4url-函数)
- * [快速适配支持maccms采集的网站 `即将上线`](#快速适配支持maccms采集的网站)
- * [内置函数](#内置函数)
+ * [:rocket: 快速适配支持maccms采集的网站 `即将上线`](#rocket-快速适配支持maccms采集的网站-即将上线)
+ * [:gear: 内置函数](#gear-内置函数)
    * [get_html()](#get_html)
    * [post_html()](#post_html)
    * [unix_to_data()](#unix_to_data)
