@@ -1,4 +1,4 @@
-# cine for kodi 0.1.0(说明还没有写好)
+# cine for kodi 0.1.0
 ## :black_nib: 简介
 - cine插件是一个电影网站聚合插件，它是vid插件的改进版，为适配电影网站而生
 
@@ -13,6 +13,7 @@
    * [get_xxx_videos(url,page)函数](#get_xxx_videosurlpage-函数)
    * [get_xxx_source(url)函数](#get_xxx_sourceurl-函数)
    * [get_xxx_mp4(url)函数](#get_xxx_mp4url-函数)
+ * [快速适配支持maccms采集的网站 `即将上线`](#快速适配支持maccms采集的网站)
  * [内置函数](#内置函数)
    * [get_html()](#get_html)
    * [post_html()](#post_html)
@@ -146,6 +147,11 @@ info | 字典，比如{'plot':'123'}具体参数参见kodi 的setinfo
 ```python
 http://gss3.baidu.com/shaufbwdusaf.mp4
 ```
+---
+## 	:rocket: 快速适配支持maccms采集的网站 `即将上线`
+
+
+
 ---
 ## :gear: 内置函数
 
