@@ -218,6 +218,80 @@ debug模式功能：
 
  - 检测搜索不同关键词是否输出相似度极高的结果
 
+### 快速适配采集站示例
+
+我们以适配卧龙资源为例子
+
+先走一套常规流程
+
+在get_categories()函数中“注册”
+
+```python
+{'id':2,'name':'卧龙资源','link':'wolongzy','author':'zhengfan2014','upload':'2020-6-12'}
+```
+创建对应函数，注意，get_wolongzy的wolongzy是由上一步的link的值决定的
+```python
+#显示对应网站分类的函数
+get_wolongzy_categories():
+    return 
+#输出视频列表的函数
+get_wolongzy_videos(url,page):
+    return 
+#输出视频多条播放线路列表和选集列表的函数
+get_wolongzy_source(url):
+    return 
+#输出视频真实播放地址函数
+get_wolongzy_mp4(url):
+    return 
+#输出视频简介信息等函数
+get_wolongzy_mp4info(url):
+    return 
+#输出搜索结果函数
+get_wolongzy_search(url):
+    return 
+```
+然后，你只需要拿到卧龙资源的接口地址，注意是要直接输出m3u8视频地址的接口，
+```
+https://cj.wlzy.tv/inc/s_api_mac_m3u8.php
+```
+接着，看清楚你的接口输出的是xml还是json，用chrome查看源代码判断。含有一堆<>的就是xml ，有大量的{}就是json接口
+
+这里以xml接口举例，知道接口类型了，接下来就是调用get_maccms函数对接了
+
+以下四个，传入什么函数，就照抄进get_maccms_xml函数里
+```python
+#显示对应网站分类的函数
+get_wolongzy_categories():
+    return get_maccms_xml('https://cj.wlzy.tv/inc/s_api_mac_m3u8.php')
+#输出视频列表的函数
+get_wolongzy_videos(url,page):
+    return get_maccms_xml('https://cj.wlzy.tv/inc/s_api_mac_m3u8.php',url=url,page=page)
+#输出视频多条播放线路列表和选集列表的函数
+get_wolongzy_source(url):
+    return get_maccms_xml('https://cj.wlzy.tv/inc/s_api_mac_m3u8.php',url=url)
+#输出搜索结果函数
+get_wolongzy_search(keyword,page):
+    return get_maccms_xml('https://cj.wlzy.tv/inc/s_api_mac_m3u8.php',keyword=keyword,page=page)
+```
+
+get_xxx_mp4也是照抄，不过不用调用get_maccms_xml函数，因为get_wolongzy_source输出的就是真实视频地址了，
+```python
+#输出视频真实播放地址函数
+get_wolongzy_mp4(url):
+    return url
+```
+至于get_xxx_mp4info函数它比较特殊，因为单url的类型已经被get_xxx_source抢了，所以只能用那些上面没用到的类型，比如url和keyword同时传入，就是上面没有的，这时就会输出mp4info(url)的内容
+
+ > 实际上get_maccms_xml函数输出mp4info的内容并不需要调用url参数和keyword的值，所以这两个值可以随便乱填，不影响内容生成
+
+```python
+#输出视频简介信息等函数
+get_wolongzy_mp4info(url):
+    return get_maccms_xml('https://cj.wlzy.tv/inc/s_api_mac_m3u8.php',url='url',keyword='123')
+```
+这样，一个资源站就适配好了，你可以尽情用kodi享受在线电影 电视剧 ~~无处不在的赌场广告~~ 了
+
+
 ---
 ## :gear: 内置函数
 
