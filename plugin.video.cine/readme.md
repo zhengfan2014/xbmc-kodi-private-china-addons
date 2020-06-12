@@ -154,11 +154,14 @@ http://gss3.baidu.com/shaufbwdusaf.mp4
 
 > 对接支持maccms采集站的xml接口
 
-必须参数
+#### 必须参数
 参数 |	格式
 :---- | :----
 api | 采集站接口的地址
 
+#### 可选参数 - url,keyword,page
+
+get_maccms_xml通过传入的可选参数来决定输出的内容
 
 ---
 ## :gear: 内置函数
