@@ -1,9 +1,9 @@
 # cine for kodi 0.1.0(说明还没有写好)
-## :black_nib:简介
+## :black_nib: 简介
 - cine插件是一个电影网站聚合插件，它是vid插件的改进版，为适配电影网站而生
 
 ---
-## :book:目录
+## :book: 目录
  * [开始使用](#开始使用)
    * [下载依赖](#下载依赖)
  * [开发文档](#开发文档)
@@ -20,7 +20,7 @@
 
 ---
 
-## :beginner:开始使用
+## :beginner: 开始使用
 
 ### 下载依赖
 
@@ -34,7 +34,7 @@
 
 ---
 
-## :moyai:开发文档 
+## :moyai: 开发文档 
 
 本插件和bangumi插件的开发文档通用
 
@@ -147,7 +147,7 @@ info | 字典，比如{'plot':'123'}具体参数参见kodi 的setinfo
 http://gss3.baidu.com/shaufbwdusaf.mp4
 ```
 ---
-## :gear:内置函数
+## :gear: 内置函数
 
 ### get_html()
 
