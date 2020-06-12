@@ -161,7 +161,15 @@ api | 采集站接口的地址
 
 #### 可选参数 - url,keyword,page
 
-get_maccms_xml通过传入的可选参数来决定输出的内容
+get_maccms_xml函数通过传入的可选参数类型来决定输出的内容
+
+参数                     |	url | keyword | page
+:----                    | :----: | :----: | :----:
+get_xxx_categories()     | 
+get_xxx_videos(url,page) | :heavy_check_mark: | | :heavy_check_mark: 
+get_xxx_source(url)      | :heavy_check_mark: | | 
+
+get_xxx_mp4info(url) : 除以上的组合之外的其他传入类型
 
 ---
 ## :gear: 内置函数
