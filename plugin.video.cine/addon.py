@@ -14,8 +14,12 @@ import HTMLParser
 import re
 import cfscrape
 import random
-
-
+import urllib
+import xml.etree.ElementTree as ET
+import difflib
+ 
+def diff_float(s1, s2):
+    return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
 
 def unescape(string):
     string = urllib2.unquote(string).decode('utf8')
@@ -53,7 +57,7 @@ def chushihua(key,default):
     return value
 
 @plugin.cached(TTL=2)
-def get_html(url,ua='pc',cf='',mode='html'):
+def get_html(url,ua='pc',cf='',mode='html',encode='utf-8'):
     if cf == '':
         if ua == 'pc':
             r = requests.get(url,headers=headers)
@@ -65,7 +69,10 @@ def get_html(url,ua='pc',cf='',mode='html'):
             r = requests.get(url,headers=ipadheaders)
         if ua == 'mac':
             r = requests.get(url,headers=macheaders)
-        r.encoding = 'utf-8'
+        if encode == 'utf-8':
+            r.encoding = 'utf-8'
+        if encode == 'gbk':
+            r.encoding = 'gbk'
         if mode == 'url':
             html = r.url
         else:
@@ -87,7 +94,12 @@ def get_html(url,ua='pc',cf='',mode='html'):
         if ua == 'mac':
             s = scraper.get_tokens(url,headers=macheaders)
             r = requests.get(url,headers=macheaders,cookies=s[0])
-        r.encoding = 'utf-8'
+
+        if encode == 'utf-8':
+            r.encoding = 'utf-8'
+        if encode == 'gbk':
+            r.encoding = 'gbk'
+
         if mode == 'url':
             html = r.url
         else:
@@ -95,7 +107,7 @@ def get_html(url,ua='pc',cf='',mode='html'):
     return html
 
 @plugin.cached(TTL=2)
-def post_html(url,data,ua='pc',cf=''):
+def post_html(url,data,ua='pc',cf='',encode='utf-8'):
     data =eval(data)
     if cf == '':
         if ua == 'pc':
@@ -108,7 +120,11 @@ def post_html(url,data,ua='pc',cf=''):
             r = requests.post(url,headers=ipadheaders,data=data)
         if ua == 'mac':
             r = requests.post(url,headers=macheaders,data=data)
-        r.encoding = 'utf-8'
+        
+        if encode == 'utf-8':
+            r.encoding = 'utf-8'
+        if encode == 'gbk':
+            r.encoding = 'gbk'
         html = r.text
     else:
         scraper = cfscrape.create_scraper()
@@ -170,7 +186,17 @@ def get_search_mode(keyword,page,mode):
 def get_categories():
     return [{'id':1,'name':'喜欢看影视(138vcd.com)','link':'138vcd','author':'zhengfan2014','upload':'2020-5-7','videos':48,'search':36},
             {'id':2,'name':'片库(pianku.tv)','link':'pianku','author':'zhengfan2014','upload':'2020-5-7','videos':42,'search':10},
-            {'id':3,'name':'老豆瓣(laodouban.com)','link':'laodouban','author':'zhengfan2014','upload':'2020-5-7','videos':12,'search':10}]
+            {'id':3,'name':'老豆瓣(laodouban.com)','link':'laodouban','author':'zhengfan2014','upload':'2020-5-7','videos':12,'search':10},
+            {'id':4,'name':'美剧天堂(meijutt.tv)','link':'meijutt','author':'zhengfan2014','upload':'2020-5-23','videos':20,'search':20},
+            {'id':5,'name':'豆瓣电影资源(douban777.com)','link':'douban777','author':'zhengfan2014','upload':'2020-6-10','videos':20},
+            {'id':6,'name':'快影资源(kyzy.tv)','link':'kyzy','author':'zhengfan2014','upload':'2020-6-10','videos':20},
+            {'id':7,'name':'卧龙资源(wlzy.tv)','link':'wlzy','author':'zhengfan2014','upload':'2020-6-10','videos':25},
+            {'id':8,'name':'OK资源(okzyw.com)','link':'okzy','author':'zhengfan2014','upload':'2020-6-11','videos':30},
+            {'id':9,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':10,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40},
+            {'id':11,'name':'采集资源(caijizy.vip)','link':'caijizy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':12,'name':'极快资源(jikzy.com)','link':'jikzy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':13,'name':'哈酷资源(666zy.com)','link':'666zy','author':'zhengfan2014','upload':'2020-6-12','videos':20}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -449,9 +475,229 @@ def get_laodouban_search(keyword,page):
     #     videos.append(videoitem)
     return videos
 
-##########################################################
+#美剧天堂
+def get_meijutt_categories():
+    return [{"name": "魔幻/科幻", "link": "https://www.meijutt.tv/file/list1"},
+          {"name": "灵异/惊悚", "link": "https://www.meijutt.tv/file/list2"}, 
+          {"name": "都市/情感", "link": "https://www.meijutt.tv/file/list3"},
+          {"name": "犯罪/历史", "link": "https://www.meijutt.tv/file/list4"},
+          {"name": "选秀/综艺", "link": "https://www.meijutt.tv/file/list5"},
+          {"name": "动漫/卡通", "link": "https://www.meijutt.tv/file/list6"}]
+
+def get_meijutt_videos(url,page):
+    videos = []
+    if page != 1:
+        url += '_' + str(page) + '.html'
+    else:
+        url += '.html'
+    r = get_html(url,encode='gbk')
+    soup = BeautifulSoup(r, "html5lib")
+    ilist = soup.find_all('div',class_='cn_box2')
+    for i in range(len(ilist)):
+        img = ilist[i].find('img')
+        a = ilist[i].find('a')
+        videoitem = {}
+        videoitem['name'] =  a['title']
+        videoitem['href'] =  'https://www.meijutt.tv' + a['href']
+        videoitem['thumb'] = img['src']
+        videos.append(videoitem)
+    return videos
+
+def get_meijutt_source(url):
+    videos = []
+    vid = re.search('[0-9]+(?=.html)',url).group()
+    r = get_html(url,encode='gbk')
+    r1 = get_html('https://www.meijutt.tv/video/'+str(vid)+'-0-0.html',encode='gbk')
+    jsurl = re.search('/playdata/[0-9]+/[0-9]+.js',r1).group()
+    r2 = get_html('https://www.meijutt.tv' + jsurl )
+    str1 = r2.find('var VideoListJson=')
+    str2 = r2.find(',urlinfo=')
+    cutjson = r2[str1+18:str2]
+    j = json.loads(cutjson)
+    
+
+    for index in range(len(j)):
+        if j[index][0] != u'百度网盘' and j[index][0] != u'西瓜影音':
+            duopname = j[index][0]
+            duopdict = {}
+            for i in range(len(j[index][1])):
+                duopdict[j[index][1][i][0]] = j[index][1][i][1]
+            videoitem = {}
+            videoitem['name'] = duopname
+            videoitem['href'] = str(duopdict)
+            videos.append(videoitem)
+    tmp['bghtml'] = r
+    return videos
+
+def get_meijutt_mp4(url):
+    if re.search('m3u8',url):
+        if re.search('9m3u8',url):
+            url = url.replace('9m3u8','m3u8')
+    else:
+        url = url[:-5] + url[-4:]
+        
+        domain = re.search('(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})',url).group()
+        r = get_html(url)
+        url = domain + re.search('(?<=\")[\S]+.m3u8\?sign\=[a-z0-9]+',r).group()
+        # dialog = xbmcgui.Dialog()
+        # dialog.textviewer('错误提示', domain)
+    return url
+
+def get_meijutt_search(keyword,page):
+    videos = []
+    if page == 1:
+        url = 'https://www.meijutt.tv/search/index.asp'
+        data = {'searchword':keyword.decode('utf-8').encode('gbk')}
+        r = post_html(url,data=str(data),encode='gbk')
+    else:
+        url = 'https://www.meijutt.tv/search/index.asp?page='+str(page)+'&searchword='+(urllib.quote(keyword.decode('utf-8').encode('gbk')).encode('utf-8'))+'&searchtype=-1'
+        r = get_html(url,encode='gbk')
+    soup = BeautifulSoup(r, "html5lib")
+    ilist = soup.find_all('div',class_='cn_box2')
+    for i in range(len(ilist)):
+        img = ilist[i].find('img')
+        a = ilist[i].find('a')
+        videoitem = {}
+        videoitem['name'] =  a['title']
+        videoitem['href'] =  'https://www.meijutt.tv' + a['href']
+        videoitem['thumb'] = img['src']
+        videos.append(videoitem)
+    return videos
+
+#豆瓣资源
+def get_douban777_categories():
+    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',banid='1,2')
+
+def get_douban777_videos(url,page):
+    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url,page=page)
+
+def get_douban777_source(url):
+    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url)
+
+def get_douban777_mp4info(url):
+    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url,keyword='douban777')
+
+def get_douban777_mp4(url):
+    if url[:5] == 'https':
+        url = 'http' + url[5:]
+    return url
+
+# def get_douban777_search(keyword,page):
+#     return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',keyword=keyword,page=page)
+
+
+#快影资源
+def get_kyzy_categories():
+    return get_maccms_xml('https://www.kyzy.tv/api.php/kym3u8/vod/at/xml',banid='1,2,20')
+
+def get_kyzy_videos(url,page):
+    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,page=page)
+
+def get_kyzy_source(url):
+    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url)
+
+def get_kyzy_mp4info(url):
+    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,keyword='douban777')
+
+def get_kyzy_mp4(url):
+    return url
+
+def get_kyzy_search(keyword,page):
+    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',keyword=keyword,page=page)
+
+#卧龙资源
+def get_wlzy_categories():
+    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',banid='2,26,30,31')
+
+def get_wlzy_videos(url,page):
+    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url,page=page)
+
+def get_wlzy_source(url):
+    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url)
+
+def get_wlzy_mp4info(url):
+    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url,keyword='douban777')
+
+def get_wlzy_mp4(url):
+    return url
+
+# def get_wlzy_search(keyword,page):
+#     return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',keyword=keyword,page=page)
+
+#ok资源
+def get_okzy_categories():
+    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',banid='1,2,3,4,20,33')
+
+def get_okzy_videos(url,page):
+    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url,page=page)
+
+def get_okzy_source(url):
+    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url)
+
+def get_okzy_mp4info(url):
+    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url,keyword='douban777')
+
+def get_okzy_mp4(url):
+    return url
+
+# def get_okzy_search(keyword,page):
+#     return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',keyword=keyword,page=page)
+
+#麻花资源
+def get_mahuazy_categories():
+    return get_maccms_xml('https://www.mhapi123.com/inc/api.php',banid='1,2,4,49,42,44,46,38,54')
+
+def get_mahuazy_videos(url,page):
+    return get_maccms_xml('https://www.mhapi123.com/inc/api.php',url=url,page=page)
+
+def get_mahuazy_source(url):
+    return get_maccms_xml('https://www.mhapi123.com/inc/api.php',url=url)
+
+def get_mahuazy_mp4info(url):
+    return get_maccms_xml('https://www.mhapi123.com/inc/api.php',url=url,keyword='douban777')
+
+def get_mahuazy_mp4(url):
+    return url
+
+# def get_mahuazy_search(keyword,page):
+#     return get_maccms_xml('https://www.mhapi123.com/inc/api.php',keyword=keyword,page=page)
+
+#最大资源
+def get_zdziyuan_categories():
+    return get_maccms_xml('http://www.zdziyuan.com/inc/api_zuidam3u8.php',banid='1,2')
+
+def get_zdziyuan_videos(url,page):
+    return get_maccms_xml('http://www.zdziyuan.com/inc/api_zuidam3u8.php',url=url,page=page)
+
+def get_zdziyuan_source(url):
+    return get_maccms_xml('http://www.zdziyuan.com/inc/api_zuidam3u8.php',url=url)
+
+def get_zdziyuan_mp4info(url):
+    return get_maccms_xml('http://www.zdziyuan.com/inc/api_zuidam3u8.php',url=url,keyword='douban777')
+
+def get_zdziyuan_mp4(url):
+    return url
+#采集资源
+def get_caijizy_categories():
+    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',banid='1,2,27')
+
+def get_caijizy_videos(url,page):
+    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,page=page)
+
+def get_caijizy_source(url):
+    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url)
+
+def get_caijizy_mp4info(url):
+    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,keyword='douban777')
+
+def get_caijizy_mp4(url):
+    return url
+
+########################################################################################################################################
+########################################################################################################################################
 ###以下是核心代码区，看不懂的请勿修改
-##########################################################
+########################################################################################################################################
+########################################################################################################################################
 
 @plugin.route('/play/<name>/<url>/<mode>/')
 def play(name,url,mode):
@@ -467,6 +713,8 @@ def play(name,url,mode):
         item = {'label': name,'path':mp4,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
     except NameError:
         item = {'label': name,'path':mp4,'is_playable': True,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
+    dialog = xbmcgui.Dialog()
+    dialog.notification('亲，请勿轻信视频内非法广告！','天上不会掉馅饼，世上没有免费的午餐',xbmcgui.NOTIFICATION_INFO, 5000)
     items.append(item)
     return items
 
@@ -517,23 +765,24 @@ def source(name,url,img,mode):
 def category(name,url,mode,page):
     videos = get_videos_mode(url,mode,page)
     items = []
-    if 'info' in videos[0]:
-        for video in videos:
-            info = video['info']
-            info['mediatype'] = 'video'
-            items.append({'label': video['name'],
-            'path': plugin.url_for('source', name=video['name'].encode('utf-8'),url=video['href'],img=video['thumb'], mode=mode),
-    	'thumbnail': video['thumb'],
-            'icon': video['thumb'],
-            'info': info,
-        })
-    else:
-        for video in videos:
-            items.append({'label': video['name'],
-            'path': plugin.url_for('source', name=video['name'].encode('utf-8'),url=video['href'],img=video['thumb'], mode=mode),
-    	'thumbnail': video['thumb'],
-            'icon': video['thumb'],
-        })
+    if videos != []:
+        if 'info' in videos[0]:
+            for video in videos:
+                info = video['info']
+                info['mediatype'] = 'video'
+                items.append({'label': video['name'],
+                'path': plugin.url_for('source', name=video['name'].encode('utf-8'),url=video['href'],img=video['thumb'], mode=mode),
+    	    'thumbnail': video['thumb'],
+                'icon': video['thumb'],
+                'info': info,
+            })
+        else:
+            for video in videos:
+                items.append({'label': video['name'],
+                'path': plugin.url_for('source', name=video['name'].encode('utf-8'),url=video['href'],img=video['thumb'], mode=mode),
+    	    'thumbnail': video['thumb'],
+                'icon': video['thumb'],
+            })
 
     categories = get_categories()
     for index in range(len(categories)):
@@ -889,5 +1138,465 @@ def show_label(label):
     ]
     return items
 
+########################################################################################################################################
+########################################################################################################################################
+#####以下是本插件独占代码，bangumi插件没有 - 用于让用户快速对接支持maccms等采集站
+########################################################################################################################################
+########################################################################################################################################
+
+def get_xml(url,t=1,debug='no'):
+    if debug == 'no':
+        if t == 1:
+            value = get_xml_1hour(url)
+        if t == 24:
+            value = get_xml_1day(url)
+    else:
+        r = requests.get(url,headers=headers)
+        r.encoding = 'utf-8'
+        r = r.text
+        value = ET.fromstring(r.encode('utf-8'))
+    return value
+ 
+@plugin.cached(TTL=60)
+def get_xml_1hour(url):
+    r = requests.get(url,headers=headers)
+    r.encoding = 'utf-8'
+    r = r.text
+    value = ET.fromstring(r.encode('utf-8'))
+    return value
+
+@plugin.cached(TTL=60*24)
+def get_xml_1day(url):
+    r = requests.get(url,headers=headers)
+    r.encoding = 'utf-8'
+    r = r.text
+    value = ET.fromstring(r.encode('utf-8'))
+    return value
+
+def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
+    if url != 0 and page != 0 and keyword == 0:
+        #分类视频列表
+        root = get_xml(api + '?ac=videolist&t=' + str(url) + '&pg=' + str(page),debug=debug)
+        typelist = []
+        lis = root.find('list')
+        if int(lis.get('recordcount')) != 0:
+            dialog = xbmcgui.Dialog()
+            dialog.notification('第' + str(page) + '/' + lis.get('pagecount') + '页', '共' + lis.get('recordcount') + '个结果', xbmcgui.NOTIFICATION_INFO, 5000,False)
+            for vide in lis.findall('video'):
+                videoitem = {}
+                videoitem['name'] = vide.find('name').text
+                videoitem['href'] =  vide.find('id').text
+                videoitem['thumb'] = vide.find('pic').text
+                
+                videoitem['info'] = {}
+                videoitem['info']['title'] = vide.find('name').text
+                plot = unicode(vide.find('des').text)
+                plot = re.sub('<.*?>','',plot)
+                plot = re.sub('&#?[a-z0-9]+;','',plot)
+                plot = plot.replace(u'None','')
+                videoitem['info']['plot'] = plot
+                videoitem['info']['dateadded'] = vide.find('last').text
+                videoitem['info']['genre'] = [vide.find('type').text]        
+                videoitem['info']['country'] = [vide.find('area').text]
+                videoitem['info']['year'] = vide.find('year').text
+
+                #演员
+                acto = unicode(vide.find('actor').text)
+                if acto.find(u',') != -1:
+                    actor = acto.split(u',')
+                else:
+                    actor = [acto]
+                videoitem['info']['cast'] = actor
+
+                #导演
+                directo = unicode(vide.find('director').text)
+                if directo.find(u',') != -1:
+                    director = directo.split(u',')
+                else:
+                    director = directo
+                videoitem['info']['director'] = director
+                videoitem['info']['mediatype'] = 'video'
+                typelist.append(videoitem)
+            
+    else:
+        if url == 0 and keyword != 0 and page != 0:
+            #搜索列表
+            root = get_xml(api + '?ac=videolist&wd=' + str(keyword) + '&pg=' + str(page),debug=debug)
+            typelist = []
+            lis = root.find('list')
+            if int(lis.get('recordcount')) != 0:
+                dialog = xbmcgui.Dialog()
+                dialog.notification('第' + str(page) + '/' + lis.get('pagecount') + '页', '共' + lis.get('recordcount') + '个结果', xbmcgui.NOTIFICATION_INFO, 5000,False)
+                for vide in lis.findall('video'):
+                    videoitem = {}
+                    videoitem['name'] = vide.find('name').text
+                    videoitem['href'] =  vide.find('id').text
+                    videoitem['thumb'] = vide.find('pic').text
+                
+                    videoitem['info'] = {}
+                    videoitem['info']['title'] = vide.find('name').text
+                    plot = unicode(vide.find('des').text)
+                    plot = re.sub('<.*?>','',plot)
+                    plot = re.sub('&#?[a-z0-9]+;','',plot)
+                    plot = plot.replace(u'None','')
+                    videoitem['info']['plot'] = plot
+                    videoitem['info']['dateadded'] = vide.find('last').text
+                    videoitem['info']['genre'] = [vide.find('type').text]        
+                    videoitem['info']['country'] = [vide.find('area').text]
+                    videoitem['info']['year'] = vide.find('year').text
+
+                    #演员
+                    acto = unicode(vide.find('actor').text)
+                    if acto.find(u',') != -1:
+                        actor = acto.split(u',')
+                    else:
+                        actor = [acto]
+                    videoitem['info']['cast'] = actor
+
+                    #导演
+                    directo = unicode(vide.find('director').text)
+                    if directo.find(u',') != -1:
+                        director = directo.split(u',')
+                    else:
+                        director = directo
+                    videoitem['info']['director'] = director
+                    videoitem['info']['mediatype'] = 'video'
+                    typelist.append(videoitem)
+        else:
+            if url != 0 and keyword == 0 and page == 0:
+                #资源列表
+                root = get_xml(api + '?ac=videolist&ids=' + str(url),debug=debug,t=24)
+                typelist = []
+                dl = root.find('list').find('video').find('dl')
+                
+                for dd in dl.findall('dd'):
+                    duopname = dd.get('flag')
+                    strduop = unicode(dd.text)
+                    duopdict = {}
+                    if strduop.find(u'#') != -1:
+                        duoplist = strduop.split(u'#')
+                        for index in range(len(duoplist)):
+                            cut = duoplist[index].split(u'$')
+                            duopdict[cut[0]] = cut[1]
+                    else:
+                        cut = strduop.split(u'$')
+                        duopdict[cut[0]] = cut[1]
+                    typelist.append({'name':duopname,'href':str(duopdict)})
+                tmp['maccmsids'] = url
+                
+            else:
+                if url == 0 and keyword == 0 and page == 0:
+                    #分类列表
+                    root = get_xml(api + '?ac=list',debug=debug,t=24)
+                    clas = root.find('class')
+                    typelist = []
+                    #debug
+                    if debug != 'no':
+                        pDialog = xbmcgui.DialogProgress()
+                        pDialog.create('Debug模式', '收集信息中...')
+                        banlist = ''
+                        dnum = 1
+                        pagesize = '0'
+                        num = 1
+                    for ty in clas.findall('ty'):
+                        #debug
+                        if debug != 'no':
+                            tid = ty.get('id')
+                            root1 = get_xml(api + '?ac=videolist&pg=1&t=' + tid,debug=debug)
+                            lis1 = root1.find('list')
+                            pagesize = str(lis1.get('pagesize'))
+                            num = (float(dnum)/float(len(clas.findall('ty'))))*100
+                            dnum += 1
+                            pDialog.update(int(num), '收集信息中...' + str(round(num,2)) + '%')
+                            if int(lis1.get('recordcount')) <= int(lis1.get('pagesize')):
+                                banlist += ty.text.encode('utf-8') + '  ' + tid + '\n'
+                        if banid != '':
+                            if re.search(',',banid):
+                                banidlist = banid.split(',')
+                            else:
+                                banidlist = [banid]
+                            if str(ty.get('id')) not in banidlist:
+                                typelist.append({'name':ty.text.encode('utf-8'),'link':ty.get('id')})
+                        else:
+                            typelist.append({'name':ty.text.encode('utf-8'),'link':ty.get('id')})
+                    #debug
+                    if debug != 'no':
+                        txt = '建议banid：\n'
+                        txt += str(banlist)
+                        if pagesize != '0':
+                            txt += '\n'
+                            txt += '-'*50
+                            txt += '\n建议设置的video值：' + pagesize + '\n'
+                        #搜索可用判断
+                        pDialog.update(50, '测试搜索中(1/2)...')
+                        r2 = get_html(api + '?ac=videolist&wd=万万')
+                        pDialog.update(100, '测试搜索中(2/2)...')
+                        r3 = get_html(api + '?ac=videolist&wd=季')
+                        txt += '-'*50
+                        txt += '\n搜索api可用情况：'
+                        if diff_float(r2,r3) > 0.95:
+                            txt += '不同关键词搜索结果相似度' + str(round(diff_float(r2,r3)*100,2)) + '%，高于95%，判断此搜索api不可用，建议屏蔽搜索功能'
+                        else:
+                            txt += '不同关键词搜索结果相似度' + str(round(diff_float(r2,r3)*100,2)) + '%，低于95%，判断此搜索api可用'
+                        dialog = xbmcgui.Dialog()
+                        dialog.textviewer('debug',txt)
+                else:
+                    #mp4info
+                    info = {}
+                    root = get_xml(api + '?ac=videolist&ids=' + tmp['maccmsids'],debug=debug,t=24)
+                    vide = root.find('list').find('video')
+                    info['title'] = vide.find('name').text
+                    plot = unicode(vide.find('des').text)
+                    plot = re.sub('<.*?>','',plot)
+                    plot = re.sub('&#?[a-z0-9]+;','',plot)
+                    plot = plot.replace(u'None','')
+                    info['plot'] = plot
+                    info['dateadded'] = vide.find('last').text
+                    info['genre'] = [vide.find('type').text]
+                    info['country'] = [vide.find('area').text]
+                    info['year'] = vide.find('year').text
+
+                    #演员
+                    acto = unicode(vide.find('actor').text)
+                    if acto.find(u',') != -1:
+                        actor = acto.split(u',')
+                    else:
+                        actor = [acto]
+                    info['cast'] = actor
+
+                    #导演
+                    directo = unicode(vide.find('director').text)
+                    if directo.find(u',') != -1:
+                        director = directo.split(u',')
+                    else:
+                        director = directo
+                    info['director'] = director
+                    info['mediatype'] = 'video'
+                    typelist = info
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(xx.encode('utf-8')))
+
+    return typelist
+########################################################################################################################################
+########################################################################################################################################
+#####json
+########################################################################################################################################
+########################################################################################################################################
+def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
+    if url != 0 and page != 0 and keyword == 0:
+        #分类视频列表
+        r = get_h(api + '?ac=videolist&t=' + str(url) + '&pg=' + str(page))
+        j = json.loads(r)
+        typelist = []
+        lis = j['list']
+        if int(j['total']) != 0:
+            dialog = xbmcgui.Dialog()
+            dialog.notification('第' + str(page) + '/' + str(j['pagecount']) + '页', '共' + str(j['total']) + '个结果', xbmcgui.NOTIFICATION_INFO, 5000,False)
+            for i in range(len(lis)):
+                videoitem = {}
+                videoitem['name'] = lis[i]['vod_name']
+                videoitem['href'] =  lis[i]['vod_id']
+                videoitem['thumb'] = lis[i]['vod_pic']
+                
+                videoitem['info'] = {}
+                videoitem['info']['title'] = lis[i]['vod_name']
+                videoitem['info']['dateadded'] = lis[i]['vod_time']
+                videoitem['info']['country'] = [lis[i]['vod_area']]
+                videoitem['info']['year'] = lis[i]['vod_year']
+                plot = lis[i]['vod_content']
+                plot = re.sub('<.*?>','',plot)
+                plot = re.sub('&#?[a-z0-9]+;','',plot)
+                plot = plot.replace('None','')
+                videoitem['info']['plot'] = plot
+                #分类
+                genr = lis[i]['vod_class']
+                if genr.find(u',') != -1:
+                    genre = genr.split(u',')
+                else:
+                    genre = [genr]
+                videoitem['info']['genre'] = genre
+
+                #演员
+                acto = lis[i]['vod_actor']
+                if acto.find(u',') != -1:
+                    actor = acto.split(u',')
+                else:
+                    actor = [acto]
+                videoitem['info']['cast'] = actor
+
+                #导演
+                directo = lis[i]['vod_director']
+                if directo.find(u',') != -1:
+                    director = directo.split(u',')
+                else:
+                    director = directo
+                videoitem['info']['director'] = director
+                videoitem['info']['mediatype'] = 'video'
+                typelist.append(videoitem)
+            
+    else:
+        if url == 0 and keyword != 0 and page != 0:
+            #搜索列表
+            r = get_h(api + '?ac=videolist&wd=' + str(keyword) + '&pg=' + str(page))
+            j = json.loads(r)
+            typelist = []
+            lis = j['list']
+            if int(j['total']) != 0:
+                dialog = xbmcgui.Dialog()
+                dialog.notification('第' + str(page) + '/' + str(j['pagecount']) + '页', '共' + str(j['total']) + '个结果', xbmcgui.NOTIFICATION_INFO, 5000,False)
+                for i in range(len(lis)):
+                    videoitem = {}
+                    videoitem['name'] = lis[i]['vod_name']
+                    videoitem['href'] =  lis[i]['vod_id']
+                    videoitem['thumb'] = lis[i]['vod_pic']
+                
+                    videoitem['info'] = {}
+                    videoitem['info']['title'] = lis[i]['vod_name']
+                    videoitem['info']['dateadded'] = lis[i]['vod_time']
+                    videoitem['info']['country'] = [lis[i]['vod_area']]
+                    videoitem['info']['year'] = lis[i]['vod_year']
+
+                    plot = lis[i]['vod_content']
+                    plot = re.sub('<.*?>','',plot)
+                    plot = re.sub('&#?[a-z0-9]+;','',plot)
+                    plot = plot.replace(u'None','')
+                    videoitem['info']['plot'] = plot
+                    #分类
+                    genr = lis[i]['vod_class']
+                    if genr.find(u',') != -1:
+                        genre = genr.split(u',')
+                    else:
+                        genre = [genr]
+                    videoitem['info']['genre'] = genre
+
+                    #演员
+                    acto = lis[i]['vod_actor']
+                    if acto.find(u',') != -1:
+                        actor = acto.split(u',')
+                    else:
+                        actor = [acto]
+                    videoitem['info']['cast'] = actor
+
+                    #导演
+                    directo = lis[i]['vod_director']
+                    if directo.find(u',') != -1:
+                        director = directo.split(u',')
+                    else:
+                        director = directo
+                    videoitem['info']['director'] = director
+                    videoitem['info']['mediatype'] = 'video'
+                    typelist.append(videoitem)
+        else:
+            if url != 0 and keyword == 0 and page == 0:
+                #资源列表
+                r = get_h(api + '?ac=videolist&ids=' + str(url))
+                j = json.loads(r)
+                typelist = []
+                dl = j['list'][0]
+                
+                duopname = dl['vod_play_from']
+                strduop = dl['vod_play_url']
+                duopdict = {}
+                if strduop.find(u'#') != -1:
+                    duoplist = strduop.split(u'#')
+                    for index in range(len(duoplist)):
+                        cut = duoplist[index].split(u'$')
+                        duopdict[cut[0]] = cut[1]
+                else:
+                    cut = strduop.split(u'$')
+                    duopdict[cut[0]] = cut[1]
+                typelist.append({'name':duopname,'href':str(duopdict)})
+                tmp['maccmsids'] = url
+                
+            else:
+                if url == 0 and keyword == 0 and page == 0:
+                    #分类列表
+                    r = get_h(api + '?ac=list')
+                    j = json.loads(r)
+                    typelist = []
+                    #debug
+                    if debug != 'no':
+                        pDialog = xbmcgui.DialogProgress()
+                        pDialog.create('Debug模式', '收集信息中...')
+                        banlist = ''
+                        dnum = 1
+                        pagesize = '0'
+                        num = 1
+                    for i in range(len(j['class'])):
+                        #debug
+                        if debug != 'no':
+                            tid = j['class'][i]['type_id']
+                            r1 = get_h(api + '?ac=videolist&pg=1&t=' + tid)
+                            j1 = json.loads(r1)
+                            pagesize = str(j['pagesize'])
+                            num = (float(dnum)/float(len(j['class'])))*100
+                            dnum += 1
+                            pDialog.update(int(num), '收集信息中...' + str(round(num,2)) + '%')
+                            if int(j['recordcount']) <= int(j['pagesize']):
+                                banlist += j['class'][i]['type_name'].encode('utf-8') + '  ' + tid + '\n'
+                        if banid != '':
+                            if re.search(',',banid):
+                                banidlist = banid.split(',')
+                            else:
+                                banidlist = [banid]
+                            if str(j['class'][i]['type_id']) not in banidlist:
+                                typelist.append({'name':j['class'][i]['type_name'].encode('utf-8'),'link':j['class'][i]['type_id']})
+                        else:
+                            typelist.append({'name':j['class'][i]['type_name'].encode('utf-8'),'link':j['class'][i]['type_id']})
+                    #debug
+                    if debug != 'no':
+
+                        txt = '建议banid：\n'
+                        txt += str(banlist)
+                        if pagesize != '0':
+                            txt += '\n\n建议设置的video值：' + pagesize
+                        dialog = xbmcgui.Dialog()
+                        dialog.textviewer('debug',txt)
+                else:
+                    #mp4info
+                    info = {}
+                    r = get_h(api + '?ac=videolist&ids=' + tmp['maccmsids'])
+                    j = json.loads(r)
+                    typelist = []
+                    vide = j['list'][0]
+                    info['title'] = vide['vod_name']
+                    plot = vide['vod_content']
+                    plot = re.sub('<.*?>','',plot)
+                    plot = re.sub('&#?[a-z0-9]+;','',plot)
+                    plot = plot.replace(u'None','')
+                    info['plot'] = plot
+                    info['dateadded'] = vide['vod_time']
+                    info['country'] = [vide['vod_area']]
+                    info['year'] = vide['vod_year']
+
+                    #分类
+                    genr = vide['vod_class']
+                    if genr.find(u',') != -1:
+                        genre = genr.split(u',')
+                    else:
+                        genre = [genr]
+                    info['genre'] = genre
+
+                     #演员
+                    acto = vide['vod_actor']
+                    if acto.find(u',') != -1:
+                        actor = acto.split(u',')
+                    else:
+                        actor = [acto]
+                    info['cast'] = actor
+
+                    #导演
+                    directo = vide['vod_director']
+                    if directo.find(u',') != -1:
+                        director = directo.split(u',')
+                    else:
+                        director = directo
+                    info['director'] = director
+                    info['mediatype'] = 'video'
+                    typelist = info
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(xx.encode('utf-8')))
+
+    return typelist
 if __name__ == '__main__':
     plugin.run()
