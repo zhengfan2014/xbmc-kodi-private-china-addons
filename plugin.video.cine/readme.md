@@ -7,9 +7,9 @@
  * 开始使用
    * [下载依赖](#下载依赖)
  * 开发文档
-   * get_categories()函数中“注册”
-   * 创建所需函数
-   * get_xxx_categories() 函数
+   * [get_categories()函数中“注册”](#get_categories()函数中“注册”)
+   * [创建所需函数](#创建所需函数)
+   * [get_xxx_categories\(\) 函数](#get_xxx_categories\(\) 函数)
    * get_xxx_videos(url,page) 函数
    * get_xxx_source(url) 函数
    * get_xxx_mp4(url) 函数
