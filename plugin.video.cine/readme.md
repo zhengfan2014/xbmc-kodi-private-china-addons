@@ -3,6 +3,14 @@
 - cine插件是一个电影网站聚合插件，它是vid插件的改进版，为适配电影网站而生
 
 ---
+## 目录
+ * 开始使用
+   * 下载依赖
+ * 开发文档
+   * get_categories()函数中“注册”
+   * 创建所需函数
+   * get_xxx_categories() 函数
+
 ## 开始使用
 
 ### 下载依赖
@@ -25,7 +33,7 @@
 
 你需要在👇
 
-### 1.get_categories()函数中“注册”
+### get_categories()函数中“注册”
 
 ```python
 def get_categories():
