@@ -150,9 +150,10 @@ http://gss3.baidu.com/shaufbwdusaf.mp4
 ---
 ## 	:rocket: 快速适配支持maccms采集的网站 `即将上线`
 
-### get_maccms_xml(api,url,keyword,page,banid,debug)
+### get_maccms_xxx(api,url,keyword,page,banid,debug)
 
-> 对接支持maccms采集站的xml接口
+> 对接支持maccms采集站的接口  
+> json接口请使用get_maccms_json函数，xml接口请使用get_maccms_xml函数
 
 #### 必须参数
 参数 |	格式
@@ -161,7 +162,7 @@ api | 采集站接口的地址
 
 #### 可选参数 - url,keyword,page
 
-get_maccms_xml函数通过传入的可选参数类型来决定输出的内容
+get_maccms_xxx函数通过传入的可选参数类型来决定输出的内容
 
 
 参数                     |	url | keyword | page
@@ -177,9 +178,9 @@ get_xxx_mp4info(url) : url,keyword,page共有2³=8的组合结果，除以上的
 
 此参数用于屏蔽一些空内容或者少内容的视频分类
 
-仅在get_maccms_xml函数输出符合get_xxx_categories()的内容时此可选参数生效
+仅在get_maccms_xxx函数输出符合get_xxx_categories()的内容时此可选参数生效
 
-格式：字符串，数字为视频分类id，可用chrome浏览器查看接口源代码获得，或者通过get_maccms_xml函数的debug模式获得
+格式：字符串，数字为视频分类id，可用chrome浏览器查看接口源代码获得，或者通过get_maccms_xxx函数的debug模式获得
 
 示例 - 屏蔽单个分类，id为1的电影分类
 ```python
@@ -189,6 +190,32 @@ banid='1'
 ```python
 banid='1,2,3'
 ```
+#### 可选参数 - debug
+
+此参数用于开启get_maccms_xxx函数的debug模式
+
+仅在get_maccms_xxx函数输出符合get_xxx_categories()的内容时此可选参数生效
+
+格式：设置一个非'no'的值
+示例
+```python
+debug='yes'
+```
+```python
+debug='123'
+```
+```python
+debug='y'
+```
+以上示例均能启用debug模式
+
+debug模式功能：
+
+ - 检测每一个分类列表，是否为空
+
+ - 检测资源站输出视频列表的pagesize值，用于设置get_categories()函数中“注册”的video的值
+
+ - 检测搜索不同关键词是否输出相似度极高的结果
 
 ---
 ## :gear: 内置函数
