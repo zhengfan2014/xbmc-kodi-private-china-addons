@@ -169,8 +169,26 @@ get_maccms_xml函数通过传入的可选参数类型来决定输出的内容
 输出get_xxx_categories()内容     | 
 输出get_xxx_videos(url,page)内容 | :heavy_check_mark: | | :heavy_check_mark: 
 输出get_xxx_source(url)内容      | :heavy_check_mark: | | 
+输出get_xxx_search(url)内容      |  | :heavy_check_mark:| :heavy_check_mark: 
 
-get_xxx_mp4info(url) : url,keyword,page共有2³的组合结果，除以上的三种组合之外，其他的五种传入类型均输出符合get_xxx_mp4info(url) 的内容
+get_xxx_mp4info(url) : url,keyword,page共有2³=8的组合结果，除以上的四种组合之外，其他的四种传入类型均输出符合get_xxx_mp4info(url) 的内容
+
+#### 可选参数 - banid
+
+此参数用于屏蔽一些空内容或者少内容的视频分类
+
+仅在get_maccms_xml函数输出符合get_xxx_categories()的内容时此可选参数生效
+
+格式：字符串，数字为视频分类id，可用chrome浏览器查看接口源代码获得，或者通过get_maccms_xml函数的debug模式获得
+
+示例 - 屏蔽单个分类，id为1的电影分类
+```python
+banid='1'
+```
+示例 - 屏蔽多个分类，id为1的电影，id为2的电视剧和id为3的动漫
+```python
+banid='1,2,3'
+```
 
 ---
 ## :gear: 内置函数
