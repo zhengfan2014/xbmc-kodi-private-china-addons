@@ -163,13 +163,14 @@ api | 采集站接口的地址
 
 get_maccms_xml函数通过传入的可选参数类型来决定输出的内容
 
+
 参数                     |	url | keyword | page
 :----                    | :----: | :----: | :----:
-get_xxx_categories()     | 
-get_xxx_videos(url,page) | :heavy_check_mark: | | :heavy_check_mark: 
-get_xxx_source(url)      | :heavy_check_mark: | | 
+输出get_xxx_categories()内容     | 
+输出get_xxx_videos(url,page)内容 | :heavy_check_mark: | | :heavy_check_mark: 
+输出get_xxx_source(url)内容      | :heavy_check_mark: | | 
 
-get_xxx_mp4info(url) : 除以上的组合之外的其他传入类型
+get_xxx_mp4info(url) : url,keyword,page共有2³的组合结果，除以上的三种组合之外，其他的五种传入类型均输出符合get_xxx_mp4info(url) 的内容
 
 ---
 ## :gear: 内置函数
