@@ -197,6 +197,7 @@ banid='1,2,3'
 仅在get_maccms_xxx函数输出符合get_xxx_categories()的内容时此可选参数生效
 
 格式：设置一个非'no'的值
+
 示例
 ```python
 debug='yes'
