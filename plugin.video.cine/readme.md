@@ -10,6 +10,14 @@
 片库 | https://pianku.tv/
 老豆瓣 | https://laodouban.com/
 美剧天堂 | https://www.meijutt.tv/
+豆瓣电影资源 | http://douban777.com/
+快影资源 | https://kyzy.tv/
+卧龙资源 | https://wolongzy.net/
+OK资源 | https://www.okzyw.com/
+麻花资源 | http://www.mahuazy.net/
+最大资源 | http://www.zuidazy5.com/
+采集资源 | https://www.caijizy.vip/
+哈酷资源 | http://www.666zy.com/
 
 ----
 ## 更新历史
