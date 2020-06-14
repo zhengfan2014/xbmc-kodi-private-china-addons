@@ -194,8 +194,7 @@ def get_categories():
             {'id':8,'name':'OK资源(okzyw.com)','link':'okzy','author':'zhengfan2014','upload':'2020-6-11','videos':30},
             {'id':9,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
             {'id':10,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40},
-            {'id':11,'name':'采集资源(caijizy.vip)','link':'caijizy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
-            {'id':12,'name':'极快资源(jikzy.com)','link':'jikzy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':11,'name':'采集资源(caijizy.vip)','link':'caijizy','author':'zhengfan2014','upload':'2020-6-12','videos':35},
             {'id':13,'name':'哈酷资源(666zy.com)','link':'666zy','author':'zhengfan2014','upload':'2020-6-12','videos':20}]
 
 ##########################################################
@@ -588,7 +587,7 @@ def get_douban777_mp4(url):
 
 #快影资源
 def get_kyzy_categories():
-    return get_maccms_xml('https://www.kyzy.tv/api.php/kym3u8/vod/at/xml',banid='1,2,20')
+    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',banid='1,2,20')
 
 def get_kyzy_videos(url,page):
     return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,page=page)
@@ -677,6 +676,7 @@ def get_zdziyuan_mp4info(url):
 
 def get_zdziyuan_mp4(url):
     return url
+
 #采集资源
 def get_caijizy_categories():
     return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',banid='1,2,27')
@@ -691,6 +691,22 @@ def get_caijizy_mp4info(url):
     return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,keyword='douban777')
 
 def get_caijizy_mp4(url):
+    return url
+
+#哈酷资源
+def get_666zy_categories():
+    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',banid='1,2,27,36')
+
+def get_666zy_videos(url,page):
+    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url,page=page)
+
+def get_666zy_source(url):
+    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url)
+
+def get_666zy_mp4info(url):
+    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url,keyword='douban777')
+
+def get_666zy_mp4(url):
     return url
 
 ########################################################################################################################################
@@ -1382,11 +1398,39 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
 #####json
 ########################################################################################################################################
 ########################################################################################################################################
+def get_json(url,t=1,debug='no'):
+    if debug == 'no':
+        if t == 1:
+            value = get_json_1hour(url)
+        if t == 24:
+            value = get_json_1day(url)
+    else:
+        r = requests.get(url,headers=headers)
+        r.encoding = 'utf-8'
+        r = r.text
+        value = json.loads(r)
+    return value
+ 
+@plugin.cached(TTL=60)
+def get_json_1hour(url):
+    r = requests.get(url,headers=headers)
+    r.encoding = 'utf-8'
+    r = r.text
+    value = json.loads(r)
+    return value
+
+@plugin.cached(TTL=60*24)
+def get_json_1day(url):
+    r = requests.get(url,headers=headers)
+    r.encoding = 'utf-8'
+    r = r.text
+    value = json.loads(r)
+    return value
+
 def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
     if url != 0 and page != 0 and keyword == 0:
         #分类视频列表
-        r = get_h(api + '?ac=videolist&t=' + str(url) + '&pg=' + str(page))
-        j = json.loads(r)
+        j = get_json(api + '?ac=videolist&t=' + str(url) + '&pg=' + str(page),debug=debug)
         typelist = []
         lis = j['list']
         if int(j['total']) != 0:
@@ -1437,8 +1481,7 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
     else:
         if url == 0 and keyword != 0 and page != 0:
             #搜索列表
-            r = get_h(api + '?ac=videolist&wd=' + str(keyword) + '&pg=' + str(page))
-            j = json.loads(r)
+            j = get_json(api + '?ac=videolist&wd=' + str(keyword) + '&pg=' + str(page),debug=debug)
             typelist = []
             lis = j['list']
             if int(j['total']) != 0:
@@ -1489,8 +1532,7 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
         else:
             if url != 0 and keyword == 0 and page == 0:
                 #资源列表
-                r = get_h(api + '?ac=videolist&ids=' + str(url))
-                j = json.loads(r)
+                j = get_json(api + '?ac=videolist&ids=' + str(url),debug=debug,t=24)
                 typelist = []
                 dl = j['list'][0]
                 
@@ -1511,8 +1553,7 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
             else:
                 if url == 0 and keyword == 0 and page == 0:
                     #分类列表
-                    r = get_h(api + '?ac=list')
-                    j = json.loads(r)
+                    j = get_json(api + '?ac=list',debug=debug,t=24)
                     typelist = []
                     #debug
                     if debug != 'no':
@@ -1526,14 +1567,13 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
                         #debug
                         if debug != 'no':
                             tid = j['class'][i]['type_id']
-                            r1 = get_h(api + '?ac=videolist&pg=1&t=' + tid)
-                            j1 = json.loads(r1)
-                            pagesize = str(j['pagesize'])
+                            j1 = get_json(api + '?ac=videolist&pg=1&t=' + str(tid),debug=debug)
+                            pagesize = str(j['limit'])
                             num = (float(dnum)/float(len(j['class'])))*100
                             dnum += 1
                             pDialog.update(int(num), '收集信息中...' + str(round(num,2)) + '%')
-                            if int(j['recordcount']) <= int(j['pagesize']):
-                                banlist += j['class'][i]['type_name'].encode('utf-8') + '  ' + tid + '\n'
+                            if int(j1['total']) <= int(j1['limit']):
+                                banlist += j['class'][i]['type_name'].encode('utf-8') + '  ' + str(tid) + '\n'
                         if banid != '':
                             if re.search(',',banid):
                                 banidlist = banid.split(',')
@@ -1549,14 +1589,26 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
                         txt = '建议banid：\n'
                         txt += str(banlist)
                         if pagesize != '0':
-                            txt += '\n\n建议设置的video值：' + pagesize
+                            txt += '\n'
+                            txt += '-'*50
+                            txt += '\n建议设置的video值：' + pagesize + '\n'
+                        #搜索可用判断
+                        pDialog.update(50, '测试搜索中(1/2)...')
+                        r2 = get_html(api + '?ac=videolist&wd=万万')
+                        pDialog.update(100, '测试搜索中(2/2)...')
+                        r3 = get_html(api + '?ac=videolist&wd=季')
+                        txt += '-'*50
+                        txt += '\n搜索api可用情况：'
+                        if diff_float(r2,r3) > 0.95:
+                            txt += '不同关键词搜索结果相似度' + str(round(diff_float(r2,r3)*100,2)) + '%，高于95%，判断此搜索api不可用，建议屏蔽搜索功能'
+                        else:
+                            txt += '不同关键词搜索结果相似度' + str(round(diff_float(r2,r3)*100,2)) + '%，低于95%，判断此搜索api可用'
                         dialog = xbmcgui.Dialog()
                         dialog.textviewer('debug',txt)
                 else:
                     #mp4info
                     info = {}
-                    r = get_h(api + '?ac=videolist&ids=' + tmp['maccmsids'])
-                    j = json.loads(r)
+                    j = get_json(api + '?ac=videolist&ids=' + tmp['maccmsids'],debug=debug,t=24)
                     typelist = []
                     vide = j['list'][0]
                     info['title'] = vide['vod_name']
