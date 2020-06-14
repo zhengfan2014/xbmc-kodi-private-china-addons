@@ -1,4 +1,4 @@
-# cine for kodi 0.1.0
+# cine for kodi 0.2.0
 ## :black_nib: 简介
 - cine插件是一个电影网站聚合插件，它是vid插件的改进版，为适配电影网站而生
 
@@ -301,14 +301,14 @@ get_wolongzy_mp4info(url):
 get_html() 函数和requests.get函数相同，但是get_html() 函数返回url的网页源代码同时会缓存一份在本地，两分钟内的相同请求直接调用缓存的结果，减少向服务器请求的次数，降低被网站站长察觉的几率
 
 #### 语法：
-get_html(url,ua)
+get_html(url)
 ####  参数：
 参数 | 说明
 ---- | ----
-url | 字符串(str)，必填参数，为要访问的url
-ua | 字符串(str)，可选参数，不填默认为pc的ua。
-cf | 整数(int)，可选参数，cf=1时启用绕过cloudflare 5秒盾功能。不填默认不启用
-mode | 字符串(str)，可选参数，当mode='url'时，返回的不是网页源代码而是request请求后的url。适合对付那些需要302跳转才能获取真实视频地址的
+url | 字符串(str)，必填参数，为要访问的url `cine beta 0.1.0+支持`
+ua | 字符串(str)，可选参数，不填默认为pc的ua。`cine beta 0.1.0+支持`
+cf | 整数(int)，可选参数，cf=1时启用绕过cloudflare 5秒盾功能。不填默认不启用`cine beta 0.1.0+支持`
+mode | 字符串(str)，可选参数，当mode='url'时，返回的不是网页源代码而是request请求后的url。适合对付那些需要302跳转才能获取真实视频地址的`cine beta 0.1.0+支持`
 
 ua可传入的值：
 
@@ -405,7 +405,7 @@ var _hmt = _hmt || [];
 post_html() 函数和requests.post函数相同，但是post_html() 函数返回url的网页源代码同时会缓存一份在本地，两分钟内的相同请求直接调用缓存的结果，减少向服务器请求的次数，降低被网站站长察觉的几率
 
 #### 语法：
-post_html(url,data,ua)
+post_html(url,data)
 ####  参数：
 参数 | 说明
 ---- | ----
