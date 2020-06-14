@@ -341,78 +341,44 @@ gbk | 使用gbk来解码html源代码
 
 以下展示了使用 get_html() 方法的实例：
 ```python
-print(get_html('http://so.cn'))
+print(get_html('http://google.cn'))
 ```
 以上实例运行后输出结果为：
 ```html
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-<title>交易所域名 区块链域名 域名商城</title>
-<style type="text/css">
-<!--
-.STYLE5 {
-	font-size: xx-large;
-	font-weight: bold;
-}
--->
-</style>
-</head>
-
-<body>
-<!--<p align="center"><strong><span class="STYLE2">您所访问的网站域名出售</span></strong></p>
-<p align="center">The domain you visiting is asking for sale</p>
-<!--<p align="center">域名释义：百花、百画、白华、白桦</p>
-<p align="center">电话/TEL：<span lang="EN-US" xml:lang="EN-US">15907387772</span></p>-->
-<p align="center">&nbsp;</p>
-<p align="center"><span class="STYLE5"><strong>您访问的网站域名可以合作</strong></span> <br />
-The domain name you visit can cooperate<br /><br />Domain name holder Dai Yue is a well-known Chinese domain name investor with 16 two-letter .COM domain names. <br />This domain name is on sale. Dai Yue has a team of Chinese domain name brokers to promote and sell these domain names. <br />People with resources from all over the world are welcome to recommend customers to buy domain names. Dai Yue can pay commissions.</p>
-
-                  </div>
-              </div>
-</div>
-            <div id="link-report_group">
-                
-
-            </div>
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center">联系微信<span lang="EN-US" xml:lang="EN-US"></span>：bieshu</p>
-<!--<p align="center">E-MAIL:<a href="mailto:66998111@QQ.COM">66998111@QQ.COM</a></p>
-<p align="center">&nbsp;</p>
-<p align="center"><a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=200575675&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:200575675:41" alt="点击这里给我发消息" title="点击这里给我发消息"/></a></p>-->
-<p align="center"><img src="weixin.jpg" width="171" height="227" /></p>
-<p align="center">扫描二维码添加我微信</p>
-<p align="center">E-mail：<a href="mailto:79758@qq.com">79758@qq.com</a></p>
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center">友情链接：<a href="http://www.yuming.com">域名商城 </a>&nbsp;<a href="http://www.loupan.com">楼盘网 </a></p>
-<!--<<div align="center">
-  <script language="javascript" type="text/javascript" src="//js.users.51.la/19152566.js"></script>
-  <noscript>
-  <a href="//www.51.la/?19152566" target="_blank"><img alt="&#x6211;&#x8981;&#x5566;&#x514D;&#x8D39;&#x7EDF;&#x8BA1;" src="//img.users.51.la/19152566.asp" style="border:none" /></a>
-  </noscript>
-</div>-->
-<p align="center">&nbsp;</p>
-<div align="center">
-  <script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?87fd4b3d3045969f2152b7a5f8121d55";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-  <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1277143880'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1277143880%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
-</div>
-</body>
-</html>
-
+<!DOCTYPE html>
+<html lang="zh">
+  <meta charset="utf-8">
+  <title>Google</title>
+  <style>
+    html { background: #fff; margin: 0 1em; }
+    body { font: .8125em/1.5 arial, sans-serif; text-align: center; }
+    h1 { font-size: 1.5em; font-weight: normal; margin: 1em 0 0; }
+    p#footer { color: #767676; font-size: .77em; }
+    p#footer a { background: url(//www.google.cn/intl/zh-CN_cn/images/cn_icp.gif) top right no-repeat; padding: 5px 20px 5px 0; }
+    ul { margin: 2em; padding: 0; }
+    li { display: inline; padding: 0 2em; }
+    div { -moz-border-radius: 20px; -webkit-border-radius: 20px; border: 1px solid #ccc; border-radius: 20px; margin: 2em auto 1em; max-width: 650px; min-width: 544px; }
+    div:hover, div:hover * { cursor: pointer; }
+    div:hover { border-color: #999; }
+    div p { margin: .5em 0 1.5em; }
+    img { border: 0; }
+  </style>
+  <div>
+    <a href="http://www.google.com.hk/webhp?hl=zh-CN&amp;sourceid=cnhp">
+      <img src="//www.google.cn/landing/cnexp/google-search.png" alt="Google" width="586" height="257">
+    </a>
+    <h1><a href="http://www.google.com.hk/webhp?hl=zh-CN&amp;sourceid=cnhp"><strong id="target">google.com.hk</strong></a></h1>
+    <p>请收藏我们的网址
+  </div>
+  <ul>
+    <li><a href="http://translate.google.cn/?sourceid=cnhp">翻译</a>
+  </ul>
+  <p id="footer">&copy;2011 - <a href="http://www.miibeian.gov.cn/">ICP证合字B2-20070004号</a>
+  <script nonce="seq4yqrbKQbF7TNEBaEOtg">
+    var gcn=gcn||{};gcn.IS_IMAGES=(/images\.google\.cn/.exec(window.location)||window.location.hash=='#images'||window.location.hash=='images');gcn.HOMEPAGE_DEST='http://www.google.com.hk/webhp?hl=zh-CN&sourceid=cnhp';gcn.IMAGES_DEST='http://images.google.com.hk/imghp?'+'hl=zh-CN&sourceid=cnhp';gcn.DEST_URL=gcn.IS_IMAGES?gcn.IMAGES_DEST:gcn.HOMEPAGE_DEST;gcn.READABLE_HOMEPAGE_URL='google.com.hk';gcn.READABLE_IMAGES_URL='images.google.com.hk';gcn.redirectIfLocationHasQueryParams=function(){if(window.location.search&&/google\.cn/.exec(window.location)&&!/webhp/.exec(window.location)){window.location=String(window.location).replace('google.cn','google.com.hk')}}();gcn.replaceHrefsWithImagesUrl=function(){if(gcn.IS_IMAGES){var a=document.getElementsByTagName('a');for(var i=0,len=a.length;i<len;i++){if(a[i].href==gcn.HOMEPAGE_DEST){a[i].href=gcn.IMAGES_DEST}}}}();gcn.listen=function(a,e,b){if(a.addEventListener){a.addEventListener(e,b,false)}else if(a.attachEvent){var r=a.attachEvent('on'+e,b);return r}};gcn.stopDefaultAndProp=function(e){if(e&&e.preventDefault){e.preventDefault()}else if(window.event&&window.event.returnValue){window.eventReturnValue=false;return false}if(e&&e.stopPropagation){e.stopPropagation()}else if(window.event&&window.event.cancelBubble){window.event.cancelBubble=true;return false}};gcn.resetChildElements=function(a){var b=a.childNodes;for(var i=0,len=b.length;i<len;i++){gcn.listen(b[i],'click',gcn.stopDefaultAndProp)}};gcn.redirect=function(){window.location=gcn.DEST_URL};gcn.setInnerHtmlInEl=function(a){if(gcn.IS_IMAGES){var b=document.getElementById(a);if(b){b.innerHTML=b.innerHTML.replace(gcn.READABLE_HOMEPAGE_URL,gcn.READABLE_IMAGES_URL)}}};
+    gcn.listen(document, 'click', gcn.redirect);
+    gcn.setInnerHtmlInEl('target');
+  </script>
 ```
 ### post_html()
 
