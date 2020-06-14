@@ -306,22 +306,37 @@ get_html(url)
 参数 | 说明
 ---- | ----
 url | 字符串(str)，必填参数，为要访问的url `cine beta 0.1.0+支持`
-ua | 字符串(str)，可选参数，不填默认为pc的ua。`cine beta 0.1.0+支持`
-cf | 整数(int)，可选参数，cf=1时启用绕过cloudflare 5秒盾功能。不填默认不启用`cine beta 0.1.0+支持`
-mode | 字符串(str)，可选参数，当mode='url'时，返回的不是网页源代码而是request请求后的url。适合对付那些需要302跳转才能获取真实视频地址的`cine beta 0.1.0+支持`
+ua | 字符串(str)，可选参数，不填默认为pc的ua。 `cine beta 0.1.0+支持`
+cf | 整数(int)，可选参数，cf=1时启用绕过cloudflare 5秒盾功能。不填默认不启用 `cine beta 0.1.0+支持`
+mode | 字符串(str)，可选参数，默认为mode='html'输出网页源代码，当mode='url'时，返回的不是网页源代码而是request请求后的url。适合对付那些需要302跳转才能获取真实视频地址的 `cine beta 0.1.0+支持`
+encode | 字符串(str)，可选参数，用来指定网页编码，默认为utf-8，当输出为乱码时可尝试指定encode='gbk'  `cine beta 0.2.0+支持`
 
 ua可传入的值：
 
 ua值 | 说明
 ---- | ----
-pc | 电脑的ua
+pc | 电脑的ua `默认`
 mobile | 安卓手机的ua
 iphone | 苹果手机的ua
 ipad | ipad的ua
 mac | 苹果电脑的ua
 
+mode可传入的值：
+
+ua值 | 说明
+---- | ----
+html | 输出网页源代码 `默认`
+url | 输出request请求后跳转到的url
+
+encode可传入的值：
+
+ua值 | 说明
+---- | ----
+utf-8 | 使用utf-8来解码html源代码 `默认`
+gbk | 使用gbk来解码html源代码
+
 #### 返回值：
-函数返回url的网页源代码，编码为utf-8
+函数返回url的网页源代码
 #### 实例：
 
 以下展示了使用 get_html() 方法的实例：
