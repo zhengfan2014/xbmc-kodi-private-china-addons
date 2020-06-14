@@ -313,7 +313,7 @@ encode | 字符串(str)，可选参数，用来指定网页编码，默认为utf
 
 ua可传入的值：
 
-ua值 | 说明
+值 | 说明
 ---- | ----
 pc | 电脑的ua `默认`
 mobile | 安卓手机的ua
@@ -323,14 +323,14 @@ mac | 苹果电脑的ua
 
 mode可传入的值：
 
-ua值 | 说明
+值 | 说明
 ---- | ----
 html | 输出网页源代码 `默认`
 url | 输出request请求后跳转到的url
 
 encode可传入的值：
 
-ua值 | 说明
+值 | 说明
 ---- | ----
 utf-8 | 使用utf-8来解码html源代码 `默认`
 gbk | 使用gbk来解码html源代码
@@ -390,19 +390,27 @@ post_html(url,data)
 ####  参数：
 参数 | 说明
 ---- | ----
-url | 字符串(str)，必填参数，为要访问的url
-data | 字符串化的字典(str(dict))，必填参数，为要post的值组成的字典
-ua | 字符串(str)，可选参数，不填默认为pc的ua。
+url | 字符串(str)，必填参数，为要访问的url `cine beta 0.1.0+支持`
+data | 字符串化的字典(str(dict))，必填参数，为要post的值组成的字典 `cine beta 0.1.0+支持`
+ua | 字符串(str)，可选参数，不填默认为pc的ua。 `cine beta 0.1.0+支持`
+encode | 字符串(str)，可选参数，用来指定网页编码，默认为utf-8，当输出为乱码时可尝试指定encode='gbk'  `cine beta 0.2.0+支持`
 
 ua可传入的值：
 
-ua值 | 说明
+值 | 说明
 ---- | ----
 pc | 电脑的ua
 mobile | 安卓手机的ua
 iphone | 苹果手机的ua
 ipad | ipad的ua
 mac | 苹果电脑的ua
+
+encode可传入的值：
+
+值 | 说明
+---- | ----
+utf-8 | 使用utf-8来解码html源代码 `默认`
+gbk | 使用gbk来解码html源代码
 
 #### 返回值：
 函数返回url的网页源代码
