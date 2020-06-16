@@ -15,7 +15,8 @@ import requests
 import xbmcgui
 from bs4 import BeautifulSoup
 from xbmcswift2 import Plugin
-
+import danmuku
+import os
 
 def random_sentence(size):
     char_lists = string.ascii_lowercase + string.digits
@@ -929,6 +930,8 @@ def get_api1(url,quality):
     r = requests.get(vurl,headers=headers)
     j = json.loads(r.text)
     cid = j['data']['pages'][int(p)]['cid']
+    danmuku.Danmuku(cid)
+    print(cid)
 
 
     entropy = 'rbMCKn@KuamXWlPMoJGsKcbiJKUfkPF_8dABscJntvqhRSETg'

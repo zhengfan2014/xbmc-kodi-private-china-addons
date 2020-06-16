@@ -10,6 +10,8 @@
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
+  <extension point="xbmc.python.module" library="danmuku.py"/>
+  <extension point="xbmc.python.module" library="xml2ass.py"/>
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <language></language>
