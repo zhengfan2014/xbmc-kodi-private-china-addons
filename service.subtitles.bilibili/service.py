@@ -37,7 +37,8 @@ ZIMUZU_API = ZIMUZU_BASE + '/x/web-interface/search/all/v2?keyword=%s'
 UserAgent  = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)'
 
 def log(module, msg):
-    xbmc.log((u"%s::%s - %s" % (__scriptname__,module,msg,)).encode('utf-8'),level=xbmc.LOGDEBUG )
+    pass
+    # xbmc.log((u"%s::%s - %s" % (__scriptname__,module,msg,)).decode('utf-8'),level=xbmc.LOGDEBUG )
 
 def GetHttpData(url, data=''):
     log(sys._getframe().f_code.co_name, "url [%s]" % (url))
@@ -110,7 +111,6 @@ def Search( item ):
             xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False)
 
 def Download(url):
-    
     if not xbmcvfs.exists(__temp__.replace('\\','/')):
         xbmcvfs.mkdirs(__temp__)
     dirs, files = xbmcvfs.listdir(__temp__)
@@ -119,8 +119,7 @@ def Download(url):
         xbmcvfs.delete(os.path.join(__temp__, file.decode("utf-8")))
     
     subtitle_list = []
-    b = 1
-    if b == 1:
+    try:
         #data = GetHttpData(url)
         if re.match('https://',url) == None:
             if re.match('http://',url) != None:
@@ -171,7 +170,7 @@ def Download(url):
                     titles.append(j['data']['pages'][p]['part'])
                     cids.append(j['data']['pages'][p]['cid'])
             if len(titles) > 1:
-                sel = xbmcgui.Dialog().select('请选择分集的字幕', titles)
+                sel = xbmcgui.Dialog().select('请选择分集的弹幕', titles)
                 if sel == -1:
                     sel = 0
             else:
@@ -179,50 +178,25 @@ def Download(url):
         r = requests.get('https://api.bilibili.com/x/v1/dm/list.so?oid=' + str(cids[sel]))
         r.encoding = 'utf-8'
         data = r.text
-        dialog = xbmcgui.Dialog()
-        dialog.textviewer('错误提示', str(data.encode('utf-8')))
-        # if data['info'] != 'OK':
-        #     return []
-        # url = data['data']['info']['file']
-        # data = GetHttpData(url)
-    #except:
-        #return []
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('获取弹幕', '初始化...')
+        pDialog.update(50, '获取弹幕成功...')
+        # dialog = xbmcgui.Dialog()
+        # dialog.textviewer('错误提示', str(data.encode('utf-8')))
+    except:
+        return []
     if len(data) < 1024:
         return []
-    # t = time.time()
-    
-    # ts = time.strftime("%Y%m%d%H%M%S",time.localtime(t)) + str(int((t - int(t)) * 1000))
     tmpfile = os.path.join(__temp__, "cid%s%s.ass" % (str(cids[sel]), os.path.splitext(url)[1])).replace('\\','/')
-    dialog = xbmcgui.Dialog()
-    dialog.textviewer('错误提示', str(tmpfile))
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(tmpfile))
     with open(tmpfile, "wb") as subFile:
         subFile.write(data.encode('utf-8'))
-
+    pDialog.update(75, '写入xml成功...')
     xbmc.sleep(500)
     xml2ass.Danmaku2ASS(tmpfile,tmpfile,960,540,duration_marquee=10.0)
-
-    # archive = urllib.quote_plus(tmpfile)
-    # if data[:4] == 'Rar!':
-    #     path = 'rar://%s' % (archive)
-    # else:
-    #     path = 'zip://%s' % (archive)
-    # dirs, files = xbmcvfs.listdir(path)
-    # if ('__MACOSX') in dirs:
-    #     dirs.remove('__MACOSX')
-    # if len(dirs) > 0:
-    #     path = path + '/' + dirs[0].decode('utf-8')
-    #     dirs, files = xbmcvfs.listdir(path)
-    # list = []
-    # for subfile in files:
-    #     if (os.path.splitext( subfile )[1] in exts):
-    #         list.append(subfile.decode('utf-8'))
-    # if len(list) == 1:
-    #     subtitle_list.append(path + '/' + list[0])
-    # elif len(list) > 1:
-    #     sel = xbmcgui.Dialog().select('请选择压缩包中的字幕', list)
-    #     if sel == -1:
-    #         sel = 0
-    #     subtitle_list.append(path + '/' + list[sel])
+    pDialog.update(100, '转换ass成功...')
+    pDialog.close()
     subtitle_list.append(tmpfile)
     return subtitle_list
 

@@ -39,7 +39,8 @@ ZIMUZU_BASE = 'https://www.acfun.cn/rest/pc-direct'
 UserAgent  = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)'
 
 def log(module, msg):
-    xbmc.log((u"%s::%s - %s" % (__scriptname__,module,msg,)).encode('utf-8'),level=xbmc.LOGDEBUG )
+    pass
+    # xbmc.log((u"%s::%s - %s" % (__scriptname__,module,msg,)).encode('utf-8'),level=xbmc.LOGDEBUG )
 
 def GetHttpData(url, data=''):
     log(sys._getframe().f_code.co_name, "url [%s]" % (url))
@@ -145,8 +146,8 @@ def Download(url):
                 str2 = r.find('window.abtestConfig =')
                 cutjson = r[str1+21:str2]
                 cutjson = cutjson.split(';')[0]
-                dialog = xbmcgui.Dialog()
-                dialog.textviewer('错误提示', str(cutjson))
+                # dialog = xbmcgui.Dialog()
+                # dialog.textviewer('错误提示', str(cutjson))
                 j = json.loads(cutjson)
         
                 titles = []
@@ -161,8 +162,8 @@ def Download(url):
                 str2 = r.find('window.videoResource =')
                 cutjson = r[str1+37:str2]
                 cutjson = cutjson.split(';')[0]
-                dialog = xbmcgui.Dialog()
-                dialog.textviewer('错误提示', str(cutjson))
+                # dialog = xbmcgui.Dialog()
+                # dialog.textviewer('错误提示', str(cutjson))
                 j = json.loads(cutjson)
                 #bvid = j['data']['pages'][0]['bvid']
                 titles = []
@@ -171,7 +172,7 @@ def Download(url):
                     titles.append(j['videoList'][p]['title'])
                     cids.append(j['videoList'][p]['id'])
             if len(titles) > 1:
-                sel = xbmcgui.Dialog().select('请选择分集的字幕', titles)
+                sel = xbmcgui.Dialog().select('请选择分集的弹幕', titles)
                 if sel == -1:
                     sel = 0
             else:
@@ -183,7 +184,9 @@ def Download(url):
         r.encoding = 'utf-8'
         r = r.text
         j = json.loads(r)
-
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('获取弹幕', '初始化...')
+        pDialog.update(25, '获取弹幕成功...')
         data = '<?xml version=\"1.0\" encoding=\"UTF-8\"?><i><chatserver>chat.bilibili.com</chatserver><chatid>72540443</chatid><mission>0</mission><maxlimit>%d</maxlimit><state>0</state><real_name>0</real_name><source>e-r</source>' % (len(j['added']))
         # str1 = r.find('\"added\":[')
         # str2 = r.find('],\"host-name\"')
@@ -204,9 +207,9 @@ def Download(url):
             data += str(j['added'][i]['danmakuId']) #弹幕在数据库的rowid,b站特有
             data += '\">' + j['added'][i]['body'] + '</d>'
         data += '</i>'
-
-        dialog = xbmcgui.Dialog()
-        dialog.textviewer('错误提示', str(data.encode('utf-8')))
+        pDialog.update(50, 'json转xml成功...')
+        # dialog = xbmcgui.Dialog()
+        # dialog.textviewer('错误提示', str(data.encode('utf-8')))
         #data = r
         # if data['info'] != 'OK':
         #     return []
@@ -220,36 +223,16 @@ def Download(url):
     
     # ts = time.strftime("%Y%m%d%H%M%S",time.localtime(t)) + str(int((t - int(t)) * 1000))
     tmpfile = os.path.join(__temp__, "cid%s%s.ass" % (str(cids[sel]), os.path.splitext(url)[1])).replace('\\','/')
-    dialog = xbmcgui.Dialog()
-    dialog.textviewer('错误提示', str(tmpfile))
+    
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(tmpfile))
     with open(tmpfile, "wb") as subFile:
         subFile.write(data.encode('utf-8'))
-
+    pDialog.update(75, '写入xml成功...')
     xbmc.sleep(500)
     xml2ass.Danmaku2ASS(tmpfile,tmpfile,960,540,duration_marquee=10.0)
-
-    # archive = urllib.quote_plus(tmpfile)
-    # if data[:4] == 'Rar!':
-    #     path = 'rar://%s' % (archive)
-    # else:
-    #     path = 'zip://%s' % (archive)
-    # dirs, files = xbmcvfs.listdir(path)
-    # if ('__MACOSX') in dirs:
-    #     dirs.remove('__MACOSX')
-    # if len(dirs) > 0:
-    #     path = path + '/' + dirs[0].decode('utf-8')
-    #     dirs, files = xbmcvfs.listdir(path)
-    # list = []
-    # for subfile in files:
-    #     if (os.path.splitext( subfile )[1] in exts):
-    #         list.append(subfile.decode('utf-8'))
-    # if len(list) == 1:
-    #     subtitle_list.append(path + '/' + list[0])
-    # elif len(list) > 1:
-    #     sel = xbmcgui.Dialog().select('请选择压缩包中的字幕', list)
-    #     if sel == -1:
-    #         sel = 0
-    #     subtitle_list.append(path + '/' + list[sel])
+    pDialog.update(100, '转换ass成功...')
+    pDialog.close()
     subtitle_list.append(tmpfile)
     return subtitle_list
 
