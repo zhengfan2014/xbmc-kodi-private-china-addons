@@ -205,7 +205,7 @@ def get_bimibimi_videos(url,page):
     plist = linelist.find_all('span',class_='fl')
     for i in range(len(alist)):
         videoitem = {}
-        videoitem['name'] =  alist[i]['title'] + '[' + plist[i].text + ']' 
+        videoitem['name'] =  alist[i]['title'] + ' [' + plist[i].text + ']' 
         videoitem['href'] =  'http://www.bimibimi.me' + alist[i]['href']
         videoitem['thumb'] = alist[i].img['data-original']
         videoitem['info'] = {'plot' : alist[i]['title'] + '\n' + plist[i].text }
@@ -238,6 +238,9 @@ def get_bimibimi_mp4info(url):
     soup = BeautifulSoup(rtext, 'html.parser')
     li = soup.find_all('li',class_='clearfix')
     infodict={}
+    infodict['title'] = soup.find('div',class_='tit').h1.text
+    if re.search(u' ',infodict['title']):
+        infodict['title'].split(u' ')[0]
     for index in range(len(li)):
         emtext = li[index].em.text
         emtext = emtext.replace(u'：','')
@@ -382,11 +385,12 @@ def get_yhdm_source(url):
 def get_yhdm_mp4info(url):
     rtext = tmp['bghtml']
     soup = BeautifulSoup(rtext, 'html.parser')
-
+    title = soup.find('div',class_='rate r').h1.text
     sinfo = soup.find('div',class_='sinfo')
     span = sinfo.find_all('span')
     info = soup.find('div',class_='info')
     infodict={}
+    infodict['title'] = title
     for index in range(len(span)):
         text = span[index].label.text.strip()+span[index].a.text.strip()
         text = text.encode('utf-8')
@@ -1185,6 +1189,9 @@ def get_tucao_videos(url,page):
 
 def get_tucao_source(url):
     videos = []
+    pDialog = xbmcgui.DialogProgress()
+    pDialog.create('加载中', '初始化')
+    pDialog.update(33, '尝试爬取网页数据...')
     html = get_html(url,cf=1)
     
     sclist = []
@@ -1201,8 +1208,18 @@ def get_tucao_source(url):
             info = duoplist[index].split('|')
             duopdict[info[1].decode('utf-8')] = info[0][16:]
         sclist.append(duopdict)
-    except IndexError:
-        pass
+    except:
+        pDialog.update(66, '爬取失败，使用官方API接口再次尝试...(一般版权原因404的番剧可以用api爬到)')
+        #尝试json接口
+        hid = re.search('(?<=play/h)[0-9]+',url).group()
+        apiurl = 'http://www.tucao.one/api_v2/view.php?apikey=25tids8f1ew1821ed&hid=' +str(hid)
+        r = get_html(apiurl,cf=1)
+        j = json.loads(r)
+        duoplist = j['result']['video']
+        duopdict = {}
+        for index in range(len(duoplist)):
+            duopdict[duoplist[index]['title']] = duoplist[index]['file']
+        sclist.append(duopdict)
     
     videoitem = {}
     videoitem['name'] = '播放线路1'
@@ -1215,9 +1232,13 @@ def get_tucao_source(url):
 def get_tucao_mp4info(url):
     rtext = tmp['bghtml']
     infodict={}
-    soup = BeautifulSoup(rtext, 'html.parser')
-    plot = soup.find('div',class_='show_content')
-    infodict['plot'] = re.sub('\n\n\n\n','',plot.text)
+    try:
+        j = json.loads(rtext)
+        infodict['plot'] = j['description']
+    except:
+        soup = BeautifulSoup(rtext, 'html.parser')
+        plot = soup.find('div',class_='show_content')
+        infodict['plot'] = re.sub('\n\n\n\n','',plot.text)
     return infodict
 
 def get_tucao_mp4(url):
@@ -1465,7 +1486,6 @@ def play(name,url,mode):
     try:
         mp4info = get_mp4info_mode(url,mode)
         mp4info['mediatype'] = 'video'
-        mp4info['title'] = name
         item = {'label': name,'path':mp4,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
     except NameError:
         item = {'label': name,'path':mp4,'is_playable': True,'info_type':'video','thumbnail': tmp['bgimg'],'icon': tmp['bgimg']}
