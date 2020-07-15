@@ -985,7 +985,7 @@ def get_api2(url):
         else:
             p = 0
         cid = j['data']['pages'][p]['cid']
-
+	danmuku.Danmuku(cid)
         apiurl = 'https://www.xbeibeix.com/api/bilibiliapi.php?url=https://www.bilibili.com/&aid='+str(aid)+'&cid=' + str(cid)
         r = requests.get(apiurl,headers=headers)
         j = json.loads(r.text)
@@ -1066,7 +1066,7 @@ def get_api3(url, quality):
             else:
                 p = 0
             cid = j['data']['pages'][p]['cid']
-    
+    	    danmuku.Danmuku(cid)
     if bvid != '':
         url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&bvid={}&qn={}'.format(cid, bvid, quality)
     else:
@@ -1118,6 +1118,7 @@ def get_api4(url,quality):
                     if int(sslist[i]['id']) == int(epid):
                         bvid = sslist[index]['bvid']
                         cid = sslist[index]['cid']
+			
     if bvid == '' or cid == '':
         dialog = xbmcgui.Dialog()
         #dialog.textviewer('tt',epid)
@@ -1125,7 +1126,7 @@ def get_api4(url,quality):
     
     #https://www.biliplus.com/BPplayurl.php?cid=181007115&bvid=BV1fK4y1r7sT&qn=80&module=bangumi&otype=json
     url_api = 'https://www.biliplus.com/BPplayurl.php?cid={}&qn={}&module=bangumi&otype=json&bvid={}'.format(cid,quality,bvid)
-    
+    danmuku.Danmuku(cid)
     r = requests.get(url_api, headers=headers)
     html = json.loads(r.text)
     #video_list = []
@@ -1191,6 +1192,7 @@ def get_api5(url,quality,api):
     if int(api) == 2:
         apihead = 'https://bilibili-hk-api.kghost.info/'
     url_api = apihead + 'x/player/playurl?cid={}&bvid={}&qn={}'.format(cid, bvid, quality)
+    danmuku.Danmuku(cid)
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         #'Cookie': sessdata, # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
