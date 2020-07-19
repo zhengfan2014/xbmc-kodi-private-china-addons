@@ -71,7 +71,13 @@ def Search( item ):
                                            int(item['episode']),)
     else:
         search_string = item['title']
-    url = ZIMUZU_API % (urllib.quote(search_string))
+    #search_string = search_string.replace(' ','')
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', search_string)
+    if search_string.find('%') != -1:
+        url = ZIMUZU_API % search_string
+    else:
+        url = ZIMUZU_API % urllib.quote(search_string)
     data = GetHttpData(url)
     try:
         j = json.loads(data)
