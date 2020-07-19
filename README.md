@@ -98,8 +98,8 @@
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- service.subtitles.acfun | <img width = "200" height = "0"/><img src="icons/acfun.png" width = "50" height = "50"/><br>Acfun 弹幕 | 0.1.0 | 2020-06-18 |获取并挂载acfun任意视频和番剧的弹幕，支持配合acfun插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
-  service.subtitles.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/><br>Bilibili 弹幕 | 0.1.0 | 2020-06-18 |获取并挂载b站任意视频和番剧的弹幕，支持配合b站插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
+ service.subtitles.acfun | <img width = "200" height = "0"/><img src="icons/acfun.png" width = "50" height = "50"/><br>Acfun 弹幕 | 0.1.1 | 2020-07-19 |获取并挂载acfun任意视频和番剧的弹幕，支持配合acfun插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
+  service.subtitles.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/><br>Bilibili 弹幕 | 0.1.1 | 2020-07-19 |获取并挂载b站任意视频和番剧的弹幕，支持配合b站插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
 
 ----
 
@@ -132,7 +132,7 @@ clicli弹幕网 | https://clicli.co/
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.cine | <img width = "200" height = "0"/><img src="icons/cine.png" width = "50" height = "50"/><br>cine | 0.1.0 | 2020-06-14 |模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
+ plugin.video.cine | <img width = "200" height = "0"/><img src="icons/cine.png" width = "50" height = "50"/><br>cine | 0.2.0 | 2020-06-14 |模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
 
 适配网站 | 网址
 ---- | ---- 
