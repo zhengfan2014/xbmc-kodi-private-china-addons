@@ -73,30 +73,43 @@ def Search( item ):
                                            int(item['episode']),)
     else:
         search_string = item['title']
-    url = ZIMUZU_BASE + '/search/bgm?keyword=%s' % (urllib.quote(search_string))
-    data = GetHttpData(url)
-    try:
-        j = json.loads(data)
-    except:
-        return
     
+    search_string = search_string[:40] #修复api提示搜索关键词过长的问题
     #番剧
-    if 'bgmList' in j:
-        bgm = j['bgmList']
-        for index in range(len(bgm)):
-            subtitles_list.append({"language_name":"Chinese", "filename":'[COLOR pink][' + bgm[index]['episodeInfo'] + '] ' + bgm[index]['bgmTitle'] + '[/COLOR]', "link":'https://www.acfun.cn/bangumi/aa' + str(bgm[index]['id']), "language_flag":'zh', "rating":"0"})
-    
-    url = ZIMUZU_BASE + '/search/video?keyword=%s' % (urllib.quote(search_string))
+    if search_string.find('%') != -1:
+        url = ZIMUZU_BASE + '/search/bgm?keyword=%s' % search_string
+    else:
+        url = ZIMUZU_BASE + '/search/bgm?keyword=%s' % (urllib.quote(search_string))
     data = GetHttpData(url)
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', data)
     try:
         j = json.loads(data)
+        
+        if 'bgmList' in j:
+            bgm = j['bgmList']
+            for index in range(len(bgm)):
+                subtitles_list.append({"language_name":"Chinese", "filename":'[COLOR pink][' + bgm[index]['episodeInfo'] + '] ' + bgm[index]['bgmTitle'] + '[/COLOR]', "link":'https://www.acfun.cn/bangumi/aa' + str(bgm[index]['id']), "language_flag":'zh', "rating":"0"})
     except:
-        return
+        pass
     #视频
-    if 'videoList' in j:
-        k = j['videoList']
-        for index in range(len(k)):
-            subtitles_list.append({"language_name":"Chinese", "filename":k[index]['title'], "link":'https://www.acfun.cn/v/ac' + str(k[index]['id']), "language_flag":'zh', "rating":"0"})
+    if search_string.find('%') != -1:
+        url = ZIMUZU_BASE + '/search/video?keyword=%s' % search_string
+    else:
+        url = ZIMUZU_BASE + '/search/video?keyword=%s' % (urllib.quote(search_string))
+    
+    data = GetHttpData(url)
+    
+    try:
+        j = json.loads(data)
+            if 'videoList' in j:
+            k = j['videoList']
+            for index in range(len(k)):
+                subtitles_list.append({"language_name":"Chinese", "filename":k[index]['title'], "link":'https://www.acfun.cn/v/ac' + str(k[index]['id']), "language_flag":'zh', "rating":"0"})
+    except:
+        pass
+    
+   
     # results = j['data']['result']
     # for it in results:
     #     link = ZIMUZU_BASE + it.find("div", class_="fl-info").a.get('href').encode('utf-8')
