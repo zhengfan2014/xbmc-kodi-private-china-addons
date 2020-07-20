@@ -81,8 +81,7 @@ def Search( item ):
     else:
         url = ZIMUZU_BASE + '/search/bgm?keyword=%s' % (urllib.quote(search_string))
     data = GetHttpData(url)
-    # dialog = xbmcgui.Dialog()
-    # dialog.textviewer('错误提示', data)
+
     try:
         j = json.loads(data)
         
@@ -102,7 +101,7 @@ def Search( item ):
     
     try:
         j = json.loads(data)
-            if 'videoList' in j:
+        if 'videoList' in j:
             k = j['videoList']
             for index in range(len(k)):
                 subtitles_list.append({"language_name":"Chinese", "filename":k[index]['title'], "link":'https://www.acfun.cn/v/ac' + str(k[index]['id']), "language_flag":'zh', "rating":"0"})
