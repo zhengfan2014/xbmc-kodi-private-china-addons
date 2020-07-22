@@ -215,7 +215,8 @@ def get_categories():
             {'id':10,'name':'clicli弹幕网(clicli.me)','link':'cliclime','author':'zhengfan2014','upload':'2020-6-30','plot':'基本都是1080p'},
             {'id':11,'name':'五弹幕(5dm.tv)','link':'5dmtv','author':'zhengfan2014','upload':'2020-6-30','videos':32,'search':32,'plot':'新番看不了的，可能得注册会员才能看，我没注册过，注册会员20大洋，现在这么多网站白嫖，愿意出20块的算是真爱粉了哈哈'},
             {'id':12,'name':'clicli弹幕网(clicli.co)','link':'cliclico','author':'zhengfan2014','upload':'2020-6-30','plot':'山寨c站，和clicli.me互掐'},
-            {'id':13,'name':'zzzfun(zzzfun.com)','link':'zzzfun','author':'zhengfan2014','upload':'2020-6-30','videos':12,'search':10,'plot':'大部分720p，少部分1080p'}]
+            {'id':13,'name':'zzzfun(zzzfun.com)','link':'zzzfun','author':'zhengfan2014','upload':'2020-6-30','videos':12,'search':10,'plot':'大部分720p，少部分1080p'},
+            {'id':14,'name':'动漫岛(dmd8.com)','link':'dmd8','author':'zhengfan2014','upload':'2020-6-30','videos':20,'search':10,'plot':'大部分720p，少部分1080p'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -1753,6 +1754,146 @@ def get_zzzfun_search(keyword,page):
         videoitem['thumb'] =  videolist[index].find('img')['src']
         videoitem['href'] = 'http://www.zzzfun.com' + videolist[index].a['href']
         videoitem['info'] = {'plot':videolist[index].find('dd',class_='juqing').p.text}
+        videos.append(videoitem)
+    return videos
+
+#dmd8
+def dmd8_fuckddos(url,data=''):
+    if data == '':
+        r = get_html(url)
+    else:
+        r = post_html(url,data)
+    if re.search('(?<=location.href = ).*?(?=;)',r.encode('utf-8')):
+        purl = re.search('(?<=location\.href = ).*?(?=;)',r.encode('utf-8')).group()
+        # dialog = xbmcgui.Dialog()
+        # dialog.textviewer('错误提示', str(purl))
+        try:
+            purl = eval(purl)
+            r = get_html('http://www.dmd8.com' + purl)
+        except:
+            pass
+    return r
+
+def get_dmd8_categories():
+    return [{'name':'新番连载','link':'http://www.dmd8.com/type/1-'},
+            {'name':'完结日漫','link':'http://www.dmd8.com/type/3-'},
+            {'name':'热门国漫','link':'http://www.dmd8.com/type/4-'},
+            {'name':'剧场动漫','link':'http://www.dmd8.com/type/16-'}]
+
+def get_dmd8_videos(url,page):
+    #爬视频列表的
+    videos = []
+    url += str(page) + '.html'
+    html = dmd8_fuckddos(url)
+
+    soup = BeautifulSoup(html,'html.parser')
+    
+    
+    videolist = soup.find_all('div',class_='cn_box2')
+    for index in range(len(videolist)):
+        videoitem = {}
+        videoitem['name'] =  videolist[index].find('a',class_='B font_16').text
+        videoitem['thumb'] =  videolist[index].find('img')['src']
+        videoitem['href'] = 'http://www.dmd8.com' + videolist[index].find('a',class_='B font_16')['href']
+        videos.append(videoitem)
+    return videos
+
+def get_dmd8_source(url):
+    videos = []
+    html = dmd8_fuckddos(url)
+    soup = BeautifulSoup(html,'html.parser')
+
+    eplist = soup.find_all('ul',class_='mn_list_li_movie')
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(av) + '\n' + str(html.encode('utf-8')))
+    sclist = []
+    
+    for index in range(len(eplist)):
+        duopdict = {}
+        epli = eplist[index].find_all('li')
+        for i in range(len(epli)):
+            duopdict[epli[i].a.text] = 'http://www.dmd8.com' + epli[i].a['href']
+        sclist.append(duopdict)
+
+        videoitem = {}
+        videoitem['name'] = '线路'+str(index+1)
+        videoitem['href'] = str(sclist[index])
+        videos.append(videoitem)
+    tmp['bghtml'] = html
+    return videos
+
+# def get_dmd8_mp4info(url):
+#     infodict={}
+#     html = tmp['bghtml']
+#     soup = BeautifulSoup(html,'html.parser')
+#     base = soup.find('div',class_='info-content')
+#     title = base.find('div',class_='content-head').h1.text
+#     infodict['title'] = title
+#     info = base.find('div',class_='info-descr')
+#     infodict['plot'] = info.text
+
+#     text = base.find('div',class_='content-count').find_all('span',class_='count-item')
+#     for index in range(len(text)):
+#         span = text[index].text.split(u':')
+#         if span[0].strip() == u'语言':
+#             infodict['country'] = span[1]
+#         if span[0].strip() == u'状态':
+#             infodict['status'] = span[1]
+#         if span[0].strip() == u'CV':
+#             cast = text[index].find_all('a')
+#             casts = []
+#             for i in range(len(cast)):
+#                 casts.append((cast[i].text,u'CV'))
+
+#             infodict['cast'] = casts
+#     return infodict
+
+def get_dmd8_mp4(url):
+    r = dmd8_fuckddos(url)
+    maccms = unescape(re.search(u'(?<=mac_url\=unescape\(\').*?(?=\'\);)',r.encode('utf-8')).group())
+    rmac = re.search('(?<=-)([0-9]+)-([0-9]+)(?=.html)',url)
+    duopnum = int(rmac.group(1))
+    pnum = int(rmac.group(2))
+    if re.search('$$$',maccms):
+        duopall=maccms.split('$$$')
+        duop = duopall[duopnum-1]
+        duop = duop.split('#')
+    else:
+        duop = maccms.split('#')
+
+    mp4 = duop[pnum-1].split('$')[1]
+    if mp4[:4] != 'http':
+        mp4 = re.search('[0-9]{4}_[0-9a-z]+',mp4).group()
+        r = dmd8_fuckddos('http://www.dmd8.com/kongjian/?url=' + mp4)
+        mp4 = re.search('(?<=var url = \').*?(?=\';)',r).group()
+    #     dialog = xbmcgui.Dialog()
+    #     ok = dialog.textviewer('错误提示', mp4)
+    
+    # dialog = xbmcgui.Dialog()
+    # ok = dialog.textviewer('错误提示', mp4)
+    return mp4
+
+def get_dmd8_search(keyword,page):
+    #爬视频列表的
+    videos = []
+    
+    if int(page) == 1:
+        url = 'http://www.dmd8.com/index.php?m=vod-search'
+        html = dmd8_fuckddos(url,str({'wd':keyword}))
+    else:
+        url = 'http://www.dmd8.com/search-pg-' + str(page) + '-wd-'+ keyword + '.html'
+        html = dmd8_fuckddos(url)
+    dialog = xbmcgui.Dialog()
+    ok = dialog.textviewer('错误提示', html)
+    soup = BeautifulSoup(html,'html.parser')
+    
+    
+    videolist = soup.find_all('div',class_='cn_box2')
+    for index in range(len(videolist)):
+        videoitem = {}
+        videoitem['name'] =  videolist[index].find('a',class_='B font_16').text
+        videoitem['thumb'] =  videolist[index].find('img')['src']
+        videoitem['href'] = 'http://www.dmd8.com' + videolist[index].find('a',class_='B font_16')['href']
         videos.append(videoitem)
     return videos
 ##########################################################
