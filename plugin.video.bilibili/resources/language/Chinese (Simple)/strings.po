@@ -1,0 +1,52 @@
+msgid ""
+msgstr ""
+
+#Chinese Simplified
+
+msgctxt "#32001"
+msgid "Login Setting"
+msgstr "登录设置"
+
+msgctxt "#32002"
+msgid "mainUid"
+msgstr "主账号设置"
+
+msgctxt "#32003"
+msgid "Uid"
+msgstr "登录Uid"
+
+msgctxt "#32004"
+msgid "SESSDATA"
+msgstr "SESSDATA"
+
+msgctxt "#32005"
+msgid "vipUid"
+msgstr "大会员账号"
+
+msgctxt "#32006"
+msgid "vipstatus"
+msgstr "使用以下SESSDATA来解析大会员视频(该账号得有大会员)"
+
+msgctxt "#32007"
+msgid "VIPSESSDATA"
+msgstr "SESSDATA"
+
+msgctxt "#32101"
+msgid "Function Setting"
+msgstr "功能设置"
+
+msgctxt "#32102"
+msgid "baipiaolv"
+msgstr "简介中显示视频白嫖率(仅供娱乐)"
+
+msgctxt "#32201"
+msgid "Damaku Setting"
+msgstr "弹幕设置"
+
+msgctxt "#32202"
+msgid "damakustatus"
+msgstr "启用内置弹幕功能"
+
+msgctxt "#32203"
+msgid "damakufolder"
+msgstr "设置弹幕缓存文件夹"

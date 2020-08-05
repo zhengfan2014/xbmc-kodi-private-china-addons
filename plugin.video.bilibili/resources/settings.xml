@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32001">
+      <setting label="32002" type="lsep"/>
+
+      <setting id="uid" type="text" label="32003" default=""/>
+      <setting id="sessdata" type="text" label="32004" default=""/>
+
+      <setting label="32005" type="lsep"/>
+
+      <setting label="32006" type="bool" id="vipstatus" default="false"/>
+      <setting id="vipsessdata" type="text" label="32007" default=""/>
+    </category>   
+    <category label="32101">
+    <setting label="32102" type="bool" id="baipiao" default="false"/>
+    </category>  
+    <category label="32201">
+    <setting label="32202" type="bool" id="damakustatus" default="false"/>
+    <setting label="32203" type="folder" id="damakufolder" source="auto" option="writeable"/>
+    </category>  
+</settings>
