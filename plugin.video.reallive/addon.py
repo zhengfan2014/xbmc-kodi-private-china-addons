@@ -13,6 +13,8 @@ import sys
 import HTMLParser
 import re
 import random
+import hashlib
+import execjs
 
 
 
@@ -252,8 +254,8 @@ def get_huya_roomid(url):
         room_id = url
     room_url = 'https://m.huya.com/' + str(room_id)
     r = get_html(room_url,'mobile')
-    if re.search(r'//[\S]*.m3u8',r):
-        url = 'https:' + re.search(r'//[\S]*.m3u8',r).group()
+    if re.search(r'//[\S]*.m3u8[\S]*?(?=\")',r):
+        url = 'https:' + re.search(r'//[\S]*.m3u8[\S]*?(?=\")',r).group()
         url = re.sub(r'_[\S]*.m3u8','.m3u8',url)
     else:
         url = ''
@@ -261,6 +263,7 @@ def get_huya_roomid(url):
         dialog.notification('请求直播源失败','未开播或直播间不存在', xbmcgui.NOTIFICATION_INFO, 5000)
     # dialog = xbmcgui.Dialog()
     # dialog.textviewer('1',str(url))
+    # print(url)
     return url
 
 #斗鱼直播
@@ -292,6 +295,34 @@ def get_douyu_rooms(url,page):
         rooms.append(roomitem)
     return rooms
 
+def get_douyu_roomidinfo(url):
+    info = {}
+    if 'douyu.com' in url:
+        if '?rid=' in url:
+            room_id = re.search('(?<=\?rid=)[0-9]+',url).group()
+        else:
+            room_id = re.search('(?<=douyu.com/)[0-9]+',url).group()
+    else:
+        room_id = url
+    room_url = 'https://www.douyu.com/betard/' + str(room_id)
+    r = get_html(room_url)
+    j = json.loads(r)
+    info['title'] = j['room']['room_name']
+    info['img'] = j['room']['room_pic']
+    info['genre'] = [j['room']['second_lvl_name']]
+    
+    plot = u'房间号: ' + str(j['room']['room_id'])
+    
+    plot += u'\n' + j['room']['show_details']
+    # if roomdata['state'] == 'ON':
+    #     info['status'] = u'开播'
+    #     plot += u' · '+str(roomdata['totalCount']) + u' 人气值' 
+    # else:
+    #     info['status'] = u'未开播'
+    info['cast'] = [(j['room']['nickname'],u'主播')]
+    info['plot'] = plot
+    return info
+
 def get_douyu_roomid(url):
     if 'douyu.com' in url:
         if '?rid=' in url:
@@ -302,14 +333,122 @@ def get_douyu_roomid(url):
         dialog.notification('提取成功','房间号：' + str(room_id), xbmcgui.NOTIFICATION_INFO, 5000)
     else:
         room_id = url
-    r = get_html('https://web.sinsyth.com/lxapi/douyujx.x?roomid=' + str(room_id))
-    j = json.loads(r)
-    live = j['Rendata']['link']
-    live = re.search('douyucdn.cn/live/[a-zA-Z0-9]+',live).group()
-    live = 'http://tx2play1.' + live + '.m3u8'
+
+    rid = str(room_id)
+    tt = get_tt()
+    url = get_pre_url(rid, tt[1])
+    if url:
+        return "http://tx2play1.douyucdn.cn/live/" + url + ".flv?uuid="
+    else:
+        result = get_homejs(rid)
+        real_rid = result[1]
+        homejs = result[0]
+        real_url = get_sign_url(tt[2], real_rid, tt[0], homejs)
+        if real_url != 0:
+            real_url = "http://tx2play1.douyucdn.cn/live/" + real_url + ".flv?uuid="
+        else:
+            real_url = '未开播'
+        return real_url
+    # r = get_html('https://web.sinsyth.com/lxapi/douyujx.x?roomid=' + str(room_id))
+    # j = json.loads(r)
+    # live = j['Rendata']['link']
+    # live = re.search('douyucdn.cn/live/[a-zA-Z0-9]+',live).group()
+    # live = 'http://tx2play1.' + live + '.m3u8'
     #dialog = xbmcgui.Dialog()
     #dialog.textviewer('1',str(live))
-    return live
+    # return live
+
+def get_homejs(rid):
+    room_url = 'https://m.douyu.com/' + rid
+    response = requests.get(url=room_url)
+    pattern_real_rid = r'"rid":(\d{1,7})'
+    real_rid = re.findall(pattern_real_rid, response.text, re.I)[0]
+    if real_rid != rid:
+        room_url = 'https://m.douyu.com/' + real_rid
+        response = requests.get(url=room_url)
+    homejs = ''
+    pattern = r'(function ub9.*)[\s\S](var.*)'
+    result = re.findall(pattern, response.text, re.I)
+    str1 = re.sub(r'eval.*;}', 'strc;}', result[0][0])
+    homejs = str1 + result[0][1]
+    return homejs, real_rid
+
+def get_sign(rid, post_v, tt, ub9):
+    docjs = execjs.compile(ub9)
+    res2 = docjs.call('ub98484234')
+    str3 = re.sub(r'\(function[\s\S]*toString\(\)', '\'', res2)
+    md5rb = hashlib.md5((rid + '10000000000000000000000000001501' + tt + '2501' +
+                         post_v).encode('utf-8')).hexdigest()
+    str4 = 'function get_sign(){var rb=\'' + md5rb + str3
+    str5 = re.sub(r'return rt;}[\s\S]*','return re;};', str4) 
+    str6 = re.sub(r'"v=.*&sign="\+', '', str5)
+    docjs1 = execjs.compile(str6)
+    sign = docjs1.call(
+        'get_sign', rid, '10000000000000000000000000001501', tt)
+    return sign
+
+def get_tt():
+    tt1 = str(int(time.time()))
+    tt2 = str(int((time.time() * 1000)))
+    today = time.strftime('%Y%m%d', time.localtime())
+    return tt1, tt2, today
+
+def get_pre_url(rid, tt):
+    request_url = 'https://playweb.douyucdn.cn/lapi/live/hlsH5Preview/' + rid
+    post_data = {
+        'rid': rid,
+        'did': '10000000000000000000000000001501'
+    }
+    auth = hashlib.md5((rid + str(tt)).encode('utf-8')).hexdigest()
+    header = {
+        'content-type': 'application/x-www-form-urlencoded',
+        'rid': rid,
+        'time': tt,
+        'auth': auth
+    }
+    response = requests.post(url=request_url, headers=header, data=post_data)
+    response = response.json()
+    pre_url = ''
+    if response.get('error') == 0:
+        real_url = (response.get('data')).get('rtmp_live')
+        if 'mix=1' in real_url:
+            pre_url = mix_room(rid)
+        else:
+            pattern1 = r'^[0-9a-zA-Z]*'
+            pre_url = re.search(pattern1, real_url, re.I).group()
+    return pre_url
+
+def get_sign_url(post_v, rid, tt, ub9):
+    sign = get_sign(rid, post_v, tt, ub9)
+    request_url = 'https://m.douyu.com/api/room/ratestream'
+    post_data = {
+        'v': '2501' + post_v,
+        'did': '10000000000000000000000000001501',
+        'tt': tt,
+        'sign': sign,
+        'ver': '219032101',
+        'rid': rid,
+        'rate': '-1'
+    }
+    header = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Mobile Safari/537.36'
+    }
+    response = requests.post(url=request_url, headers=header, data=post_data).json()
+    if response.get('code') == 0:
+        real_url = (response.get('data')).get('url')
+        if 'mix=1' in real_url:
+            result1 = mix_room(rid)
+        else:
+            pattern = r'/(\d{1,8}[0-9a-zA-Z]+)_?[\d]{0,4}.m3u8'
+            result1 = re.search(pattern, real_url).group(1)
+    else:
+        result1 = 0
+    return result1
+
+def mix_room(rid):
+    result1 = 'PKing'
+    return result1
 
 #触手
 def get_chushou_categories():
