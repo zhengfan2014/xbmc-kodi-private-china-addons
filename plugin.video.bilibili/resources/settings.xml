@@ -12,7 +12,18 @@
       <setting id="vipsessdata" type="text" label="32007" default=""/>
     </category>   
     <category label="32101">
-    <setting label="32102" type="bool" id="baipiao" default="false"/>
+
+    <setting label="32102" type="lsep"/>
+    <setting label="32103" type="bool" id="baipiao" default="false"/>
+
+    <setting label="32104" type="lsep"/>
+    <setting label="32105" type="bool" id="gaoaotaiswitch" default="false"/>
+    <setting type="sep"/>
+    <setting label="32106" type="bool" id="cdnswitch" default="false"/>
+    <setting id="cdnreplace" type="text" label="32107" default="upos-hz-mirrorakam.acgvideo.com"/>
+
+    <setting label="32108" type="lsep"/>
+    <setting label="32109" type="bool" id="1080pplusswitch" default="true"/>
     </category>  
     <category label="32201">
     <setting label="32202" type="bool" id="damakustatus" default="false"/>

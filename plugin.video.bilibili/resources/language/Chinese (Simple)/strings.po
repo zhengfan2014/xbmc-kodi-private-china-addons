@@ -31,13 +31,45 @@ msgctxt "#32007"
 msgid "VIPSESSDATA"
 msgstr "SESSDATA"
 
+
+
 msgctxt "#32101"
 msgid "Function Setting"
 msgstr "功能设置"
 
 msgctxt "#32102"
+msgid "zaxiang"
+msgstr "杂项"
+
+msgctxt "#32103"
 msgid "baipiaolv"
 msgstr "简介中显示视频白嫖率(仅供娱乐)"
+
+msgctxt "#32104"
+msgid "gat"
+msgstr "港澳台相关"
+
+msgctxt "#32105"
+msgid "gangaotaiswitch"
+msgstr "海外模式(使用官方api2来解析仅限港澳台番剧)"
+
+msgctxt "#32106"
+msgid "gangaotaiswitch"
+msgstr "替换b站海外CDN(用于国内用户加速观看仅限港澳台番剧)"
+
+msgctxt "#32107"
+msgid "api"
+msgstr "替换为..."
+
+msgctxt "#32108"
+msgid "api"
+msgstr "解析相关"
+
+msgctxt "#32109"
+msgid "1080pplusswitch"
+msgstr "显示大会员专享的清晰度(视频1080p60，720p60，番剧1080p+)"
+
+
 
 msgctxt "#32201"
 msgid "Damaku Setting"

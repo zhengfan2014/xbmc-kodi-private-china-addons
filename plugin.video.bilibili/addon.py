@@ -76,18 +76,6 @@ cache = plugin.get_storage('cache')
 headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
 mheaders = {'user-agent' : 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
 
-def chushihua(key,default):
-    if key in cache:
-        switch = cache[key]
-    else:
-        cache[key] = default
-        switch = cache[key]
-    if switch == 1:
-        value = '开'
-    else:
-        value = '关'
-    return value
-
 #仿b站随机输出主播正在xx
 def rd_live_gz():
     gz = ['思考人生','抠脚丫','俯卧撑热身','卖萌','打滚','换女装','觅食','海扁小电视','成为魔法少女','修电锯','跳广播体操','吸猫','渡劫中','学习','梳妆打扮','撩妹','逛漫展','拔腿毛','逛b站']
@@ -188,19 +176,71 @@ def sessdata(mode=''):
     #     sessdata = ''
     return sessdata
 
+def get_html(url,t=1,debug='no',head=''):
+    if debug == 'no':
+        if head == '':
+            if t == 1:
+                r = get_html_1min(url)
+            if t == 10:
+                r = get_html_10min(url)
+            if t == 60:
+                r = get_html_1hour(url)
+        else:
+            if t == 1:
+                r = get_html_1min(url,head=head)
+            if t == 10:
+                r = get_html_10min(url,head=head)
+            if t == 60:
+                r = get_html_1hour(url,head=head)
+    else:
+        if head == 'no':
+            r = requests.get(url,headers=headers)
+            r.encoding = 'utf-8'
+            r = r.text
+        else:
+            r = requests.get(url,headers=eval(head))
+            r.encoding = 'utf-8'
+            r = r.text
+    return r
+
+@plugin.cached(TTL=60)
+def get_html_1hour(url,head=''):
+    if head == '':
+        r = requests.get(url,headers=headers)
+    else:
+        r = requests.get(url,headers=eval(head))
+    r.encoding = 'utf-8'
+    r = r.text
+    return r
+
+@plugin.cached(TTL=10)
+def get_html_10min(url,head=''):
+    if head == '':
+        r = requests.get(url,headers=headers)
+    else:
+        r = requests.get(url,headers=eval(head))
+    r.encoding = 'utf-8'
+    r = r.text
+    return r
+
 @plugin.cached(TTL=1)
+def get_html_1min(url,head=''):
+    if head == '':
+        r = requests.get(url,headers=headers)
+    else:
+        r = requests.get(url,headers=eval(head))
+    r.encoding = 'utf-8'
+    r = r.text
+    return r
+
 def get_up_roomold(uid):
-    r = requests.get('https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid='+str(uid), headers=headers)
-    r.encoding = 'UTF-8'
-    return r.text
+    r = get_html('https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid='+str(uid))
+    return r
 
-@plugin.cached(TTL=60)
 def get_up_baseinfo(uid):
-    r = requests.get('https://api.bilibili.com/x/space/acc/info?mid='+str(uid)+'&jsonp=jsonp', headers=headers)
-    r.encoding = 'UTF-8'
-    return r.text
+    r = get_html('https://api.bilibili.com/x/space/acc/info?mid='+str(uid)+'&jsonp=jsonp', t=60)
+    return r
 
-@plugin.cached(TTL=60)
 def get_upinfo(uid):
     
     j = json.loads(get_up_baseinfo(uid))
@@ -293,33 +333,28 @@ def get_upinfo(uid):
     return text
 
 #最新投稿 ‘’ 播放最多 click 收藏最多stow
-@plugin.cached(TTL=10)
 def up_sort_vid(uid,sort):
     if sort == '':
         so = ''
     else:
         so = '&order=' +sort
-    r = requests.get('https://api.bilibili.com/x/space/arc/search?mid='+uid+'&pn=1&ps=25'+so+'&jsonp=jsonp', headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html('https://api.bilibili.com/x/space/arc/search?mid='+uid+'&pn=1&ps=25'+so+'&jsonp=jsonp', t=10)
+    j = json.loads(r)
     return j['data']
 
 
 #up播放数据
-@plugin.cached(TTL=10)
 def up_allnum(uid):
     di = {}
-    r = requests.get('https://api.bilibili.com/x/relation/stat?vmid='+uid+'&jsonp=jsonp', headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html('https://api.bilibili.com/x/relation/stat?vmid='+uid+'&jsonp=jsonp', t=10)
+    j = json.loads(r)
     #关注
     di['following'] = j['data']['following']
     #粉丝
     di['follower'] = j['data']['follower']
     
-    r = requests.get('https://api.bilibili.com/x/space/upstat?mid='+uid+'&jsonp=jsonp', headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html('https://api.bilibili.com/x/space/upstat?mid='+uid+'&jsonp=jsonp', t=10)
+    j = json.loads(r)
     #播放量
     di['archive'] = j['data']['archive']['view']
     #专栏
@@ -329,13 +364,11 @@ def up_allnum(uid):
 
     return di
     
-@plugin.cached(TTL=10)
 def get_search(keyword,page):
     serachUrl = 'https://api.bilibili.com/x/web-interface/search/all/v2?keyword=' + keyword + '&page=' + str(page)
 
-    r = requests.get(serachUrl, headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html(serachUrl,t=10)
+    j = json.loads(r)
     #视频
     k = j['data']['result'][8]['data']
     #番剧
@@ -355,6 +388,7 @@ def get_search(keyword,page):
         videoitem['name'] = title
         videoitem['href'] = surl
         videoitem['thumb'] = 'http:'+pic
+        videoitem['info'] = {'plot':bgm[index]['desc']}
         videos.append(videoitem)
     for index in range(len(mov)):
         surl = 'https://www.bilibili.com/bangumi/play/ss' + str(mov[index]['season_id'])
@@ -368,6 +402,7 @@ def get_search(keyword,page):
         videoitem['name'] = title
         videoitem['href'] = surl
         videoitem['thumb'] = 'http:'+pic
+        videoitem['info'] = {'plot':mov[index]['desc']}
         videos.append(videoitem)
     #k = k.encode('utf-8')
     #dialog = xbmcgui.Dialog()
@@ -381,12 +416,21 @@ def get_search(keyword,page):
         #清除b站api数据污染
         title = title.replace('<em class="keyword">', '')
         title = title.replace('</em>', '')
+
+        uptime = k[index]['pubdate']
+        #转换成localtime
+        time_local = time.localtime(uptime)
+        #转换成新的时间格式(2016-05-05 20:28:54)
+        data = time.strftime("%Y-%m-%d",time_local)
+
+        genre = k[index]['tag'].split(u',')
         
         videoitem = {}
         videoitem['name'] = title
         videoitem['href'] = arcurl
         videoitem['thumb'] = 'http://'+pic
-        videoitem['genre'] = '喜剧片'
+        videoitem['info'] = {'mediatype':'video','genre':genre,'plot':zh(k[index]['play']) + u'播放 · ' + data + '\n'}
+        videoitem['info']['plot'] += u'[COLOR pink]UP:[/COLOR]' + k[index]['author'] + '\n\n' + k[index]['description']
         videos.append(videoitem)
     if int(j['data']['numResults']) == 1000:
         numResults = str(j['data']['numResults']) + '+'
@@ -396,16 +440,15 @@ def get_search(keyword,page):
     dialog.notification('当前'+ str(page) + '/' + str(j['data']['numPages']) + '页', '总共'+ numResults + '个视频', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
 
-@plugin.cached(TTL=10)
+
 def get_vidsearch(keyword,page):
     serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=video&order=&keyword=' + keyword + '&page=' + str(page) +'&duration=&category_id=&tids_1=&tids_2=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
     }
-    r = requests.get(serachUrl, headers=apiheaders)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html(serachUrl, head=str(apiheaders),t=10)
+    j = json.loads(r)
     #
     videos = []
     try:
@@ -423,11 +466,21 @@ def get_vidsearch(keyword,page):
             #清除b站api数据污染
             title = title.replace('<em class="keyword">', '')
             title = title.replace('</em>', '')
+            
+            uptime = bgm[index]['pubdate']
+            #转换成localtime
+            time_local = time.localtime(uptime)
+            #转换成新的时间格式(2016-05-05 20:28:54)
+            data = time.strftime("%Y-%m-%d",time_local)
+
+            genre = bgm[index]['tag'].split(u',')
         
             videoitem = {}
             videoitem['name'] = title
             videoitem['href'] = vurl
             videoitem['thumb'] = 'http:'+pic
+            videoitem['info'] = {'mediatype':'video','genre':genre,'plot':zh(bgm[index]['play']) + u'播放 · ' + data + '\n'}
+            videoitem['info']['plot'] += u'[COLOR pink]UP:[/COLOR]' + bgm[index]['author'] + '\n\n' + bgm[index]['description']
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
             numResults = str(j['data']['numResults']) + '+'
@@ -440,16 +493,14 @@ def get_vidsearch(keyword,page):
         dialog.notification('提示', '搜索结果为空', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
 
-@plugin.cached(TTL=10)
 def get_bgsearch(keyword,page):
     serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=media_bangumi&order=&keyword=' + keyword + '&page=' + str(page) +'&category_id=&__refresh__=true&_extra=&highlight=1&single_column=1&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
     }
-    r = requests.get(serachUrl, headers=apiheaders)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html(serachUrl, head=str(apiheaders),t=10)
+    j = json.loads(r)
     #
     videos = []
     try:
@@ -475,6 +526,7 @@ def get_bgsearch(keyword,page):
             videoitem['name'] = title
             videoitem['href'] = surl
             videoitem['thumb'] = 'http:'+pic
+            videoitem['info'] = {'plot':bgm[index]['desc']}
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
             numResults = str(j['data']['numResults']) + '+'
@@ -487,17 +539,14 @@ def get_bgsearch(keyword,page):
         dialog.notification('提示', '搜索结果为空', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
 
-@plugin.cached(TTL=10)
 def get_movsearch(keyword,page):
-    
     serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=media_ft&order=&keyword=' + keyword + '&page=' + str(page) +'&category_id=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
     }
-    r = requests.get(serachUrl, headers=apiheaders)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html(serachUrl, head=str(apiheaders),t=10)
+    j = json.loads(r)
     #
     videos = []
     try:
@@ -523,6 +572,7 @@ def get_movsearch(keyword,page):
             videoitem['name'] = title
             videoitem['href'] = surl
             videoitem['thumb'] = 'http:'+pic
+            videoitem['info'] = {'plot':bgm[index]['desc']}
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
             numResults = str(j['data']['numResults']) + '+'
@@ -535,16 +585,14 @@ def get_movsearch(keyword,page):
         dialog.notification('提示', '搜索结果为空', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
 
-@plugin.cached(TTL=10)
 def get_livesearch(keyword,page):
     serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&keyword=' + keyword + '&page=' + str(page) +'&order=&category_id=&duration=&user_type=&order_sort=&tids_1=&tids_2=&search_type=live&changing=id&cover_type=user_cover&__refresh__=true&__reload__=false&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
     }
-    r = requests.get(serachUrl, headers=apiheaders)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html(serachUrl, head=str(apiheaders),t=10)
+    j = json.loads(r)
     #
     videos = []
     try:
@@ -579,7 +627,6 @@ def get_livesearch(keyword,page):
         dialog.notification('提示', '搜索结果为空', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
 
-@plugin.cached(TTL=10)
 def get_upsearch(keyword,page):
     
     serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=bili_user&order=&keyword=' + keyword + '&page=' + str(page) +'&category_id=&user_type=&order_sort=&changing=mid&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
@@ -587,9 +634,8 @@ def get_upsearch(keyword,page):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
     }
-    r = requests.get(serachUrl, headers=apiheaders)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html(serachUrl, head=str(apiheaders),t=10)
+    j = json.loads(r)
     #
     videos = []
     try:
@@ -627,11 +673,9 @@ def get_upsearch(keyword,page):
         dialog.notification('提示', '搜索结果为空', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
 
-@plugin.cached(TTL=10)
 def get_up(uid,page):
-    r = requests.get('https://api.bilibili.com/x/space/arc/search?mid='+uid+'&ps=30&tid=0&pn='+page+'&keyword=&order=pubdate&jsonp=jsonp', headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html('https://api.bilibili.com/x/space/arc/search?mid='+uid+'&ps=30&tid=0&pn='+page+'&keyword=&order=pubdate&jsonp=jsonp',t=10)
+    j = json.loads(r)
     #
     videos = []
     vlist = j['data']['list']['vlist']
@@ -645,19 +689,16 @@ def get_up(uid,page):
     dialog.notification('当前'+ str(page) + '/' + str(int(int(j['data']['page']['count']) / 30) + 1) + '页', '总共'+ str(j['data']['page']['count']) + '个视频', xbmcgui.NOTIFICATION_INFO, 5000,False)
     return videos
     
-@plugin.cached(TTL=60)
 def get_bangumiinfo(url):
-    r = requests.get(url,headers=headers)
-    rtext = r.text
-    str1 = rtext.find('window.__INITIAL_STATE__=')
-    str2 = rtext.find(';(function(){var s')
-    vjson = rtext[str1+25:str2]
+    r = get_html(url,t=60)
+    str1 = r.find('window.__INITIAL_STATE__=')
+    str2 = r.find(';(function(){var s')
+    vjson = r[str1+25:str2]
     j = json.loads(vjson)
-    r1 = requests.get('https://www.bilibili.com/bangumi/media/md' + str(j['mediaInfo']['id']),headers=headers)
-    rt = r1.text
-    str1 = rt.find('window.__INITIAL_STATE__=')
-    str2 = rt.find(';(function(){var s')
-    mjson = rt[str1+25:str2]
+    r1 = get_html('https://www.bilibili.com/bangumi/media/md' + str(j['mediaInfo']['id']),t=60)
+    str1 = r1.find('window.__INITIAL_STATE__=')
+    str2 = r1.find(';(function(){var s')
+    mjson = r1[str1+25:str2]
     j2 = json.loads(mjson)
 
 
@@ -696,10 +737,11 @@ def get_bangumiinfo(url):
     st13 = []
     for index in range(len(staff1)):
         
-        if staff1[index].find('编剧'.decode('utf-8')) and staff1[index].find('设计'.decode('utf-8')) != -1:
-            st10 = staff1[index].split(':'.decode('utf-8'))
-            if st10[1].find(',') != -1:
-                st11 = st10[1].split(',')
+        if staff1[index].find(u'编剧') and staff1[index].find(u'设计') != -1:
+            staff1[index] = staff1[index].replace(u'：',u':')
+            st10 = staff1[index].split(u':')
+            if st10[1].find(u',') != -1:
+                st11 = st10[1].split(u',')
             else:
                 st11 = [st10[1]]
             #print(st11)
@@ -708,13 +750,14 @@ def get_bangumiinfo(url):
             #dialog = xbmcgui.Dialog()
             #ok = dialog.ok('错误提示', str(st12))
             mp4info['writer'] = st12
-        if staff1[index].find('导演'.decode('utf-8')) and staff1[index].find('监督'.decode('utf-8')) != -1:
-            
-            st10 = staff1[index].split(':'.decode('utf-8'))
+        if staff1[index].find(u'导演') and staff1[index].find(u'监督') != -1:
             # dialog = xbmcgui.Dialog()
-            # dialog.textviewer('错误提示', str(st10[1].encode('utf-8')))
-            if st10[1].find(',') != -1:
-                st11 = st10[1].split(',')
+            # dialog.textviewer('错误提示', str(staff1[index].encode('utf-8')))
+            staff1[index] = staff1[index].replace(u'：',u':')
+            st10 = staff1[index].split(u':')
+            
+            if st10[1].find(u',') != -1:
+                st11 = st10[1].split(u',')
             else:
                 st11 = [st10[1]]
             
@@ -743,14 +786,11 @@ def get_bangumiinfo(url):
     mp4info['reply'] = zh(stat['reply'])
     return mp4info
 
-@plugin.cached(TTL=60)
 def get_mp4info(url):
-    r = requests.get(url,headers=headers)
-    r.encoding = 'utf-8'
-    rtext = r.text
-    str1 = rtext.find('window.__INITIAL_STATE__=')
-    str2 = rtext.find(';(function(){var s')
-    vjson = rtext[str1+25:str2]
+    r = get_html(url,t=60)
+    str1 = r.find('window.__INITIAL_STATE__=')
+    str2 = r.find(';(function(){var s')
+    vjson = r[str1+25:str2]
     j = json.loads(vjson)
     uptime = j['videoData']['ctime']
     #转换成localtime
@@ -759,8 +799,8 @@ def get_mp4info(url):
     uptime = time.strftime("%Y-%m-%d %H:%M:%S",time_local)
     data = time.strftime("%Y-%m-%d",time_local)
     
-    sr = requests.get('https://api.bilibili.com/x/web-interface/archive/stat?aid='+str(j['aid']),headers=headers)
-    sj = json.loads(sr.text)
+    sr = get_html('https://api.bilibili.com/x/web-interface/archive/stat?aid='+str(j['aid']),t=60)
+    sj = json.loads(sr)
     stat = sj['data']
     mp4info = {}
     jianjie =  zh(stat['view']) + '播放 · ' + zh(stat['danmaku']) + '弹幕 · ' + zh(stat['reply']) +'评论\n'
@@ -821,7 +861,6 @@ def get_mp4info(url):
     return mp4info
 
 #评论区
-@plugin.cached(TTL=60)
 def get_comm(url,sort):
     if re.match('https://',url) == None:
         if re.match('http://',url) != None:
@@ -837,12 +876,11 @@ def get_comm(url,sort):
             epid = re.search(r'ep[0-9]+', url)
             epid = epid.group()
             epid = epid[2:]
-            r = requests.get(url,headers=headers)
+            r = get_html(url,t=10)
         
-            rtext = r.text
-            str1 = rtext.find('window.__INITIAL_STATE__=')
-            str2 = rtext.find(';(function(){var s')
-            vjson = rtext[str1+25:str2]
+            str1 = r.find('window.__INITIAL_STATE__=')
+            str2 = r.find(';(function(){var s')
+            vjson = r[str1+25:str2]
             j = json.loads(vjson)
             elist = j['epList']
             aid = ''
@@ -864,8 +902,8 @@ def get_comm(url,sort):
         if ifvideourl != None:
             bvid = re.search(r'BV[a-zA-Z0-9]+', url)
             bvurl = 'https://api.bilibili.com/x/web-interface/view?bvid='+bvid.group()
-            r = requests.get(bvurl,headers=headers)
-            j = json.loads(r.text)
+            r = get_html(bvurl,t=10)
+            j = json.loads(r)
             aid = j['data']['aid']
             mid = j['data']['owner']['mid']
     
@@ -873,8 +911,8 @@ def get_comm(url,sort):
     apiurl = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&oid='+str(aid)+'&sort=' + sort
     apiheaders = {'user-agent' : 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36','referer':'https://www.bilibili.com/video/BV1Ze411W7EL'}
 
-    r = requests.get(apiurl,headers=apiheaders)
-    j = json.loads(r.text)
+    r = get_html(apiurl,head=str(apiheaders),t=10)
+    j = json.loads(r)
     rep = j['data']['replies']
     text = ''
     for index in range(len(rep)):
@@ -921,7 +959,7 @@ def get_comm(url,sort):
                 text += level_color(rrep[i]['member']['level_info']['current_level'])
                 #判断是否up主
                 if ifvideourl != None:
-                    if int(mid) == int(rep[index]['member']['mid']):
+                    if int(mid) == int(rrep[i]['member']['mid']):
                         text += ' [COLOR pink][UP主][/COLOR]' 
                 text += '\n'
                 text += ' '*5 + rrep[i]['content']['message'].encode('utf-8') +'\n'
@@ -931,22 +969,90 @@ def get_comm(url,sort):
   
     return text
 
-@plugin.cached(TTL=60)
+#解析6分钟番剧api（已废弃
 def get_bangumijson(url):
     cutep = url.find('y/ep')
     epnum = url[cutep+4:]
     epnum = re.sub(r'\D','',epnum)
     apiurl = 'https://api.bilibili.com/pgc/player/web/playurl/html5?ep_id='
-    rec = requests.get(apiurl+epnum,headers=mheaders)
-    #rec.encoding = 'utf-8'
-    rectext = rec.text
-    rectext = rectext.encode('utf-8')
-    j = json.loads(rec.text)
+    r = get_html(apiurl+epnum,head=str(mheaders),t=10)
+    
+    j = json.loads(r)
     return j
 
+#获取清晰度
+def get_vidquality(url):
+    if re.search(r'[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', url):
+        bvid = re.search(r'[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', url)
+        vurl = 'https://api.bilibili.com/x/web-interface/view?bvid='+bvid.group()
+    if re.search('[aA]{1}[vV]{1}[0-9]+', url):
+        aid = re.search(r'[aA]{1}[vV]{1}[0-9]+', url)
+        aid = aid.group()
+        aid = aid[2:]
+        vurl = 'https://api.bilibili.com/x/web-interface/view?aid='+aid
+    if '?p=' in url:
+        # 单独下载分P视频中的一集
+        p = int(re.search(r'\?p=(\d+)',url).group(1)) -1
+    else:
+        p = 0
+    r = get_html(vurl,t=10)
+    j = json.loads(r)
+    cid = j['data']['pages'][int(p)]['cid']
+    bvid = j['data']['bvid']
+    
+    r = get_html('https://api.bilibili.com/x/player/playurl?cid=' + str(cid) + '&bvid=' + bvid + '&qn=0&fourk=1')
+    j = json.loads(r)
+    # vdict = {}
+    vlist = []
+    for index in range(len(j['data']['accept_quality'])):
+        # vdict[j['data']['accept_description'][index]] = j['data']['accept_quality'][index]
+        vlist.append(j['data']['accept_quality'][index])
+    return vlist
 
+def get_bgmquality(url):
+    epid = re.search(r'ep[0-9]+', url)
+    epid = epid.group()
+    epid = epid[2:]
+    r = get_html(url,t=10)
 
-@plugin.cached(TTL=10)
+    str1 = r.find('window.__INITIAL_STATE__=')
+    str2 = r.find(';(function(){var s')
+    vjson = r[str1+25:str2]
+    j = json.loads(vjson)
+    elist = j['epList']
+    bvid = ''
+    cid = ''
+    for index in range(len(elist)):
+        if int(elist[index]['id']) == int(epid):
+            bvid = elist[index]['bvid']
+            cid = elist[index]['cid']
+    if bvid == '' or cid == '':
+        slist = j['sections']
+        if slist != []:
+            for index in range(len(slist)):
+                ##
+                sslist = slist[index]['epList']
+                for i in range(len(sslist)):
+                    if int(sslist[i]['id']) == int(epid):
+                        bvid = sslist[index]['bvid']
+                        cid = sslist[index]['cid']
+
+    apiheaders = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+        'Cookie': sessdata(mode='vip'), # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
+        'Host': 'api.bilibili.com'
+    }
+    r = get_html('https://api.bilibili.com/x/player/playurl?cid=' + str(cid) + '&bvid=' + bvid + '&qn=0',head=str(apiheaders))
+    j = json.loads(r)
+    
+    # vdict = {}
+    vlist = []
+    for index in range(len(j['data']['accept_quality'])):
+        # vdict[j['data']['accept_description'][index]] = j['data']['accept_quality'][index]
+        vlist.append(j['data']['accept_quality'][index])
+    return vlist
+
+#官方api1
 def get_api1(url,quality):
     if re.search(r'[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', url):
         bvid = re.search(r'[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', url)
@@ -962,8 +1068,8 @@ def get_api1(url,quality):
         p = int(re.search(r'\?p=(\d+)',url).group(1)) -1
     else:
         p = 0
-    r = requests.get(vurl,headers=headers)
-    j = json.loads(r.text)
+    r = get_html(vurl,t=10)
+    j = json.loads(r)
     cid = j['data']['pages'][int(p)]['cid']
 
     if xbmcplugin.getSetting(int(sys.argv[1]),'damakustatus') == 'true':
@@ -984,7 +1090,7 @@ def get_api1(url,quality):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
     }
     # print(url_api)
-    html = requests.get(url_api, headers=apiheaders).json()
+    html = json.loads(get_html(url_api, head=str(apiheaders)))
     # print(json.dumps(html))
     video_list = []
     for i in html['durl']:
@@ -992,7 +1098,7 @@ def get_api1(url,quality):
     # print(video_list)
     return video_list
 
-@plugin.cached(TTL=10)
+#xbeibeix.com 解析
 def get_api2(url):
     mp4 = ''
     if re.match('https://',url) == None:
@@ -1014,8 +1120,8 @@ def get_api2(url):
             aid = aid.group()
             aid = aid[2:]
             vurl = 'https://api.bilibili.com/x/web-interface/view?aid='+aid
-        r = requests.get(vurl,headers=headers)
-        j = json.loads(r.text)
+        r = get_html(vurl,t=10)
+        j = json.loads(r)
         aid = j['data']['aid']
         if '?p=' in url:
             # 单独下载分P视频中的一集
@@ -1028,8 +1134,8 @@ def get_api2(url):
             danmuku.Danmuku(cid,dpath)
 
         apiurl = 'https://www.xbeibeix.com/api/bilibiliapi.php?url=https://www.bilibili.com/&aid='+str(aid)+'&cid=' + str(cid)
-        r = requests.get(apiurl,headers=headers)
-        j = json.loads(r.text)
+        r = get_html(apiurl,t=10)
+        j = json.loads(r)
         if str(j['url']) != 'null':
             mp4 = j['url']
             dialog = xbmcgui.Dialog()
@@ -1042,7 +1148,7 @@ def get_api2(url):
         ok = dialog.ok('错误提示', '不支持的url格式')
     return mp4
 
-@plugin.cached(TTL=10)
+#官方api2
 def get_api3(url, quality):
     if re.match('https://',url) == None:
         if re.match('http://',url) != None:
@@ -1058,12 +1164,11 @@ def get_api3(url, quality):
             epid = re.search(r'ep[0-9]+', url)
             epid = epid.group()
             epid = epid[2:]
-            r = requests.get(url,headers=headers)
-        
-            rtext = r.text
-            str1 = rtext.find('window.__INITIAL_STATE__=')
-            str2 = rtext.find(';(function(){var s')
-            vjson = rtext[str1+25:str2]
+            r = get_html(url,t=10)
+
+            str1 = r.find('window.__INITIAL_STATE__=')
+            str2 = r.find(';(function(){var s')
+            vjson = r[str1+25:str2]
             j = json.loads(vjson)
             elist = j['epList']
             bvid = ''
@@ -1102,8 +1207,8 @@ def get_api3(url, quality):
                 aid = aid.group()
                 aid = aid[2:]
                 vurl = 'https://api.bilibili.com/x/web-interface/view?aid='+aid
-            r = requests.get(vurl,headers=headers)
-            j = json.loads(r.text)
+            r = get_html(vurl,t=10)
+            j = json.loads(r)
             #bvid = j['data']['pages'][0]['bvid']
             if '?p=' in url:
                 # 单独下载分P视频中的一集
@@ -1116,38 +1221,41 @@ def get_api3(url, quality):
                 danmuku.Danmuku(cid,dpath)
     
     if bvid != '':
-        url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&bvid={}&qn={}'.format(cid, bvid, quality)
+        url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&bvid={}&qn={}&fourk=1'.format(cid, bvid, quality)
     else:
-        url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&aid={}&qn={}'.format(cid, aid, quality)
+        url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&aid={}&qn={}&fourk=1'.format(cid, aid, quality)
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Cookie': sessdata(mode='vip'), # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         'Host': 'api.bilibili.com'
     }
-    html = requests.get(url_api, headers=apiheaders).json()
+    html = json.loads(get_html(url_api,head=str(apiheaders)))
     video_list = []
     #dialog = xbmcgui.Dialog()
     #dialog.textviewer('评论区',str(html['data']['durl']))
-    if 'data' in html:
-        for i in html['data']['durl']:
-            video_list.append(i['url'])
-    else:
+    try:
+        if 'data' in html:
+            for i in html['data']['durl']:
+                video_list.append(i['url'])
+        else:
+            dialog = xbmcgui.Dialog()
+            dialog.ok('提示','无法解析视频')
+    except TypeError:
         dialog = xbmcgui.Dialog()
-        dialog.ok('提示','无法解析视频')
+        dialog.ok('提示','解析视频失败,此视频可能为大会员专享视频，而你的sessdata没有大会员或者已过期')
     
     return video_list
 
-@plugin.cached(TTL=10)
+#biliplus.com 用于解析港澳台番剧
 def get_api4(url,quality):
     epid = re.search(r'ep[0-9]+', url)
     epid = epid.group()
     epid = epid[2:]
-    r = requests.get(url,headers=headers)
-        
-    rtext = r.text
-    str1 = rtext.find('window.__INITIAL_STATE__=')
-    str2 = rtext.find(';(function(){var s')
-    vjson = rtext[str1+25:str2]
+    r = get_html(url,t=10)
+
+    str1 = r.find('window.__INITIAL_STATE__=')
+    str2 = r.find(';(function(){var s')
+    vjson = r[str1+25:str2]
     j = json.loads(vjson)
     elist = j['epList']
     bvid = ''
@@ -1178,26 +1286,20 @@ def get_api4(url,quality):
     #https://www.biliplus.com/BPplayurl.php?cid=181007115&bvid=BV1fK4y1r7sT&qn=80&module=bangumi&otype=json
     url_api = 'https://www.biliplus.com/BPplayurl.php?cid={}&qn={}&module=bangumi&otype=json&bvid={}'.format(cid,quality,bvid)
     
-    r = requests.get(url_api, headers=headers)
-    html = json.loads(r.text)
-    #video_list = []
+    r = get_html(url_api)
+    html = json.loads(r)
     
-    # if 'durl' in html:
-    #     videolist = []
-    #     for i in html['durl']:
-    #         videolist.append(i['url'])
-    #     #video_list = video_list[0]
-    # if 'dash' in html:
-    #     videolist = {}
-    #     videolist['video'] = html['dash']['video'][0]['base_url']
-    #     videolist['audio'] = html['dash']['audio'][0]['base_url']
-    #     #video_list = video_list[0]
-    #dialog = xbmcgui.Dialog()
-    #dialog.textviewer('评论区',str(html))
     video_list = []
+    cdnswitch = xbmcplugin.getSetting(int(sys.argv[1]),'cdnswitch')
+    cdnreplace = xbmcplugin.getSetting(int(sys.argv[1]),'cdnreplace')
     if 'durl' in html:
         for i in range(len(html['durl'])):
-            video_list.append(html['durl'][i]['url'])
+            durl = html['durl'][i]['url']
+            if cdnswitch == 'true':
+                durl= durl.replace('upos-hz-mirrorakam.akamaized.net',cdnreplace)
+                # dialog = xbmcgui.Dialog()
+                # dialog.textviewer('评论区',durl)
+            video_list.append(durl)
         #video_list = video_list[0]
     else:
         dialog = xbmcgui.Dialog()
@@ -1206,17 +1308,15 @@ def get_api4(url,quality):
     #dialog.textviewer('评论区',str(video_list))
     return video_list
 
-@plugin.cached(TTL=10)
 def get_api5(url,quality,api):
     epid = re.search(r'ep[0-9]+', url)
     epid = epid.group()
     epid = epid[2:]
-    r = requests.get(url,headers=headers)
-        
-    rtext = r.text
-    str1 = rtext.find('window.__INITIAL_STATE__=')
-    str2 = rtext.find(';(function(){var s')
-    vjson = rtext[str1+25:str2]
+    r = get_html(url,t=10)
+    
+    str1 = r.find('window.__INITIAL_STATE__=')
+    str2 = r.find(';(function(){var s')
+    vjson = r[str1+25:str2]
     j = json.loads(vjson)
     elist = j['epList']
     bvid = ''
@@ -1252,26 +1352,30 @@ def get_api5(url,quality,api):
         #'Cookie': sessdata, # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         #'Host': 'api.bilibili.com'
     }
-    html = requests.get(url_api, headers=apiheaders).json()
+    html = json.loads(get_html(url_api, head=str(apiheaders)))
     video_list = []
     #dialog = xbmcgui.Dialog()
     #dialog.textviewer('评论区',str(html))
+    cdnswitch = xbmcplugin.getSetting(int(sys.argv[1]),'cdnswitch')
+    cdnreplace = xbmcplugin.getSetting(int(sys.argv[1]),'cdnreplace')
     if html['data']:
         for i in html['data']['durl']:
-            video_list.append(i['url'])
+            durl = i['url']
+            if cdnswitch == 'true':
+                durl= durl.replace('upos-hz-mirrorakam.akamaized.net',cdnreplace)
+            video_list.append(durl)
         video_list = video_list[0]
     else:
         dialog = xbmcgui.Dialog()
         dialog.ok('提示','无法解析视频')
     return video_list
 
-@plugin.cached(TTL=10)
+#获取分类下"全部"分类下直播房间列表
 def get_live(page):
     videos = []
-    r = requests.get('https://api.live.bilibili.com/room/v1/room/get_user_recommend?page=' +str(page), headers=headers)
-    r.encoding = 'UTF-8'
+    r = get_html('https://api.live.bilibili.com/room/v1/room/get_user_recommend?page=' +str(page),t=10)
     
-    j = json.loads(r.text)
+    j = json.loads(r)
     llist = j['data']
     for index in range(len(llist)):
         videoitem = {}
@@ -1281,13 +1385,12 @@ def get_live(page):
         videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=10)
+#获取分类下其他分类下直播房间列表
 def get_livemore(url,page):
     videos = []
-    r = requests.get(url + '&page=' +str(page), headers=headers)
-    r.encoding = 'UTF-8'
+    r = get_html(url + '&page=' +str(page),t=10)
     
-    j = json.loads(r.text)
+    j = json.loads(r)
     llist = j['data']['list']
     for index in range(len(llist)):
         videoitem = {}
@@ -1297,13 +1400,11 @@ def get_livemore(url,page):
         videos.append(videoitem)
     return videos
 
-@plugin.cached(TTL=1)
+#获取房间信息
 def get_roominfo(id):
     flvdict = {}
-    r = requests.get('https://api.live.bilibili.com/room/v1/Room/get_info?id='+str(id), headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
-    
+    r = get_html('https://api.live.bilibili.com/room/v1/Room/get_info?id='+str(id))
+    j = json.loads(r)
     
     ro = j['data']
 
@@ -1334,8 +1435,6 @@ def get_roominfo(id):
     flvdict['genre'] = genre + tag
     flvdict['tag'] = genre + tag
 
-
-    
     j = json.loads(get_up_baseinfo(ro['uid']))
     #up主 cast
     fan = zh(ro['attention']) + '粉丝'
@@ -1345,12 +1444,10 @@ def get_roominfo(id):
     flvdict['mediatype'] = 'video'
     return flvdict
 
-@plugin.cached(TTL=1)
+#获取真实直播地址
 def get_roommp4(id):
-    
-    r = requests.get('https://api.live.bilibili.com/xlive/web-room/v1/index/getRoomPlayInfo?room_id='+str(id)+'&play_url=1&mask=0&qn=0&platform=web', headers=headers)
-    r.encoding = 'UTF-8'
-    j = json.loads(r.text)
+    r = get_html('https://api.live.bilibili.com/xlive/web-room/v1/index/getRoomPlayInfo?room_id='+str(id)+'&play_url=1&mask=0&qn=0&platform=web')
+    j = json.loads(r)
     vlist = []
     try:
         flv = j['data']['play_url']['durl']
@@ -1382,17 +1479,10 @@ def get_categories():
             {'name':'[COLOR pink]电影[/COLOR]','link':'https://www.bilibili.com/ranking/cinema/23/0/3'},
             {'name':'[COLOR pink]电视剧[/COLOR]','link':'https://www.bilibili.com/ranking/cinema/11/0/3'}]
 
-#@plugin.cached(TTL=10)
+#爬分类下视频列表的
 def get_videos(url):
-#爬视频列表的
-    r = requests.get(url, headers=headers)
-    r.encoding = 'UTF-8'
-    soup = BeautifulSoup(r.text, "html.parser")
     videos = []
-
-    # videoelements = soup.find_all('li',class_='rank-item')
-    rectext = r.text
-    cutjson =str(rectext.encode('utf-8'))
+    cutjson = get_html(url,t=10)
     str1 = cutjson.find('window.__INITIAL_STATE__=')
     str2 = cutjson.find(';(function(){var s;')
     rankinfojson = cutjson[str1+25:str2]
@@ -1412,7 +1502,6 @@ def get_videos(url):
                     videoitem['info']['plot'] += '[COLOR pink]Bilibili独占[/COLOR] · '
             videoitem['info']['plot'] += j['rankList'][index]['new_ep']['index_show'].encode('utf-8') + '\n'
             videoitem['info']['plot'] += zh(j['rankList'][index]['stat']['view']) + '播放 · ' + zh(j['rankList'][index]['stat']['danmaku']) + '弹幕 · ' + zh(j['rankList'][index]['stat']['follow']) + '追番'
-            # videoitem['info']['plot'] += '\nAV' + j['rankList'][index]['aid'].encode('utf-8') + ' · BV' + j['rankList'][index]['bvid'].encode('utf-8')
             videoitem['mediatype'] = 'video'
             videos.append(videoitem)
         else:
@@ -1428,21 +1517,7 @@ def get_videos(url):
             
     return videos
 
-    # if videoelements is None:
-    #     dialog = xbmcgui.Dialog()
-    #     ok = dialog.ok('错误提示', '没有播放源')
-    # else:
-    #     num = 0
-    #     for videoelement in videoelements:
-    #         videoitem = {}
-    #         videoitem['name'] = videoelement.find('img')['alt']
-    #         videoitem['href'] = videoelement.find('a')['href']
-    #         videoitem['thumb'] = j['rankList'][num]['pic'].encode('utf-8')
-    #         videos.append(videoitem)
-    #         num = num+1
-    #     return videos
-
-@plugin.cached(TTL=10)
+#解析视频/番剧分集信息
 def get_sources(url):
     sources = []
     if re.match('https://',url) == None:
@@ -1457,32 +1532,15 @@ def get_sources(url):
     if ifbangumiurl or ifvideourl != None:
       if ifbangumiurl != None:
     
-        r = requests.get(url,headers=headers)
+        r = get_html(url,t=10)
         
-        rtext = r.text
-        str1 = rtext.find('window.__INITIAL_STATE__=')
-        str2 = rtext.find(';(function(){var s')
-        vjson = rtext[str1+25:str2]
+        str1 = r.find('window.__INITIAL_STATE__=')
+        str2 = r.find(';(function(){var s')
+        vjson = r[str1+25:str2]
         j = json.loads(vjson)
         #缓存标题，方便后续判断
         cache['bgtitle'] = j['h1Title']
-        elist = j['epList']
-        for index in range(len(elist)):
-            videosource = {}
-            if elist[index]['badge'] != '':
-                if elist[index]['longTitle'] == '':
-                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8')) + ' - ' + elist[index]['longTitle'].encode('utf-8') + ' [COLOR pink][' + elist[index]['badge'].encode('utf-8') + '][/COLOR]'
-                else:
-                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8')) + ' [COLOR pink][' + elist[index]['badge'].encode('utf-8') + '][/COLOR]'
-            else:
-                if elist[index]['longTitle'] != '':
-                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8')) + ' - ' + elist[index]['longTitle'].encode('utf-8')
-                else:
-                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8'))
-            href = 'https://www.bilibili.com/bangumi/play/ep' + str(elist[index]['id']) + '?https://www.bilibili.com/video/' + elist[index]['bvid']
-            videosource['name'] = ename
-            videosource['href'] = plugin.url_for('play',name=ename,url=href)
-            sources.append(videosource)
+        
         slist = j['sections']
         if slist != []:
             for index in range(len(slist)):
@@ -1505,17 +1563,34 @@ def get_sources(url):
                     videosource['name'] = ssname
                     videosource['href'] = plugin.url_for('play',name=ssname,url=href)
                     sources.append(videosource)
+
+        elist = j['epList']
+        for index in range(len(elist)):
+            videosource = {}
+            if elist[index]['badge'] != '':
+                if elist[index]['longTitle'] == '':
+                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8')) + ' - ' + elist[index]['longTitle'].encode('utf-8') + ' [COLOR pink][' + elist[index]['badge'].encode('utf-8') + '][/COLOR]'
+                else:
+                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8')) + ' [COLOR pink][' + elist[index]['badge'].encode('utf-8') + '][/COLOR]'
+            else:
+                if elist[index]['longTitle'] != '':
+                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8')) + ' - ' + elist[index]['longTitle'].encode('utf-8')
+                else:
+                    ename = '正片 : ' + str(elist[index]['title'].encode('utf-8'))
+            href = 'https://www.bilibili.com/bangumi/play/ep' + str(elist[index]['id']) + '?https://www.bilibili.com/video/' + elist[index]['bvid']
+            videosource['name'] = ename
+            videosource['href'] = plugin.url_for('play',name=ename,url=href)
+            sources.append(videosource)
             
         return sources
 
       else:
         #print('视频')
-        r = requests.get(url,headers=headers)
+        r = get_html(url,t=10)
         
-        rtext = r.text
-        str1 = rtext.find('window.__INITIAL_STATE__=')
-        str2 = rtext.find(';(function(){var s')
-        vjson = rtext[str1+25:str2]
+        str1 = r.find('window.__INITIAL_STATE__=')
+        str2 = r.find(';(function(){var s')
+        vjson = r[str1+25:str2]
         #print(vjson)
         j = json.loads(vjson)
         vlist = j['videoData']['pages']
@@ -1533,7 +1608,7 @@ def get_sources(url):
         return sources
 
 #收藏分类列表
-@plugin.cached(TTL=10)
+
 def get_collectlist(uid):
     clists = []
     apiheaders = {
@@ -1541,8 +1616,9 @@ def get_collectlist(uid):
         'Cookie': sessdata(), # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         'Host': 'api.bilibili.com'
     }
-    r = requests.get('https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid='+str(uid)+'&jsonp=jsonp',headers=apiheaders)
-    j = json.loads(r.text)
+    
+    r = get_html('https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid='+str(uid)+'&jsonp=jsonp',head=str(apiheaders),t=10)
+    j = json.loads(r)
     try:
         c = j['data']['list']
         for index in range(len(c)):
@@ -1556,7 +1632,6 @@ def get_collectlist(uid):
     return clists
 
 #收藏分类下视频列表
-@plugin.cached(TTL=10)
 def get_collect(id,page):
     clists = []
     apiheaders = {
@@ -1564,8 +1639,8 @@ def get_collect(id,page):
         'Cookie': sessdata(), # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         'Host': 'api.bilibili.com'
     }
-    r = requests.get('https://api.bilibili.com/x/v3/fav/resource/list?media_id='+str(id)+'&pn='+str(page)+'&ps=20&keyword=&order=mtime&type=0&tid=0&jsonp=jsonp',headers=apiheaders)
-    j = json.loads(r.text)
+    r = get_html('https://api.bilibili.com/x/v3/fav/resource/list?media_id='+str(id)+'&pn='+str(page)+'&ps=20&keyword=&order=mtime&type=0&tid=0&jsonp=jsonp',head=str(apiheaders),t=10)
+    j = json.loads(r)
     c = j['data']['medias']
     for index in range(len(c)):
         source = {}
@@ -1580,7 +1655,6 @@ def get_collect(id,page):
     return clists
 
 #追番/追剧 mode=1 是追番列表 2是追剧列表
-@plugin.cached(TTL=10)
 def get_zhui(uid,page,mode):
     clists = []
     apiheaders = {
@@ -1588,8 +1662,8 @@ def get_zhui(uid,page,mode):
         'Cookie': sessdata(), # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         'Host': 'api.bilibili.com'
     }
-    r = requests.get('https://api.bilibili.com/x/space/bangumi/follow/list?type='+str(mode)+'&follow_status=0&pn='+str(page)+'&ps=30&vmid='+str(uid),headers=apiheaders)
-    j = json.loads(r.text)
+    r = get_html('https://api.bilibili.com/x/space/bangumi/follow/list?type='+str(mode)+'&follow_status=0&pn='+str(page)+'&ps=30&vmid='+str(uid),head=str(apiheaders),t=10)
+    j = json.loads(r)
     try:
         c = j['data']['list']
         for index in range(len(c)):
@@ -1615,82 +1689,110 @@ def play(name,url):
     ifbangumiurl = re.match('https://www.bilibili.com/bangumi/play/ep',url)
     ifvideourl = re.match('https://www.bilibili.com/video/',url)
     if ifbangumiurl or ifvideourl != None:
-      if ifbangumiurl != None:
-        #番剧
-        items = []
-        if 'bgtitle' in cache:
-            ti = cache['bgtitle']
-            ti = ti.encode('utf-8')
-            if re.search('僅限.*地區',ti):
-                #gangaotai
-                item = {'label': '[1080p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='80')}
-                items.append(item)
-
-                item = {'label': '[720p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='64')}
-                items.append(item)
-
-                item = {'label': '[480p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='32')}
-                items.append(item)
-
-                if re.search('僅限.*台.*地區',ti):
-                    item = {'label': '[480p]b站台湾代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='32',api=1)}
+        if ifbangumiurl != None:
+            #番剧
+            items = []
+            if 'bgtitle' in cache:
+                ti = cache['bgtitle']
+                ti = ti.encode('utf-8')
+                gaoaotaiswitch = xbmcplugin.getSetting(int(sys.argv[1]),'gaoaotaiswitch')
+                if re.search('僅限.*地區',ti) and gaoaotaiswitch == 'false':
+                    #gangaotai
+                    item = {'label': '[1080p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='80')}
                     items.append(item)
-                if re.search('僅限.*港.*地區',ti):
-                    item = {'label': '[480p]b站香港代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='32',api=2)}
+
+                    item = {'label': '[720p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='64')}
                     items.append(item)
+
+                    item = {'label': '[480p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='32')}
+                    items.append(item)
+
+                    if re.search('僅限.*台.*地區',ti):
+                        item = {'label': '[480p]b站台湾代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='32',api=1)}
+                        items.append(item)
+                    if re.search('僅限.*港.*地區',ti):
+                        item = {'label': '[480p]b站香港代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='32',api=2)}
+                        items.append(item)
                 
-                item = {'label': '[320p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='16')}
-                items.append(item)
+                    item = {'label': '[320p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='16')}
+                    items.append(item)
 
-                if re.search('僅限.*台.*地區',ti):
-                    item = {'label': '[320p]b站台湾代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='16',api=1)}
+                    if re.search('僅限.*台.*地區',ti):
+                        item = {'label': '[320p]b站台湾代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='16',api=1)}
+                        items.append(item)
+                    if re.search('僅限.*港.*地區',ti):
+                        item = {'label': '[320p]b站香港代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='16',api=2)}
+                        items.append(item)
+                else:
+                    #dalu
+                    bgmqn = get_bgmquality(url)
+                    # dialog = xbmcgui.Dialog()
+                    # ok = dialog.ok('错误提示', str(bgmqn))
+                    plus = xbmcplugin.getSetting(int(sys.argv[1]),'1080pplusswitch')
+                    if sessdata(mode='vip') != '':
+                        if plus == 'true':
+                            if 112 in bgmqn:
+                                item = {'label': '[COLOR pink][大会员][/COLOR][1080p+]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=112)}
+                                items.append(item)
+                        if 80 in bgmqn:
+                            item = {'label': '[1080p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=80)}
+                            items.append(item)
+                        if 64 in bgmqn:
+                            item = {'label': '[720p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=64)}
+                            items.append(item)
+                    else:
+                        dialog = xbmcgui.Dialog()
+                        dialog.notification('未设置sessdata','使用api2 720p以上解析，请在 高级功能 内填写sessdata', xbmcgui.NOTIFICATION_INFO, 5000)
+                    if 32 in bgmqn:
+                        item = {'label': '[480p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=32)}
+                        items.append(item)
+                    if 16 in bgmqn:
+                        item = {'label': '[320p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=16)}
+                        items.append(item)
+                    #item = {'label': '[480p][6分钟试看]使用 b站官方api3 解析','path': plugin.url_for('bangumiapi', name=name,url=url)}
+                    #items.append(item)
+            return items
+        else:
+            vidqn = get_vidquality(url)
+            #视频
+            items = []
+            plus = xbmcplugin.getSetting(int(sys.argv[1]),'1080pplusswitch')
+            if sessdata(mode='vip') != '' and plus == 'true':
+                if 120 in vidqn:
+                    item = {'label': '[COLOR pink][大会员][/COLOR][4k]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=120)}
                     items.append(item)
-                if re.search('僅限.*港.*地區',ti):
-                    item = {'label': '[320p]b站香港代理解析 [多谢 kghost.info API]','path': plugin.url_for('api5', name=name,url=url,quality='16',api=2)}
+                if 116 in vidqn:
+                    item = {'label': '[COLOR pink][大会员][/COLOR][1080p60]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=116)}
                     items.append(item)
-            else:
-                #dalu
+                if 74 in vidqn:
+                    item = {'label': '[COLOR pink][大会员][/COLOR][720p60]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=74)}
+                    items.append(item)
+            if 80 in vidqn:
+                item = {'label': '[1080p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=80)}
+                items.append(item)
                 if sessdata(mode='vip') != '':
-                    #dialog = xbmcgui.Dialog()
-                    #ok = dialog.ok('错误提示', sessdata())
                     item = {'label': '[1080p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=80)}
                     items.append(item)
+            # item = {'label': '[原画]使用 xbeibeix.com api 解析','path': plugin.url_for('api2', name=name,url=url)}
+            # items.append(item)
+            if 64 in vidqn:
+                item = {'label': '[720p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=64)}
+                items.append(item)
+                if sessdata(mode='vip') != '':
                     item = {'label': '[720p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=64)}
                     items.append(item)
-                else:
-                    dialog = xbmcgui.Dialog()
-                    dialog.notification('未设置sessdata','使用api2 720p以上解析，请在 高级功能 内填写sessdata', xbmcgui.NOTIFICATION_INFO, 5000)
+            if 32 in vidqn:
+                item = {'label': '[480p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=32)}
+                items.append(item)
                 item = {'label': '[480p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=32)}
+                items.append(item)
+            if 16 in vidqn:
+                item = {'label': '[320p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=16)}
                 items.append(item)
                 item = {'label': '[320p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=16)}
                 items.append(item)
-                #item = {'label': '[480p][6分钟试看]使用 b站官方api3 解析','path': plugin.url_for('bangumiapi', name=name,url=url)}
-                #items.append(item)
-        return items
-      else:
         
-        #视频
-        items = []
-        item = {'label': '[1080p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=80)}
-        items.append(item)
-        item = {'label': '[1080p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=80)}
-        items.append(item)
-        item = {'label': '[原画]使用 xbeibeix.com api 解析','path': plugin.url_for('api2', name=name,url=url)}
-        items.append(item)
-        item = {'label': '[720p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=64)}
-        items.append(item)
-        item = {'label': '[720p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=64)}
-        items.append(item)
-        item = {'label': '[480p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=32)}
-        items.append(item)
-        item = {'label': '[480p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=32)}
-        items.append(item)
-        item = {'label': '[320p]使用 b站官方api1 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api1', name=name,url=url,quality=16)}
-        items.append(item)
-        item = {'label': '[320p]使用 b站官方api2 解析 [万分感谢 Henryhaohao]','path': plugin.url_for('api3', name=name,url=url,quality=16)}
-        items.append(item)
-        
-        return items
+            return items
 
 
 @plugin.route('/bangumiapi/<name>/<url>/')
@@ -1854,8 +1956,10 @@ def sources(url):
         'path': source['href']
         #'is_playable': True
     } for source in sources]
-    sorted_items = sorted(items, key=lambda item: item['label'])
-    return sorted_items
+    # sorted_items = sorted(items, key=lambda item: item['label'])
+    # sorted_items = sorted(sorted_items,key=lambda x:int(re.search('\d+',x).group()),reverse = True)
+    # sorted_items = sorted(items, key=lambda item: item['label'])
+    return items[::-1]
 
 
 @plugin.route('/category/<url>/')
@@ -2030,37 +2134,6 @@ def sea():
     })
     return items
 
-# @plugin.route('/vip/')
-# def vip():
-    
-
-#     items = []
-#     if 'uid' in cache and cache['uid'] != '':
-#         items.append({
-#             'label': u'设置uid (uid:'+cache['uid'] +')',
-#             'path': plugin.url_for('input',key='uid',value='请输入uid：'),
-#         })
-#     else:
-#         items.append({
-#             'label': u'设置uid (uid为空)',
-#             'path': plugin.url_for('input',key='uid',value='请输入uid：'),
-#         })
-#     if 'sessdata' in cache and cache['sessdata'] != '':
-#         items.append({
-#             'label': u'设置SESSDATA (SESSDATA:'+cache['sessdata'] +')',
-#             'path': plugin.url_for('input',key='sessdata',value='请输入sessdata：(sessdata有效期30天，过期后只能解析480p的视频)'),
-#         })
-#     else:
-#         items.append({
-#             'label': u'设置SESSDATA (sessdata为空)',
-#             'path': plugin.url_for('input',key='sessdata',value='请输入sessdata：(sessdata有效期30天，过期后只能解析480p的视频)'),
-#         })
-    
-#     items.append({
-#         'label': 'up主视频白嫖率计算 - 仅供娱乐 (状态:'+chushihua('bq',0) +')',
-#         'path': plugin.url_for('switch',key='bq'),
-#     })
-#     return items
 
 @plugin.route('/search/<value>/<page>/')
 def search(value,page):
@@ -2084,7 +2157,8 @@ def search(value,page):
             'label': video['name'],
             'path': plugin.url_for('sources', url=video['href']),
             'thumbnail': video['thumb'],
-            'icon': video['thumb']
+            'icon': video['thumb'],
+            'info': video['info']
         } for video in videos]
         if len(videos) >= 20:
             items.append({
@@ -2119,7 +2193,8 @@ def bgsearch(value,page):
             'label': video['name'],
             'path': plugin.url_for('sources', url=video['href']),
             'thumbnail': video['thumb'],
-            'icon': video['thumb']
+            'icon': video['thumb'],
+            'info': video['info']
         } for video in videos]
         if len(videos) >= 20:
             items.append({
@@ -2154,7 +2229,8 @@ def movsearch(value,page):
             'label': video['name'],
             'path': plugin.url_for('sources', url=video['href']),
             'thumbnail': video['thumb'],
-            'icon': video['thumb']
+            'icon': video['thumb'],
+            'info': video['info']
         } for video in videos]
         if len(videos) >= 20:
             items.append({
@@ -2189,7 +2265,8 @@ def vidsearch(value,page):
             'label': video['name'],
             'path': plugin.url_for('sources', url=video['href']),
             'thumbnail': video['thumb'],
-            'icon': video['thumb']
+            'icon': video['thumb'],
+            'info': video['info']
         } for video in videos]
         if len(videos) >= 20:
             items.append({
