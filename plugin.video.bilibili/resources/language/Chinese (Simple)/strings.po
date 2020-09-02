@@ -82,3 +82,20 @@ msgstr "启用内置弹幕功能"
 msgctxt "#32203"
 msgid "damakufolder"
 msgstr "设置弹幕缓存文件夹"
+
+
+msgctxt "#32301"
+msgid "API Setting"
+msgstr "API设置"
+
+msgctxt "#32302"
+msgid "BiliPlus"
+msgstr "BiliPlus"
+
+msgctxt "#32303"
+msgid "accesskeyswitch"
+msgstr "使用此access_key访问需要用户权限的操作"
+
+msgctxt "#32304"
+msgid "accesskey"
+msgstr "access_key"
