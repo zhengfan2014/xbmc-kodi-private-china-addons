@@ -29,4 +29,10 @@
     <setting label="32202" type="bool" id="damakustatus" default="false"/>
     <setting label="32203" type="folder" id="damakufolder" source="auto" option="writeable"/>
     </category>  
+
+    <category label="32301">
+    <setting label="32302" type="lsep"/>
+    <setting label="32303" type="bool" id="accesskeyswitch" default="false"/>
+    <setting id="accesskey" type="text" label="32304" default=""/>
+    </category>
 </settings>

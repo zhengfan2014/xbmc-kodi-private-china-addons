@@ -1047,9 +1047,14 @@ def get_bgmquality(url):
     
     # vdict = {}
     vlist = []
-    for index in range(len(j['data']['accept_quality'])):
-        # vdict[j['data']['accept_description'][index]] = j['data']['accept_quality'][index]
-        vlist.append(j['data']['accept_quality'][index])
+    try:
+        for index in range(len(j['data']['accept_quality'])):
+            # vdict[j['data']['accept_description'][index]] = j['data']['accept_quality'][index]
+            vlist.append(j['data']['accept_quality'][index])
+    except TypeError:
+        # json file may not contain proper structure, return empty vlist in this case
+        # 海外用户在尝试打开番剧时，j['data']['accept_quality']会返回错误
+        pass
     return vlist
 
 #官方api1
@@ -1283,8 +1288,15 @@ def get_api4(url,quality):
             danmuku.Danmuku(cid,dpath)
     #hk9ho2af5hdw20wewf4ahqovwp79kq2z
     
-    #https://www.biliplus.com/BPplayurl.php?cid=181007115&bvid=BV1fK4y1r7sT&qn=80&module=bangumi&otype=json
-    url_api = 'https://www.biliplus.com/BPplayurl.php?cid={}&qn={}&module=bangumi&otype=json&bvid={}'.format(cid,quality,bvid)
+    accesskeyswitch = xbmcplugin.getSetting(int(sys.argv[1]),'accesskeyswitch')
+    if accesskeyswitch == 'true':
+        # 获取access_key的方法：登陆biliplus.com，从浏览器cookie中获取
+        accesskey = xbmcplugin.getSetting(int(sys.argv[1]),'accesskey')
+        # somehow, had to add a "platform" parameter to make it work
+        url_api = 'https://www.biliplus.com/BPplayurl.php?cid={}&qn={}&module=bangumi&otype=json&bvid={}&platform=ios&access_key={}'.format(cid,quality,bvid,accesskey)
+    else:
+        #https://www.biliplus.com/BPplayurl.php?cid=181007115&bvid=BV1fK4y1r7sT&qn=80&module=bangumi&otype=json
+        url_api = 'https://www.biliplus.com/BPplayurl.php?cid={}&qn={}&module=bangumi&otype=json&bvid={}'.format(cid,quality,bvid)
     
     r = get_html(url_api)
     html = json.loads(r)
@@ -1726,6 +1738,22 @@ def play(name,url):
                 else:
                     #dalu
                     bgmqn = get_bgmquality(url)
+
+                    if len(bgmqn) == 0:
+                        # oversea users
+                        # 海外用户使用biliplus解析番剧
+                        item = {'label': '[1080p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='80')}
+                        items.append(item)
+
+                        item = {'label': '[720p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='64')}
+                        items.append(item)
+
+                        item = {'label': '[480p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='32')}
+                        items.append(item)
+
+                        item = {'label': '[320p]b站国外代理解析 [多谢 biliplus.com API]','path': plugin.url_for('api4', name=name,url=url,quality='16')}
+                        items.append(item)
+
                     # dialog = xbmcgui.Dialog()
                     # ok = dialog.ok('错误提示', str(bgmqn))
                     plus = xbmcplugin.getSetting(int(sys.argv[1]),'1080pplusswitch')
