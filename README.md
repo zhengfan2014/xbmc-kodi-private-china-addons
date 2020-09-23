@@ -76,8 +76,8 @@
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ----
- plugin.video.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/><br>bilibili | 0.5.3 | 2020-05-10 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
- plugin.video.acfun | <img src="icons/acfun.png" width = "50" height = "50"/><br>acfun | 0.2.1 | 2020-05-05 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
+ plugin.video.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/><br>bilibili | 0.5.6 | 2020-05-10 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
+ plugin.video.acfun | <img src="icons/acfun.png" width = "50" height = "50"/><br>acfun | 0.2.1 | 2020-08-24 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
  plugin.video.changku | <img src="icons/changku.png" width = "50" height = "50"/><br>场库 | 0.1.0 | 2020-03-29 | 高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影
  plugin.video.huanxi | <img src="icons/huanxi.png" width = "50" height = "50"/><br>欢喜首映 | 0.1.0 | 2020-03-29 | 欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影
  plugin.video.skypixel | <img src="icons/skypixel.png" width = "50" height = "50"/><br>天空之城 | 0.1.0 | 2020-03-29 | 世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中
