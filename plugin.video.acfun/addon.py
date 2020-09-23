@@ -207,6 +207,11 @@ def get_videos(category):
             videoitem['name'] = item['contentTitle']
             videoitem['href'] = 'https://www.acfun.cn/v/ac' + item['dougaId']
             videoitem['thumb'] = item['coverUrl']
+            videoitem['info'] = {'plot':'UP主：' + item['userName'].encode('utf-8') + '\n'}
+            videoitem['info']['plot'] += str(item['viewCountShow'].encode('utf-8')) + '播放 · ' + str(item['danmakuCountShow'].encode('utf-8')) + '弹幕 · ' + str(item['commentCountShow'].encode('utf-8')) + '评论\n'
+            videoitem['info']['plot'] += 'AC' + str(item['dougaId']) + ' · ' + str(item['bananaCountShow'].encode('utf-8')) + '香蕉\n\n'
+            if 'contentDesc' in item:
+                videoitem['info']['plot'] += item['contentDesc'].encode('utf-8').replace('<br/>','\n')
             videos.append(videoitem)
     return videos
 
@@ -257,6 +262,7 @@ def get_sources(url):
                     sources.append(videosource)
                 
         except ValueError:
+            
             dialog = xbmcgui.Dialog()
             ok = dialog.ok('错误提示', '错误404，咦？世界线变动了，你好像来到了奇怪的地方。看看其他内容吧~')
             
@@ -301,6 +307,7 @@ def category(url):
         'path': plugin.url_for('sources', url=video['href']),
 	'thumbnail': video['thumb'],
 	'icon': video['thumb'],
+    'info': video['info'],
     } for video in videos]
 
     sorted_items = items
@@ -570,22 +577,21 @@ def play(url):
         mp4info['mediatype'] = 'video'
         videojson =j ['currentVideoInfo']['ksPlayJson']
         j2 = json.loads(videojson)
-
-
+        
         items = []
-        if len(j2['adaptationSet']['representation']) == 1 :
-            title = '['+j2['adaptationSet']['representation'][0]['qualityType'] + ']' + j['title']
-            path = j2['adaptationSet']['representation'][0]['url']
+        if len(j2['adaptationSet'][0]['representation']) == 1:
+            title = '['+j2['adaptationSet'][0]['representation'][0]['qualityType'] + ']' + j['title']
+            path = j2['adaptationSet'][0]['representation'][0]['url']
             item = {'label': title,'path':path,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': j['coverCdnUrls'][0]['url'],'icon': j['coverCdnUrls'][0]['url']}
         
             items.append(item)
         #return items
         else:
-            for index in range(len(j2['adaptationSet']['representation'])):
-                #print(j2['adaptationSet']['representation'][index]['qualityType'])
-                #print(j2['adaptationSet']['representation'][index]['url'])
-                title = '['+j2['adaptationSet']['representation'][index]['qualityType'] + ']' + j['title']
-                path = j2['adaptationSet']['representation'][index]['url']
+            for index in range(len(j2['adaptationSet'][0]['representation'])):
+                #print(j2['adaptationSet'][0]['representation'][index]['qualityType'])
+                #print(j2['adaptationSet'][0]['representation'][index]['url'])
+                title = '['+j2['adaptationSet'][0]['representation'][index]['qualityType'] + ']' + j['title']
+                path = j2['adaptationSet'][0]['representation'][index]['url']
                 item = {'label': title,'path':path,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': j['coverCdnUrls'][0]['url'],'icon': j['coverCdnUrls'][0]['url']}
         
                 items.append(item)
@@ -652,11 +658,11 @@ def play(url):
         img = j['bangumiCoverImageV'].split('?')
         img = img[0]
         vid = str(j['bangumiId']).encode('utf-8')
-        for index in range(len(j2['adaptationSet']['representation'])):
-            #print(j2['adaptationSet']['representation'][index]['qualityType'])
-            #print(j2['adaptationSet']['representation'][index]['url'])
-            title = '['+j2['adaptationSet']['representation'][index]['qualityType'] + ']' + j['bangumiTitle']
-            path = j2['adaptationSet']['representation'][index]['url']
+        for index in range(len(j2['adaptationSet'][0]['representation'])):
+            #print(j2['adaptationSet'][0]['representation'][index]['qualityType'])
+            #print(j2['adaptationSet'][0]['representation'][index]['url'])
+            title = '['+j2['adaptationSet'][0]['representation'][index]['qualityType'] + ']' + j['bangumiTitle']
+            path = j2['adaptationSet'][0]['representation'][index]['url']
             item = {'label': title,'path':path,'is_playable': True,'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
         
             items.append(item)
