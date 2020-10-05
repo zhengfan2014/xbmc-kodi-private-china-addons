@@ -17,15 +17,24 @@ import random
 import urllib
 import xml.etree.ElementTree as ET
 import difflib
+
+from requests.adapters import HTTPAdapter
+from requests.auth import HTTPBasicAuth
  
+from urllib import unquote
+
 def diff_float(s1, s2):
     return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
 
-def unescape(string):
-    string = urllib2.unquote(string).decode('utf8')
-    quoted = HTMLParser.HTMLParser().unescape(string).encode('utf-8')
-    #转成中文
-    return re.sub(r'%u([a-fA-F0-9]{4}|[a-fA-F0-9]{2})', lambda m: unichr(int(m.group(1), 16)), quoted)
+def urldecode(fname):
+    fname = unquote(fname.encode('utf-8'))
+    fname = unicode(fname.decode('utf-8'))
+    return fname
+# def unescape(string):
+#     string = urllib2.unquote(string).decode('utf8')
+#     quoted = HTMLParser.HTMLParser().unescape(string).encode('utf-8')
+#     #转成中文
+#     return re.sub(r'%u([a-fA-F0-9]{4}|[a-fA-F0-9]{2})', lambda m: unichr(int(m.group(1), 16)), quoted)
 
 
 plugin = Plugin()
@@ -58,78 +67,113 @@ def chushihua(key,default):
 
 @plugin.cached(TTL=2)
 def get_html(url,ua='pc',cf='',mode='html',encode='utf-8'):
-    if cf == '':
-        if ua == 'pc':
-            r = requests.get(url,headers=headers)
-        if ua == 'mobile':
-            r = requests.get(url,headers=mheaders)
-        if ua == 'iphone':
-            r = requests.get(url,headers=iphoneheaders)
-        if ua == 'ipad':
-            r = requests.get(url,headers=ipadheaders)
-        if ua == 'mac':
-            r = requests.get(url,headers=macheaders)
-        if encode == 'utf-8':
-            r.encoding = 'utf-8'
-        if encode == 'gbk':
-            r.encoding = 'gbk'
-        if mode == 'url':
-            html = r.url
+    #UA相关
+    if ua == 'pc':
+        head = headers
+    if ua == 'mobile':
+        head = mheaders
+    if ua == 'iphone':
+        head = iphoneheaders
+    if ua == 'ipad':
+        head = ipadheaders
+    if ua == 'mac':
+        head = macheaders
+    
+    #超时重试3次
+    s0 = requests.Session()
+    s0.mount('http://', HTTPAdapter(max_retries=3))
+    s0.mount('https://', HTTPAdapter(max_retries=3))
+
+    #获取网页源代码
+    if mode == 'html':
+        #cloudflare相关
+        if cf == '':
+            r = s0.get(url,headers=head)
         else:
-            html = r.text
-    else:
-        scraper = cfscrape.create_scraper()
-        if ua == 'pc':
-            s = scraper.get_tokens(url,headers=headers)
-            r = requests.get(url,headers=headers,cookies=s[0])
-        if ua == 'mobile':
-            s = scraper.get_tokens(url,headers=mheaders)
-            r = requests.get(url,headers=mheaders,cookies=s[0])
-        if ua == 'iphone':
-            s = scraper.get_tokens(url,headers=iphoneheaders)
-            r = requests.get(url,headers=iphoneheaders,cookies=s[0])
-        if ua == 'ipad':
-            s = scraper.get_tokens(url,headers=ipadheaders)
-            r = requests.get(url,headers=ipadheaders,cookies=s[0])
-        if ua == 'mac':
-            s = scraper.get_tokens(url,headers=macheaders)
-            r = requests.get(url,headers=macheaders,cookies=s[0])
-
-        if encode == 'utf-8':
-            r.encoding = 'utf-8'
-        if encode == 'gbk':
-            r.encoding = 'gbk'
-
-        if mode == 'url':
-            html = r.url
-        else:
-            html = r.text
-    return html
-
-@plugin.cached(TTL=2)
-def post_html(url,data,ua='pc',cf='',encode='utf-8'):
-    data =eval(data)
-    if cf == '':
-        if ua == 'pc':
-            r = requests.post(url,headers=headers,data=data)
-        if ua == 'mobile':
-            r = requests.post(url,headers=mheaders,data=data)
-        if ua == 'iphone':
-            r = requests.post(url,headers=iphoneheaders,data=data)
-        if ua == 'ipad':
-            r = requests.post(url,headers=ipadheaders,data=data)
-        if ua == 'mac':
-            r = requests.post(url,headers=macheaders,data=data)
-        
+            scraper = cfscrape.create_scraper()
+            s = scraper.get_tokens(url,headers=head)
+            r = s0.get(url,headers=head,cookies=s[0])
+        #编码相关
         if encode == 'utf-8':
             r.encoding = 'utf-8'
         if encode == 'gbk':
             r.encoding = 'gbk'
         html = r.text
-    else:
-        scraper = cfscrape.create_scraper()
-        html = scraper.post(url,data).content
+    
+    #用于获取302跳转网页的真实url
+    if mode == 'url':
+        #cloudflare相关
+        if cf == '':
+            r = s0.get(url,headers=head,timeout=5,stream=True)
+        else:
+            scraper = cfscrape.create_scraper()
+            s = scraper.get_tokens(url,headers=head)
+            r = s0.get(url,headers=head,cookies=s[0],timeout=5,stream=True)
+        
+        html = r.url
+        
     return html
+
+@plugin.cached(TTL=2)
+def post_html(url,data='',ua='pc',cf='',mode='html',encode='utf-8',jsons=''):
+    if data != '':
+        data =eval(data)
+    if jsons != '':
+        jsons =eval(jsons)
+
+    #UA相关
+    if ua == 'pc':
+        head = headers
+    if ua == 'mobile':
+        head = mheaders
+    if ua == 'iphone':
+        head = iphoneheaders
+    if ua == 'ipad':
+        head = ipadheaders
+    if ua == 'mac':
+        head = macheaders
+
+    #超时重试3次
+    s0 = requests.Session()
+    s0.mount('http://', HTTPAdapter(max_retries=3))
+    s0.mount('https://', HTTPAdapter(max_retries=3))
+
+    #cloudflare相关
+    if data != '' or jsons != '':
+        if cf == '':
+            if data != '':
+                r = s0.post(url,headers=head,data=data)
+            if jsons != '':
+                r = s0.post(url,headers=head,json=jsons)
+
+            if encode == 'utf-8':
+                r.encoding = 'utf-8'
+            if encode == 'gbk':
+                r.encoding = 'gbk'
+            html = r.text
+
+            if mode == 'url':
+                html = r.url
+            else:
+                html = r.text
+        else:
+            scraper = cfscrape.create_scraper()
+            s = scraper.get_tokens(url,headers=head)
+            if data != '':
+                r = s0.post(url,data=data,headers=head,cookies=s[0])
+            if jsons != '':
+                r = s0.post(url,json=jsons,headers=head,cookies=s[0])
+
+            if encode == 'utf-8':
+                r.encoding = 'utf-8'
+            if encode == 'gbk':
+                r.encoding = 'gbk'
+
+            if mode == 'url':
+                html = r.url
+            else:
+                html = r.text
+        return html
 
 def unix_to_data(uptime,format='data'):
     if len(str(uptime)) > 10:
@@ -195,7 +239,12 @@ def get_categories():
             {'id':9,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
             {'id':10,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40},
             {'id':11,'name':'采集资源(caijizy.vip)','link':'caijizy','author':'zhengfan2014','upload':'2020-6-12','videos':35},
-            {'id':13,'name':'哈酷资源(666zy.com)','link':'666zy','author':'zhengfan2014','upload':'2020-6-12','videos':20}]
+            {'id':12,'name':'哈酷资源(666zy.com)','link':'666zy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':13,'name':'kuku(pan.kuku.me)','link':'kukume','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':14,'name':'Share With You(ty.let-me-try.com)','link':'letmetry','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':15,'name':'goindex测试','link':'ddosi','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':16,'name':'goindex多盘版测试','link':'yanzai','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':17,'name':'goindex多盘版acrou','link':'acrou','author':'zhengfan2014','upload':'2020-9-26'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
@@ -203,16 +252,18 @@ def get_categories():
 
 #138vcd
 def get_138vcd_categories():
-    return [{"name": "电影", "link": "https://www.138vcd.com/vodshow/id/20"},
-          {"name": "连续剧", "link": "https://www.138vcd.com/vodshow/id/21"}, 
-          {"name": "综艺", "link": "https://www.138vcd.com/vodshow/id/22"}, 
-          {"name": "动漫", "link": "https://www.138vcd.com/vodshow/id/23"},
-          {"name": "纪录片", "link": "https://www.138vcd.com/vodshow/id/24"}]
+    return [{"name": "动作片", "link": "https://www.138vcd.com/index.php/vod/show/id/26"},
+          {"name": "喜剧片", "link": "https://www.138vcd.com/index.php/vod/show/id/27"}, 
+          {"name": "爱情片", "link": "https://www.138vcd.com/index.php/vod/show/id/28"}, 
+          {"name": "科幻片", "link": "https://www.138vcd.com/index.php/vod/show/id/29"},
+          {"name": "剧情片", "link": "https://www.138vcd.com/index.php/vod/show/id/30"},
+          {"name": "战争片", "link": "https://www.138vcd.com/index.php/vod/show/id/31"},
+          {"name": "恐怖片", "link": "https://www.138vcd.com/index.php/vod/show/id/36"}]
 
 def get_138vcd_videos(url,page):
     videos = []
     if page == 1:
-        r = get_html(url + '/')
+        r = get_html(url + '.html')
     else:
         r = get_html(url + '/page/' +str(page) +'.html')
     soup = BeautifulSoup(r, "html5lib")
@@ -246,12 +297,8 @@ def get_138vcd_source(url):
 
 def get_138vcd_mp4(url):
     r = get_html(url)
-    str1 = r.find('var player_data=')
-    cut = r[str1:]
-    mp4 = re.search('https?:..+\.mp4',cut).group()
+    mp4 = re.search('(?<=link_pre\":\"\",\"url\":\").*?(?=\",\"url_next)',r).group()
     mp4 = mp4.replace('\\','')
-    #dialog = xbmcgui.Dialog()
-    #ok = dialog.ok('错误提示', mp4)
     return mp4
 
 def get_138vcd_search(keyword,page):
@@ -709,6 +756,20 @@ def get_666zy_mp4info(url):
 def get_666zy_mp4(url):
     return url
 
+
+def get_kukume_categories():
+    return get_sharelist('https://pan.kuku.me/')
+
+def get_letmetry_categories():
+    return get_sharelist('https://ty.let-me-try.com/')
+
+def get_ddosi_categories():
+    return get_goindex('https://w.ddosi.workers.dev/')
+
+def get_yanzai_categories():
+    return get_yanzaigoindex('https://yanzai-goindex.java.workers.dev/')
+def get_acrou_categories():
+    return get_yanzaigoindex('https://oss.achirou.workers.dev/')
 ########################################################################################################################################
 ########################################################################################################################################
 ###以下是核心代码区，看不懂的请勿修改
@@ -815,19 +876,89 @@ def category(name,url,mode,page):
 @plugin.route('/home/<mode>/')
 def home(mode):
     categories = get_categories_mode(mode)
-    items = [{
-        'label': category['name'],
-        'path': plugin.url_for('category', name=category['name'] , url=category['link'],mode=mode,page=1),
-    } for category in categories]
+    if categories[0]['name'] == 'mode':
+        items = []
+        netdiskmod = categories[0]['link']
+        del categories[0]
+        pnum = 0
+        allnum = len(categories)
+        pDialog = xbmcgui.DialogProgress()
+        pDialog.create('解析网盘文件下载地址', '准备开始发送请求...')
+            
+        for category in categories:
+            
+            if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',urldecode(category['name'])):
+                #解析文件
+                pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：解析文件地址中...  [' + str(pnum+1) + '/' + str(allnum) + ']')
+                r = requests.get(category['link'], stream=True,headers=headers)
+                items.append({'label': category['name'],'path': r.url,'is_playable':True})
+            else:
+                #判断是否文件夹，是继续循环调用
+                pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：判断为文件夹,跳过...  [' + str(pnum+1) + '/' + str(allnum) + ']')
+                items.append({'label': category['name'],
+                'path': plugin.url_for('onetogo', name=category['name'].encode('utf-8'), url=category['link'].encode('utf-8'),mode=netdiskmod,page=1),
+                })
+            pnum += 1
+    else:
+        items = [{
+            'label': category['name'],
+            'path': plugin.url_for('category', name=category['name'] , url=category['link'],mode=mode,page=1),
+        } for category in categories]
+        try:
+            eval('get_' + mode + '_search')
+            items.append({
+                'label': '[COLOR yellow]搜索[/COLOR]',
+                'path': plugin.url_for('history',name='搜索',url='search',mode=mode),
+           })
+        except NameError:
+            pass
+    return items
+
+@plugin.route('/onetogo/<name>/<url>/<mode>/<page>/')
+def onetogo(name,url,mode,page):
     try:
-        eval('get_' + mode + '_search')
-        items.append({
-            'label': '[COLOR yellow]搜索[/COLOR]',
-            'path': plugin.url_for('history',name='搜索',url='search',mode=mode),
-        })
+        categories = eval('get_' + mode)(url)
+    
+        if categories[0]['name'] == 'mode':
+            items = []
+            del categories[0]
+            pnum = 0
+            allnum = len(categories)
+            pDialog = xbmcgui.DialogProgress()
+            pDialog.create('解析网盘文件下载地址', '准备开始发送请求...')
+            
+            for category in categories:
+            
+                if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',urldecode(category['name'])):
+                    #解析文件
+                    pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：解析文件地址中...  [' + str(pnum+1) + '/' + str(allnum) + ']')
+
+                    # s = requests.Session()
+                    # s.mount('http://', HTTPAdapter(max_retries=3))
+                    # s.mount('https://', HTTPAdapter(max_retries=3))
+
+                    # try:
+                    #     r = s.get(category['link'],timeout=5,stream=True,headers=headers)
+                    # except requests.exceptions.RequestException as e:
+                    #     dialog = xbmcgui.Dialog()
+                    #     dialog.textviewer('错误提示',str(e))
+                    # r = requests.get(category['link'], stream=True,headers=headers)
+                    r = get_html(category['link'],mode='url')
+                    items.append({'label': category['name'],'path':r,'is_playable':True})
+                else:
+                    #判断是否文件夹，是继续循环调用
+                    pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：判断为文件夹,跳过...  [' + str(pnum+1) + '/' + str(allnum) + ']')
+                    items.append({'label': category['name'],
+                    'path': plugin.url_for('onetogo', name=category['name'].encode('utf-8'), url=category['link'].encode('utf-8'),mode=mode,page=1),
+                    })
+                pnum += 1
+    
     except NameError:
         pass
+
     return items
+
+
 
 @plugin.route('/search/<value>/<page>/<mode>/')
 def search(value,page,mode):
@@ -1650,5 +1781,239 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
     # dialog.textviewer('错误提示', str(xx.encode('utf-8')))
 
     return typelist
+
+
+
+
+#对接sharelist搭建的网盘站
+def get_sharelist(home):
+    typelist = []
+    typelist.append({'name':'mode','link':'sharelist'})
+    r = get_html(home)
+    rurl = get_html(home,mode='url')
+    soup = BeautifulSoup(r, "html5lib")
+    files = soup.find_all('a')
+
+    baseurl = re.search('(http(s)?:\/\/).*?\/',rurl).group()
+    
+    if baseurl[-1:] == '/':
+        baseurl = baseurl[:-1]
+
+    for index in range(len(files)):
+        try:
+            x = 0
+            if files[index]['href'] != '/':
+                files[index]['href'] = files[index]['href'].replace('?preview','')
+                if files[index]['href'][:4] != 'http':
+                    flink = baseurl + files[index]['href']
+                else:
+                    flink = files[index]['href']
+
+                if files[index]['href'][-1:] == '/':
+                    fname = files[index]['href'][:-1]
+                else:
+                    fname = files[index]['href']
+                
+                if fname != '':
+                    fname = re.search('[^/]+(?!.*/)',fname).group()
+                fname = urldecode(fname)
+
+                if typelist != []:
+                    #对比和已有列表是否有重复项
+                    for i in range(len(typelist)):
+                        if typelist[i]['link'] != flink:
+                            x = x+1
+                    
+                    if x ==  len(typelist) and fname != '':
+                        typelist.append({'name':fname + ' - [COLOR gray]' + urldecode(flink) + '[/COLOR]','link':flink})
+                            
+                else:
+                    typelist.append({'name':fname + ' - [COLOR gray]' + urldecode(flink) + '[/COLOR]','link':flink})
+                    # nowlist.append(fname)
+                
+                
+        except KeyError:
+            pass
+    # lastlist = nowlist
+    # dialog = xbmcgui.Dialog()
+    # dialog.textviewer('错误提示', str(lastlist))
+    return typelist
+
+
+#对接原版goindex
+def get_goindex(home):
+    typelist = []
+    typelist.append({'name':'mode','link':'goindex'})
+    if re.search('workers.dev',home):
+        r = post_html(home,str({"password":"null"}),cf=1)
+    else:
+        r = post_html(home,str({"password":"null"}))
+
+    j = json.loads(r)
+    fl = j['files']
+    for i in range(len(fl)):
+        if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',fl[i]['name']):
+            #文件
+            typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'[/COLOR]','link':home.decode('utf-8') + fl[i]['name']})
+        else:
+            #文件夹
+            typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'/[/COLOR]','link':home.decode('utf-8') + fl[i]['name'] + u'/'})
+    return typelist
+
+#对接yanzai修改版goindex - 官网demo 2020-4-28版本测试通过
+def get_yanzaigoindex(home):
+    if re.search('\|',home):
+        
+        ho = home.split('|')
+        home = ho[0]
+        if len(ho) == 3:
+            pindex = int(ho[1])
+            ptoken = ho[2]
+    else:
+        pindex = 0
+        ptoken = ''
+
+    typelist = []
+    typelist.append({'name':'mode','link':'yanzaigoindex'})
+
+    if re.search('\/[0-9]+\:\/',home):
+        #不是首页，不检索有几个网盘
+        if re.search('workers.dev',home):
+            r0 = requests.get(home)
+            if r0.status_code != requests.codes.ok:
+                #检测到状态码401 需要登录
+
+                # dialog = xbmcgui.Dialog()
+                # dialog.textviewer('错误提示', str(r0.status_code))
+                if tmp['yanzaiuser'] and tmp['yanzaipass']:
+                    #尝试用缓存的账号密码登录
+                    scraper = cfscrape.create_scraper()
+                    s = scraper.get_tokens(home,headers=headers,auth=HTTPBasicAuth(tmp['yanzaiuser'], tmp['yanzaipass']))
+
+                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,cookies=s[0],auth=HTTPBasicAuth(tmp['yanzaiuser'], tmp['yanzaipass']))
+                    if r.status_code == 200:
+                        #登录成功
+                        j = json.loads(r.text)
+                    else:
+                        #失败，要求输入账号密码
+                        dialog = xbmcgui.Dialog()
+                        username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM)
+                        password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM)
+                        scraper = cfscrape.create_scraper()
+                        s = scraper.get_tokens(home,headers=headers,auth=HTTPBasicAuth(username, password))
+                        r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,cookies=s[0],auth=HTTPBasicAuth(username, password))
+                        j = json.loads(r.text)
+                        tmp['yanzaiuser'] = username
+                        tmp['yanzaipass'] = password
+                else:
+                    dialog = xbmcgui.Dialog()
+                    username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM)
+                    password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM)
+                    scraper = cfscrape.create_scraper()
+                    s = scraper.get_tokens(home,headers=headers,auth=HTTPBasicAuth(username, password))
+                
+                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,cookies=s[0],auth=HTTPBasicAuth(username, password))
+                    # dialog = xbmcgui.Dialog()
+                    # dialog.textviewer('错误提示', str(r.status_code))
+                    j = json.loads(r.text)
+                    tmp['yanzaiuser'] = username
+                    tmp['yanzaipass'] = password
+            else:
+                #网盘没有加密
+                r = post_html(home,str({"password":"","page_token":ptoken,"page_index":pindex}),cf=1)
+                try:
+                    j = json.loads(r)
+                except ValueError:
+                    r = post_html(home,jsons=str({"password":"","page_token":ptoken,"page_index":pindex,"q": ""}),cf=1)
+                    j = json.loads(r)
+        else:
+            r0 = requests.get(home)
+            if r0.status_code != requests.codes.ok:
+                #检测到状态码401 需要登录
+                if tmp['yanzaiuser'] and tmp['yanzaipass']:
+                    #尝试用缓存的账号密码登录
+                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,auth=HTTPBasicAuth(tmp['yanzaiuser'],tmp['yanzaipass']))
+                    if r.status_code == 200:
+                        #登录成功
+                        j = json.loads(r.text)
+                    else:
+                        #失败，要求输入账号密码
+                        dialog = xbmcgui.Dialog()
+                        username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                        password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                        r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,auth=HTTPBasicAuth(username, password))
+                        j = json.loads(r.text)
+                        tmp['yanzaiuser'] = username
+                        tmp['yanzaipass'] = password
+                else:
+                    dialog = xbmcgui.Dialog()
+                    username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                    password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,auth=HTTPBasicAuth(username, password))
+                    j = json.loads(r.text)
+                    tmp['yanzaiuser'] = username
+                    tmp['yanzaipass'] = password
+            else:
+                #网盘没有加密
+                r = post_html(home,str({"password":"","page_token":ptoken,"page_index":pindex}))
+                try:
+                    j = json.loads(r)
+                except ValueError:
+                    r = post_html(home,jsons=str({"password":"","page_token":ptoken,"page_index":pindex,"q": ""}))
+                    j = json.loads(r)
+        
+        
+        fl = j['data']['files']
+        for i in range(len(fl)):
+            if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',fl[i]['name']):
+                #文件
+                typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'[/COLOR]','link':home.decode('utf-8') + fl[i]['name']})
+            else:
+                #文件夹
+                typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'/[/COLOR]','link':home.decode('utf-8') + fl[i]['name'] + u'/'})
+        if j['nextPageToken']:
+            # dialog = xbmcgui.Dialog()
+            # dialog.textviewer('错误提示', str(j['nextPageToken'].encode('utf-8')))
+            typelist.append({'name':u'[COLOR yellow]下一页[/COLOR]','link':home + '|' + str(pindex+1) + '|' + j['nextPageToken'].encode('utf-8')})
+        
+    else:
+        #检索有几个网盘
+        if re.search('workers.dev',home):
+            r = get_html(home,cf=1)
+        else:
+            r = get_html(home)
+        try:
+            ser = re.search('\[(\"|\').*?(\"|\')\]',r).group()
+            dlist = eval(ser)
+            for i in range(len(dlist)):
+                typelist.append({'name':dlist[i].decode('utf-8') + u' - [COLOR gray]' + home.decode('utf-8') + str(i) +  u':/[/COLOR]','link':home.decode('utf-8') + str(i) +  u':/'})
+        except NameError:
+            pass
+    return typelist
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     plugin.run()
