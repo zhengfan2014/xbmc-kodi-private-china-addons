@@ -45,6 +45,10 @@ msgctxt "#32103"
 msgid "baipiaolv"
 msgstr "简介中显示视频白嫖率(仅供娱乐)"
 
+msgctxt "#32110"
+msgid "cachestatus"
+msgstr "禁用缓存(当插件出现问题可尝试)"
+
 msgctxt "#32104"
 msgid "gat"
 msgstr "港澳台相关"
@@ -98,4 +102,4 @@ msgstr "使用此access_key访问需要用户权限的操作"
 
 msgctxt "#32304"
 msgid "accesskey"
-msgstr "access_key"
+msgstr "access_key" 

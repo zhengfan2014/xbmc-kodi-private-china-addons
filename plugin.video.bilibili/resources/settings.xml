@@ -15,6 +15,7 @@
 
     <setting label="32102" type="lsep"/>
     <setting label="32103" type="bool" id="baipiao" default="false"/>
+    <setting label="32110" type="bool" id="cachestatus" default="false"/>
 
     <setting label="32104" type="lsep"/>
     <setting label="32105" type="bool" id="gaoaotaiswitch" default="false"/>
