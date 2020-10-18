@@ -268,9 +268,11 @@ def get_sources(url):
             
     if cutjson.find('window.pageInfo = window.bangumiData = ') != -1:
         #番剧
-        str1 = cutjson.find('window.bangumiList')
-        str2 = cutjson.find('window.abtestConfig = ')
-        bgm = cutjson[str1+21:str2-28]
+        # str1 = cutjson.find('window.bangumiList')
+        # str2 = cutjson.find('window.abtestConfig = ')
+        bgm = re.search('(?<=window.bangumiList = ).*?(?=;)',cutjson).group()
+        
+        # bgm = cutjson[str1+21:str2-28]
         j = json.loads(bgm)
         for index in range(len(j['items'])):
             videosource = {}
