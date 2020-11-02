@@ -225,11 +225,11 @@ def get_categories():
 
 #bimibimi
 def get_bimibimi_categories():
-    return [{'name':'新番放送','link':'http://www.bimibimi.me/type/riman'},
-            {'name':'国产动漫','link':'http://www.bimibimi.me/type/guoman'},
-            {'name':'番组计划','link':'http://www.bimibimi.me/type/fanzu'},
-            {'name':'剧场动画','link':'http://www.bimibimi.me/type/juchang'},
-            {'name':'影视','link':'http://www.bimibimi.me/type/move'}]
+    return [{'name':'新番放送','link':'http://www.bimiacg.com/type/riman'},
+            {'name':'国产动漫','link':'http://www.bimiacg.com/type/guoman'},
+            {'name':'番组计划','link':'http://www.bimiacg.com/type/fanzu'},
+            {'name':'剧场动画','link':'http://www.bimiacg.com/type/juchang'},
+            {'name':'影视','link':'http://www.bimiacg.com/type/move'}]
 
 def get_bimibimi_videos(url,page):
     videos = []
@@ -244,7 +244,7 @@ def get_bimibimi_videos(url,page):
     for i in range(len(alist)):
         videoitem = {}
         videoitem['name'] =  alist[i]['title'] + ' [' + plist[i].text + ']' 
-        videoitem['href'] =  'http://www.bimibimi.me' + alist[i]['href']
+        videoitem['href'] =  'http://www.bimiacg.com' + alist[i]['href']
         videoitem['thumb'] = alist[i].img['data-original']
         videoitem['info'] = {'plot' : alist[i]['title'] + '\n' + plist[i].text }
         videos.append(videoitem)
@@ -260,7 +260,7 @@ def get_bimibimi_source(url):
         alist = linelist[index].find_all('a')
         duopdict = {}
         for i in range(len(alist)):
-            duopdict[alist[i].text] = 'http://www.bimibimi.me/' + alist[i]['href']
+            duopdict[alist[i].text] = 'http://www.bimiacg.com/' + alist[i]['href']
         sourcelist.append(duopdict)
 
     for index in range(len(sourcelist)):
@@ -341,11 +341,11 @@ def get_bimibimi_mp4(url):
 def get_bimibimi_search(keyword,page):
     videos = []
     if int(page) == 1:
-        url = 'http://www.bimibimi.me/vod/search/'
+        url = 'http://www.bimiacg.com/vod/search/'
         data = str({'wd':keyword})
         r = post_html(url,data)
     else:
-        url = 'http://www.bimibimi.me/vod/search/wd/'+keyword+'/page/'+ str(page) +'/'
+        url = 'http://www.bimiacg.com/vod/search/wd/'+keyword+'/page/'+ str(page) +'/'
         r = get_html(url)
     soup = BeautifulSoup(r, "html5lib")
     linelist = soup.find('ul',class_='drama-module clearfix tab-cont')
@@ -356,12 +356,11 @@ def get_bimibimi_search(keyword,page):
     for i in range(len(alist)):
         videoitem = {}
         videoitem['name'] =  alist[i]['title'] + '[' + plist[i].text + ']' 
-        videoitem['href'] =  'http://www.bimibimi.me' + alist[i]['href']
+        videoitem['href'] =  'http://www.bimiacg.com' + alist[i]['href']
         videoitem['thumb'] = alist[i].img['data-original']
         videoitem['info'] =  {'plot' : alist[i]['title'] + '\n' + plist[i].text  }
         videos.append(videoitem)
     return videos
-
 #樱花
 def get_yhdm_categories():
     return [{'name':'日本动漫','link':'http://www.yhdm.tv/japan/'},
@@ -465,10 +464,11 @@ def get_yhdm_mp4(url):
             mp4 = j['url']
             mp4 = mp4.replace('\\','')
             rt = mp4
+            return rt
     else:
         dialog = xbmcgui.Dialog()
         ok = dialog.ok('错误提示','不受支持的播放链接')
-    return rt
+    
 
 def get_yhdm_search(keyword,page):
     videos = []
