@@ -1,0 +1,112 @@
+# flsusr <flsusr@a-ca.pro>, 2020.
+msgid ""
+msgstr ""
+"Last-Translator: flsusr <flsusr@a-ca.pro>\n"
+"PO-Revision-Date: 2020-12-11 10:57+0800\n"
+"Project-Id-Version: \n"
+"Language-Team: English <kde-i18n-doc@kde.org>\n"
+"Language: en_AU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 20.08.3\n"
+
+#Chinese Simplified
+msgctxt "#32001"
+msgid "Login Setting"
+msgstr "Login Setting"
+
+msgctxt "#32002"
+msgid "mainUid"
+msgstr "mainUid"
+
+msgctxt "#32003"
+msgid "Uid"
+msgstr "Uid"
+
+msgctxt "#32004"
+msgid "SESSDATA"
+msgstr "SESSDATA"
+
+msgctxt "#32005"
+msgid "vipUid"
+msgstr "vipUid"
+
+msgctxt "#32006"
+msgid "vipstatus"
+msgstr "vipstatus"
+
+msgctxt "#32007"
+msgid "VIPSESSDATA"
+msgstr "VIPSESSDATA"
+
+msgctxt "#32101"
+msgid "Function Setting"
+msgstr "Function Setting"
+
+msgctxt "#32102"
+msgid "zaxiang"
+msgstr "Misc"
+
+msgctxt "#32103"
+msgid "baipiaolv"
+msgstr "display free bang rate in intros(just for fun)"
+
+msgctxt "#32110"
+msgid "cachestatus"
+msgstr "disable cache(try this if you have issues)"
+
+msgctxt "#32104"
+msgid "gat"
+msgstr "HK, MO, TW"
+
+msgctxt "#32105"
+msgid "gangaotaiswitch"
+msgstr "oversea mode(use official api2 to parse HK,MO,TW only series)"
+
+msgctxt "#32106"
+msgid "gangaotaiswitch"
+msgstr ""
+"replace bilibili oversea CDN(For domestic users who want to improve HK,MO,TW"
+" series watching experience)"
+
+msgctxt "#32107"
+msgid "api"
+msgstr "replace by..."
+
+msgctxt "#32108"
+msgid "api"
+msgstr "Parser related"
+
+msgctxt "#32109"
+msgid "1080pplusswitch"
+msgstr "Display big member only resolutions(1080p60，720p60，1080p+)"
+
+msgctxt "#32201"
+msgid "Damaku Setting"
+msgstr "Damaku Setting"
+
+msgctxt "#32202"
+msgid "damakustatus"
+msgstr "Damaku Status"
+
+msgctxt "#32203"
+msgid "damakufolder"
+msgstr "Damaku Folder"
+
+msgctxt "#32301"
+msgid "API Setting"
+msgstr "API Setting"
+
+msgctxt "#32302"
+msgid "BiliPlus"
+msgstr "BiliPlus"
+
+msgctxt "#32303"
+msgid "accesskeyswitch"
+msgstr "use this access_key for user privilege required operations"
+
+msgctxt "#32304"
+msgid "accesskey"
+msgstr "access_key"
