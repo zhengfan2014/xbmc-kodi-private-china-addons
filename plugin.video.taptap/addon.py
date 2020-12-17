@@ -36,6 +36,11 @@ ipadheaders = {'user-agent': 'Mozilla/5.0 (iPad; CPU OS 10_15_4 Supplemental Upd
 iphoneheaders = {'user-agent': 'Mozilla/5.0 (iPhone; CPU OS 10_15_4 Supplemental Update like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Mobile/14E304 Safari/605.1.15'}
 mheaders = {'user-agent':'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Mobile Safari/537.36'}
 headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
+@plugin.cached(TTL=30)
+def get_html_longtimecache(url,ua='pc',cookie='',mode='html',encode='utf-8'):
+    output = get_html(url,ua,cookie,mode,encode)
+    return output
+
 @plugin.cached(TTL=2)
 def get_html(url,ua='pc',cookie='',mode='html',encode='utf-8'):
     if cookie != '':
@@ -553,20 +558,31 @@ def play(name,url):
             #api += '&X-UA=V%3D1%26PN%3DWebApp%26LANG%3Dzh_CN%26VN_CODE%3D2%26VN%3D0.1.0%26LOC%3DCN%26PLT%3DPC%26UID%3D5aef8bdb-c213-4803-8a5e-33b333de04bb'
             r = get_html(api)
             j = json.loads(r)
-
             items = []
-            item = {'is_playable': True}
-            item['label'] = j['data']['video']['video_resource']['info']['best_format_name']  + ' - '
-            item['label'] += j['data']['video']['title']
-            item['path'] = j['data']['video']['url']
-            item['thumbnail'] = j['data']['video']['image']['medium_url'].split('?')[0]
-            item['icon'] = j['data']['video']['image']['medium_url'].split('?')[0]
-            item['info'] = {}
-            item['info']['plot'] = zh(j['data']['video']['stat']['play_total']) + ' 播放 · ' + unix_to_data(int(j['data']['video']['created_time']),'ymdh') + ' · '
-            item['info']['plot'] += zh(j['data']['video']['ups']) + ' 赞 · ' + zh(j['data']['video']['comments']) + ' 回复'
-            if 'intro' in j['data']['video']:
-                item['info']['plot'] += '\n\n' + re.sub('<.*?>','',j['data']['video']['intro']['text'].encode('utf-8'))
-            items.append(item)
+
+            #再解析一次url，缓存安排上
+            r = get_html_longtimecache(j['data']['video']['url'])
+            prule = re.compile(r'(?<=NAME=")\d+[p|k]\d?\d?') 
+            pname = prule.findall(r)
+            #print(pname)
+            urlrule = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')   # 查找数字
+            m3u8url = urlrule.findall(r)
+            dialog = xbmcgui.Dialog()
+            ok = dialog.ok('错误',str(pname))
+            for index in range(len(pname)):
+                item = {'is_playable': True}
+                #item['label'] = j['data']['video']['video_resource']['info']['best_format_name']  + ' - '
+                item['label'] = pname[index]  + ' - '
+                item['label'] += j['data']['video']['title']
+                item['path'] = m3u8url[index]
+                item['thumbnail'] = j['data']['video']['image']['medium_url'].split('?')[0]
+                item['icon'] = j['data']['video']['image']['medium_url'].split('?')[0]
+                item['info'] = {}
+                item['info']['plot'] = zh(j['data']['video']['stat']['play_total']) + ' 播放 · ' + unix_to_data(int(j['data']['video']['created_time']),'ymdh') + ' · '
+                item['info']['plot'] += zh(j['data']['video']['ups']) + ' 赞 · ' + zh(j['data']['video']['comments']) + ' 回复'
+                if 'intro' in j['data']['video']:
+                    item['info']['plot'] += '\n\n' + re.sub('<.*?>','',j['data']['video']['intro']['text'].encode('utf-8'))
+                items.append(item)
         else:
             dialog = xbmcgui.Dialog()
             ok = dialog.ok('错误','url格式错误')
