@@ -1,0 +1,105 @@
+msgid ""
+msgstr ""
+
+#Chinese Simplified
+
+msgctxt "#32001"
+msgid "Login Setting"
+msgstr "登录设置"
+
+msgctxt "#32002"
+msgid "mainUid"
+msgstr "主账号设置"
+
+msgctxt "#32003"
+msgid "Uid"
+msgstr "登录Uid"
+
+msgctxt "#32004"
+msgid "SESSDATA"
+msgstr "SESSDATA"
+
+msgctxt "#32005"
+msgid "vipUid"
+msgstr "大会员账号"
+
+msgctxt "#32006"
+msgid "vipstatus"
+msgstr "使用以下SESSDATA来解析大会员视频(该账号得有大会员)"
+
+msgctxt "#32007"
+msgid "VIPSESSDATA"
+msgstr "SESSDATA"
+
+
+
+msgctxt "#32101"
+msgid "Function Setting"
+msgstr "功能设置"
+
+msgctxt "#32102"
+msgid "zaxiang"
+msgstr "杂项"
+
+msgctxt "#32103"
+msgid "baipiaolv"
+msgstr "简介中显示视频白嫖率(仅供娱乐)"
+
+msgctxt "#32110"
+msgid "cachestatus"
+msgstr "禁用缓存(当插件出现问题可尝试)"
+
+msgctxt "#32104"
+msgid "gat"
+msgstr "港澳台相关"
+
+msgctxt "#32105"
+msgid "gangaotaiswitch"
+msgstr "海外模式(使用官方api2来解析仅限港澳台番剧)"
+
+msgctxt "#32106"
+msgid "gangaotaiswitch"
+msgstr "替换b站海外CDN(用于国内用户加速观看仅限港澳台番剧)"
+
+msgctxt "#32107"
+msgid "api"
+msgstr "替换为..."
+
+msgctxt "#32108"
+msgid "api"
+msgstr "解析相关"
+
+msgctxt "#32109"
+msgid "1080pplusswitch"
+msgstr "显示大会员专享的清晰度(视频1080p60，720p60，番剧1080p+)"
+
+
+
+msgctxt "#32201"
+msgid "Damaku Setting"
+msgstr "弹幕设置"
+
+msgctxt "#32202"
+msgid "damakustatus"
+msgstr "启用内置弹幕功能"
+
+msgctxt "#32203"
+msgid "damakufolder"
+msgstr "设置弹幕缓存文件夹"
+
+
+msgctxt "#32301"
+msgid "API Setting"
+msgstr "API设置"
+
+msgctxt "#32302"
+msgid "BiliPlus"
+msgstr "BiliPlus"
+
+msgctxt "#32303"
+msgid "accesskeyswitch"
+msgstr "使用此access_key访问需要用户权限的操作"
+
+msgctxt "#32304"
+msgid "accesskey"
+msgstr "access_key" 
