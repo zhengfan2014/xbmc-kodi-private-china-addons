@@ -11,19 +11,41 @@ jobs:
     runs-on: ubuntu-latest
     name: Zip Pack 
     steps: 
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
     - name: Initialization environment
       run: |
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        sudo mkdir -p /workdir/zip
+        sudo chown $USER:$GROUPS /workdir/zip
     - name: Clone source code
       working-directory: /workdir
       run: |
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH kodi
-    - name: Zip kodi addons
+    - name: Create kodi addons Zip
       run: |
-        zip -r /workdir/kodi.zip /workdir/kodi
-        sudo cp /workdir/kodi.zip /workdir/kodi
+        zip -r /workdir/zip/metadata.douban.com.python-${{ steps.date.outputs.date }}.zip /workdir/kodi/metadata.douban.com.python
+        zip -r /workdir/zip/plugin.audio.jsososo-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.audio.jsososo
+        zip -r /workdir/zip/plugin.video.acfun-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.acfun
+        zip -r /workdir/zip/plugin.video.bangumi-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.bangumi
+        zip -r /workdir/zip/plugin.video.bilibili-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.bilibili
+        zip -r /workdir/zip/plugin.video.changku-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.changku
+        zip -r /workdir/zip/plugin.video.cine-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.cine
+        zip -r /workdir/zip/plugin.video.huanxi-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.huanxi
+        zip -r /workdir/zip/plugin.video.kaiyan-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.kaiyan
+        zip -r /workdir/zip/plugin.video.medicalvideo-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.medicalvideo
+        zip -r /workdir/zip/plugin.video.reallive-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.reallive
+        zip -r /workdir/zip/plugin.video.skypixel-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.skypixel
+        zip -r /workdir/zip/plugin.video.taptap-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.taptap
+        zip -r /workdir/zip/plugin.video.vid-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.vid
+        zip -r /workdir/zip/plugin.video.weibotv-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.weibotv
+        zip -r /workdir/zip/plugin.video.xinpianchang-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.xinpianchang
+        zip -r /workdir/zip/service.subtitles.acfun-${{ steps.date.outputs.date }}.zip /workdir/kodi/service.subtitles.acfun
+        zip -r /workdir/zip/service.subtitles.bilibili-${{ steps.date.outputs.date }}.zip /workdir/kodi/service.subtitles.bilibili
+        sudo cp /workdir/zip /workdir/kodi
     # - name: Archive production artifacts
     #   uses: actions/upload-artifact@v2
     #   with:
@@ -36,7 +58,7 @@ jobs:
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add kodi.zip
-        git commit -m "Auto Update kodi.zip"
+        git commit -m "Auto Create kodi addons zip"
         git init
     - name: Push changes
       uses: ad-m/github-push-action@master
