@@ -1,0 +1,12 @@
+
+name: zip kodi addons
+on: push
+
+jobs: 
+  my-job: 
+    name: Zip Pack
+    steps: 
+    - name: Compress
+      uses: TonyBogdanov/zip@1.0
+      with:
+        args: zip -qq -r ./archive.zip ./img
