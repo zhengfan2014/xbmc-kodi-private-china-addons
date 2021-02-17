@@ -20,14 +20,12 @@ jobs:
       run: |
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH kodi
-        ln -sf /workdir/kodi $GITHUB_WORKSPACE/kodi
     - name: Zip kodi addons
-      uses: TonyBogdanov/zip@1.0
-      with:
-        args: zip -qq -r /workdir/archive.zip  /workdir/kodi
+      run: |
+        zip -r /workdir/kodi.zip /workdir/kodi
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
         name: dist-without-markdown
         path: |
-          /workdir/archive.zip
+          /workdir/kodi.zip
