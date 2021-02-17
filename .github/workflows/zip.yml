@@ -42,6 +42,6 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: repo
+        branch: default
         repository: zhengfan2014/xbmc-kodi-private-china-addons
         directory: /workdir/kodi
