@@ -5,6 +5,22 @@ on: push
 env:
   REPO_URL: https://github.com/zhengfan2014/xbmc-kodi-private-china-addons
   REPO_BRANCH: master
+  DOUBAN_PYTHON:0.1.0
+  JSOSOSO:0.1.0
+  ACFUN:0.1.0
+  BANGUMI:0.1.0
+  BILIBILI:0.1.0
+  CHANGKU:0.1.0
+  CINE:0.1.0
+  HUANXI:0.1.0
+  KAIYAN:0.1.0
+  SKYPIXEL:0.1.0
+  TAPTAP:0.1.0
+  VID:0.1.0
+  WEIBOTV:0.1.0
+  XINPIANCHANG:0.1.0
+  DANMU_ACFUN:0.1.0
+  DANMU_BILIBILI:0.1.0
   
 jobs: 
   my-job: 
@@ -46,6 +62,18 @@ jobs:
         zip -r /workdir/zip/plugin.video.xinpianchang.zip plugin.video.xinpianchang
         zip -r /workdir/zip/service.subtitles.acfun.zip service.subtitles.acfun
         zip -r /workdir/zip/service.subtitles.bilibili.zip service.subtitles.bilibili
+        sudo cp -r /workdir/zip/. /workdir/kodi/latest
+    - name: Create Repo 
+      run: |
+        cd /workdir/kodi/
+        sudo mkdir -p repo
+        sudo chown $USER:$GROUPS repo
+        sudo mkdir -p repo/metadata.douban.com.python
+        sudo cp metadata.douban.com.python/resources/icon.png repo/metadata.douban.com.python/icon.png
+        sudo cp latest/metadata.douban.com.python.zip repo/metadata.douban.com.python/metadata.douban.com.python-$DOUBAN_PYTHON.zip
+        sudo mkdir -p repo/plugin.audio.jsososo
+        sudo cp plugin.audio.jsososo/resources/icon.png repo/plugin.audio.jsososo/icon.png
+        sudo cp latest/plugin.audio.jsososo.zip repo/plugin.audio.jsososo/plugin.audio.jsososo-$JSOSOSO.zip
         sudo cp -r /workdir/zip/. /workdir/kodi/latest
     - name: Commit files
       run: |
