@@ -2,10 +2,14 @@
 name: zip kodi addons
 on: push
 
+env:
+  REPO_URL: https://github.com/zhengfan2014/xbmc-kodi-private-china-addons
+  REPO_BRANCH: master
+  
 jobs: 
   my-job: 
     runs-on: ubuntu-latest
-    name: Zip Pack
+    name: Zip Pack 
     steps: 
     - name: Initialization environment
       run: |
