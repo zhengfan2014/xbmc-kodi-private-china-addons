@@ -98,9 +98,27 @@ jobs:
     - name: Create addons.xml
       run: |
         cd /workdir/kodi/
-        echo "<?xml version="1.0" encoding="UTF-8" standalone="yes"?><addons>" >tmp.txt
-        cat metadata.douban.com.python/addon.xml | tail -n +2 >> tmp.txt
-        cat plugin.video.changku/addon.xml | tail -n +2 >> tmp.txt
+        echo "<?xml version="1.0" encoding="UTF-8" standalone="yes"?><addons>" >addons.xml
+        cat metadata.douban.com.python/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.audio.jsososo/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.acfun/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.bangumi/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.bilibili/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.changku/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.cine/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.huanxi/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.kaiyan/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.medicalvideo/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.reallive/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.skypixel/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.taptap/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.vid/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.weibotv/addon.xml | tail -n +2 >> addons.xml
+        cat plugin.video.xinpianchang/addon.xml | tail -n +2 >> addons.xml
+        cat service.subtitles.acfun/addon.xml | tail -n +2 >> addons.xml
+        cat service.subtitles.bilibili/addon.xml | tail -n +2 >> addons.xml
+        echo "</addons>" >> addons.xml
+        
     - name: Commit files
       run: |
         cd /workdir/kodi
@@ -108,7 +126,7 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add latest
         git add repo
-        git add tmp.txt
+        git add addons.xml
         git commit -m "Auto Create kodi addons zip"
         git init
     - name: Push changes
