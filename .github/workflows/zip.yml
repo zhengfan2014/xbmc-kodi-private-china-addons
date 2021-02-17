@@ -27,37 +27,42 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH kodi
     - name: Create kodi addons Zip
       run: |
-        zip -r /workdir/zip/metadata.douban.com.python.zip /workdir/kodi/metadata.douban.com.python
-        zip -r /workdir/zip/plugin.audio.jsososo.zip /workdir/kodi/plugin.audio.jsososo
-        zip -r /workdir/zip/plugin.video.acfun.zip /workdir/kodi/plugin.video.acfun
-        zip -r /workdir/zip/plugin.video.bangumi.zip /workdir/kodi/plugin.video.bangumi
-        zip -r /workdir/zip/plugin.video.bilibili.zip /workdir/kodi/plugin.video.bilibili
-        zip -r /workdir/zip/plugin.video.changku.zip /workdir/kodi/plugin.video.changku
-        zip -r /workdir/zip/plugin.video.cine.zip /workdir/kodi/plugin.video.cine
-        zip -r /workdir/zip/plugin.video.huanxi.zip /workdir/kodi/plugin.video.huanxi
-        zip -r /workdir/zip/plugin.video.kaiyan.zip /workdir/kodi/plugin.video.kaiyan
-        zip -r /workdir/zip/plugin.video.medicalvideo.zip /workdir/kodi/plugin.video.medicalvideo
-        zip -r /workdir/zip/plugin.video.reallive.zip /workdir/kodi/plugin.video.reallive
-        zip -r /workdir/zip/plugin.video.skypixel.zip /workdir/kodi/plugin.video.skypixel
-        zip -r /workdir/zip/plugin.video.taptap.zip /workdir/kodi/plugin.video.taptap
-        zip -r /workdir/zip/plugin.video.vid.zip /workdir/kodi/plugin.video.vid
-        zip -r /workdir/zip/plugin.video.weibotv.zip /workdir/kodi/plugin.video.weibotv
-        zip -r /workdir/zip/plugin.video.xinpianchang.zip /workdir/kodi/plugin.video.xinpianchang
-        zip -r /workdir/zip/service.subtitles.acfun.zip /workdir/kodi/service.subtitles.acfun
-        zip -r /workdir/zip/service.subtitles.bilibili.zip /workdir/kodi/service.subtitles.bilibili
+        zip -rj /workdir/zip/metadata.douban.com.python.zip /workdir/kodi/metadata.douban.com.python
+        zip -rj /workdir/zip/plugin.audio.jsososo.zip /workdir/kodi/plugin.audio.jsososo
+        zip -rj /workdir/zip/plugin.video.acfun.zip /workdir/kodi/plugin.video.acfun
+        zip -rj /workdir/zip/plugin.video.bangumi.zip /workdir/kodi/plugin.video.bangumi
+        zip -rj /workdir/zip/plugin.video.bilibili.zip /workdir/kodi/plugin.video.bilibili
+        zip -rj /workdir/zip/plugin.video.changku.zip /workdir/kodi/plugin.video.changku
+        zip -rj /workdir/zip/plugin.video.cine.zip /workdir/kodi/plugin.video.cine
+        zip -rj /workdir/zip/plugin.video.huanxi.zip /workdir/kodi/plugin.video.huanxi
+        zip -rj /workdir/zip/plugin.video.kaiyan.zip /workdir/kodi/plugin.video.kaiyan
+        zip -rj /workdir/zip/plugin.video.medicalvideo.zip /workdir/kodi/plugin.video.medicalvideo
+        zip -rj /workdir/zip/plugin.video.reallive.zip /workdir/kodi/plugin.video.reallive
+        zip -rj /workdir/zip/plugin.video.skypixel.zip /workdir/kodi/plugin.video.skypixel
+        zip -rj /workdir/zip/plugin.video.taptap.zip /workdir/kodi/plugin.video.taptap
+        zip -rj /workdir/zip/plugin.video.vid.zip /workdir/kodi/plugin.video.vid
+        zip -rj /workdir/zip/plugin.video.weibotv.zip /workdir/kodi/plugin.video.weibotv
+        zip -rj /workdir/zip/plugin.video.xinpianchang.zip /workdir/kodi/plugin.video.xinpianchang
+        zip -rj /workdir/zip/service.subtitles.acfun.zip /workdir/kodi/service.subtitles.acfun
+        zip -rj /workdir/zip/service.subtitles.bilibili.zip /workdir/kodi/service.subtitles.bilibili
         sudo cp -r /workdir/zip/. /workdir/kodi/dist
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2
       with:
-        name: Packaged kodi plugin zip installation package
+        name: metadata.douban.com.python.zip
         path: |
-          /workdir/zip/
+          /workdir/zip/metadata.douban.com.python.zip
+    - uses: actions/upload-artifact@v2
+      with:
+        name: plugin.audio.jsososo.zip
+        path: |
+          /workdir/zip/plugin.audio.jsososo.zip
     - name: Commit files
       run: |
         cd /workdir/kodi
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add kodi.zip
+        git add dist
         git commit -m "Auto Create kodi addons zip"
         git init
     - name: Push changes
