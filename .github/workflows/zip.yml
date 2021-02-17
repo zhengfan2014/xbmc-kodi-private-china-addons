@@ -13,7 +13,7 @@ jobs:
     steps: 
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S')"
     - name: Initialization environment
       run: |
         sudo mkdir -p /workdir
@@ -27,25 +27,25 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH kodi
     - name: Create kodi addons Zip
       run: |
-        zip -r /workdir/zip/metadata.douban.com.python-${{ steps.date.outputs.date }}.zip /workdir/kodi/metadata.douban.com.python
-        zip -r /workdir/zip/plugin.audio.jsososo-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.audio.jsososo
-        zip -r /workdir/zip/plugin.video.acfun-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.acfun
-        zip -r /workdir/zip/plugin.video.bangumi-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.bangumi
-        zip -r /workdir/zip/plugin.video.bilibili-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.bilibili
-        zip -r /workdir/zip/plugin.video.changku-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.changku
-        zip -r /workdir/zip/plugin.video.cine-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.cine
-        zip -r /workdir/zip/plugin.video.huanxi-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.huanxi
-        zip -r /workdir/zip/plugin.video.kaiyan-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.kaiyan
-        zip -r /workdir/zip/plugin.video.medicalvideo-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.medicalvideo
-        zip -r /workdir/zip/plugin.video.reallive-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.reallive
-        zip -r /workdir/zip/plugin.video.skypixel-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.skypixel
-        zip -r /workdir/zip/plugin.video.taptap-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.taptap
-        zip -r /workdir/zip/plugin.video.vid-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.vid
-        zip -r /workdir/zip/plugin.video.weibotv-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.weibotv
-        zip -r /workdir/zip/plugin.video.xinpianchang-${{ steps.date.outputs.date }}.zip /workdir/kodi/plugin.video.xinpianchang
-        zip -r /workdir/zip/service.subtitles.acfun-${{ steps.date.outputs.date }}.zip /workdir/kodi/service.subtitles.acfun
-        zip -r /workdir/zip/service.subtitles.bilibili-${{ steps.date.outputs.date }}.zip /workdir/kodi/service.subtitles.bilibili
-        sudo cp /workdir/zip /workdir/kodi
+        zip -r /workdir/zip/metadata.douban.com.python.zip /workdir/kodi/metadata.douban.com.python
+        zip -r /workdir/zip/plugin.audio.jsososo.zip /workdir/kodi/plugin.audio.jsososo
+        zip -r /workdir/zip/plugin.video.acfun.zip /workdir/kodi/plugin.video.acfun
+        zip -r /workdir/zip/plugin.video.bangumi.zip /workdir/kodi/plugin.video.bangumi
+        zip -r /workdir/zip/plugin.video.bilibili.zip /workdir/kodi/plugin.video.bilibili
+        zip -r /workdir/zip/plugin.video.changku.zip /workdir/kodi/plugin.video.changku
+        zip -r /workdir/zip/plugin.video.cine.zip /workdir/kodi/plugin.video.cine
+        zip -r /workdir/zip/plugin.video.huanxi.zip /workdir/kodi/plugin.video.huanxi
+        zip -r /workdir/zip/plugin.video.kaiyan.zip /workdir/kodi/plugin.video.kaiyan
+        zip -r /workdir/zip/plugin.video.medicalvideo.zip /workdir/kodi/plugin.video.medicalvideo
+        zip -r /workdir/zip/plugin.video.reallive.zip /workdir/kodi/plugin.video.reallive
+        zip -r /workdir/zip/plugin.video.skypixel.zip /workdir/kodi/plugin.video.skypixel
+        zip -r /workdir/zip/plugin.video.taptap.zip /workdir/kodi/plugin.video.taptap
+        zip -r /workdir/zip/plugin.video.vid.zip /workdir/kodi/plugin.video.vid
+        zip -r /workdir/zip/plugin.video.weibotv.zip /workdir/kodi/plugin.video.weibotv
+        zip -r /workdir/zip/plugin.video.xinpianchang.zip /workdir/kodi/plugin.video.xinpianchang
+        zip -r /workdir/zip/service.subtitles.acfun.zip /workdir/kodi/service.subtitles.acfun
+        zip -r /workdir/zip/service.subtitles.bilibili.zip /workdir/kodi/service.subtitles.bilibili
+        sudo cp -r /workdir/zip/. /workdir/kodi/dist
     # - name: Archive production artifacts
     #   uses: actions/upload-artifact@v2
     #   with:
@@ -64,6 +64,6 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: default
+        branch: ${{ steps.date.outputs.date }}
         repository: zhengfan2014/xbmc-kodi-private-china-addons
         directory: /workdir/kodi
