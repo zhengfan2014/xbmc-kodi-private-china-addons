@@ -13,7 +13,7 @@ jobs:
     steps: 
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S')"
+      run: echo "::set-output name=date::$(date +'%Y%m%d-%H%M%S')"
     - name: Initialization environment
       run: |
         sudo mkdir -p /workdir
@@ -51,12 +51,12 @@ jobs:
       with:
         name: metadata.douban.com.python.zip
         path: |
-          /workdir/zip/metadata.douban.com.python.zip
+          /workdir/kodi/metadata.douban.com.python
     - uses: actions/upload-artifact@v2
       with:
         name: plugin.audio.jsososo.zip
         path: |
-          /workdir/zip/plugin.audio.jsososo.zip
+          /workdir/kodi/plugin.audio.jsososo
     - name: Commit files
       run: |
         cd /workdir/kodi
