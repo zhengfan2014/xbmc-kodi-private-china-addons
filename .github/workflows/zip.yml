@@ -46,13 +46,13 @@ jobs:
         zip -r /workdir/zip/plugin.video.xinpianchang.zip plugin.video.xinpianchang
         zip -r /workdir/zip/service.subtitles.acfun.zip service.subtitles.acfun
         zip -r /workdir/zip/service.subtitles.bilibili.zip service.subtitles.bilibili
-        sudo cp -r /workdir/zip/. /workdir/kodi/dist
+        sudo cp -r /workdir/zip/. /workdir/kodi/latest
     - name: Commit files
       run: |
         cd /workdir/kodi
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add dist
+        git add latest
         git commit -m "Auto Create kodi addons zip"
         git init
     - name: Push changes
