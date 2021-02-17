@@ -10,12 +10,10 @@ jobs:
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
-        args: zip -qq -r ./archive.zip . -i ./img
-    - name: creat
-      uses: djnicholson/release-action@v2.11
+        args: zip -qq -r /archive.zip  /img
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        release-name: 'Latest rolling build'
-        tag-name: 'repo'
-        asset-name: 'archive.zip'
-        file: 'archive.zip'
+        name: dist-without-markdown
+        path: |
+          archive.zip
