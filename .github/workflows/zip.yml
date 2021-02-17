@@ -4,6 +4,7 @@ on: push
 
 jobs: 
   my-job: 
+    runs-on: ubuntu-latest
     name: Zip Pack
     steps: 
     - name: Compress
