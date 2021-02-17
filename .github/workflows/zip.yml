@@ -92,3 +92,9 @@ jobs:
         branch: master
         repository: zhengfan2014/xbmc-kodi-private-china-addons
         directory: /workdir/kodi
+    - uses: wearerequired/git-mirror-action@master
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_KEY }}
+      with:
+        source-repo: "git@gitee.com:zhengfan2014/xbmc-kodi-private-china-addons.git"
+        destination-repo: "git@gitee.com:zhengfan2014/xbmc-kodi-private-china-addons.git"
