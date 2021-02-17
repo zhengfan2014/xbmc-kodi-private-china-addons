@@ -38,7 +38,5 @@ jobs:
         git add kodi.zip
         git commit -m "Auto Update kodi.zip"
     - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        repository: 'zhengfan2014/xbmc-kodi-private-china-addons'
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git push -u origin repo
