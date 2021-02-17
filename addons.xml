@@ -1,4 +1,4 @@
-<?xml version=1.0 encoding=UTF-8 standalone=yes?><addons>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><addons>
 <addon id="metadata.douban.com.python" name="豆瓣刮削器Python" version="0.1.0" provider-name="zhengfan">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
