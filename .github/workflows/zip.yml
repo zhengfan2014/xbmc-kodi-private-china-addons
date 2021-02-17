@@ -39,4 +39,5 @@ jobs:
         git commit -m "Auto Update kodi.zip"
     - name: Push changes
       run: |
+        git init
         git push -u origin repo
