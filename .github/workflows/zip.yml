@@ -72,7 +72,7 @@ jobs:
         sudo cp metadata.douban.com.python/resources/icon.png repo/metadata.douban.com.python/icon.png
         sudo cp latest/metadata.douban.com.python.zip repo/metadata.douban.com.python/metadata.douban.com.python-$DOUBAN_PYTHON.zip
         sudo mkdir -p repo/plugin.audio.jsososo
-        sudo cp plugin.audio.jsososo/resources/icon.png repo/plugin.audio.jsososo/icon.png
+        sudo cp plugin.audio.jsososo/icon.png repo/plugin.audio.jsososo/icon.png
         sudo cp latest/plugin.audio.jsososo.zip repo/plugin.audio.jsososo/plugin.audio.jsososo-$JSOSOSO.zip
         sudo cp -r /workdir/zip/. /workdir/kodi/latest
     - name: Commit files
