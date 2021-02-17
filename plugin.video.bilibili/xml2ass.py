@@ -29,7 +29,7 @@ sys.setdefaultencoding('utf-8')
 # if sys.version_info < (3,):
 #     raise RuntimeError('at least Python 3.0 is required')
 
-gettext.install('danmaku2ass', os.path.join(os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0] or 'locale'))), 'locale'))
+#gettext.install('danmaku2ass', os.path.join(os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0] or 'locale'))), 'locale'))
 
 def SeekZero(function):
     def decorated_function(file_):
@@ -740,7 +740,7 @@ def export(func):
 
 @export
 #修改弹幕字体与速度
-def Danmaku2ASS(input_files, output_file, stage_width, stage_height, reserve_blank=0, font_face=_('(FONT) Microsoft YaHei')[7:], font_size=30.0, text_opacity=1.0, comment_duration=8.0, is_reduce_comments=False, progress_callback=None):
+def Danmaku2ASS(input_files, output_file, stage_width, stage_height, reserve_blank=0, font_face=('(FONT) Microsoft YaHei')[7:], font_size=30.0, text_opacity=1.0, comment_duration=8.0, is_reduce_comments=False, progress_callback=None):
     fo = None
     comments = ReadComments(input_files, font_size)
     try:
