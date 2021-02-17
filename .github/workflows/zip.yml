@@ -98,8 +98,9 @@ jobs:
     - name: Create addons.xml
       run: |
         cd /workdir/kodi/
-        cat plugin.video.changku/addon.xml > tmp.txt
-        sed -r '/\<\?xml version=\"1.0\" encoding=\"UTF-8\" standalone\=\"yes\"\?>/' tmp.txt
+        echo "<?xml version="1.0" encoding="UTF-8" standalone="yes"?><addons>" >tmp.txt
+        cat metadata.douban.com.python/addon.xml | tail -n +2 >> tmp.txt
+        cat plugin.video.changku/addon.xml | tail -n +2 >> tmp.txt
     - name: Commit files
       run: |
         cd /workdir/kodi
