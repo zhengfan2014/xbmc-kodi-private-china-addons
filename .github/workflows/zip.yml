@@ -7,25 +7,27 @@ env:
   REPO_BRANCH: master
   DOUBAN_PYTHON: 0.1.0
   JSOSOSO: 0.1.0
-  ACFUN: 0.1.0
-  BANGUMI: 0.1.0
-  BILIBILI: 0.1.0
+  ACFUN: 0.2.3
+  BANGUMI: 0.2.0
+  BILIBILI: 0.5.7
   CHANGKU: 0.1.0
   CINE: 0.1.0
   HUANXI: 0.1.0
   KAIYAN: 0.1.0
+  MEDICALVIDEO :0.1.0
+  REALLIVE: 0.1.2
   SKYPIXEL: 0.1.0
-  TAPTAP: 0.1.0
+  TAPTAP: 0.2.1
   VID: 0.1.0
-  WEIBOTV: 0.1.0
+  WEIBOTV: 0.1.1
   XINPIANCHANG: 0.1.0
-  DANMU_ACFUN: 0.1.0
-  DANMU_BILIBILI: 0.1.0
+  DANMU_ACFUN: 0.1.1
+  DANMU_BILIBILI: 0.1.1
   
 jobs: 
   my-job: 
     runs-on: ubuntu-latest
-    name: Zip Pack 
+    name: Package Kodi plug-ins and update plug-in library automatically
     steps: 
     - name: Get current date
       id: date
@@ -81,19 +83,47 @@ jobs:
         sudo cp plugin.video.bangumi/icon.png repo/plugin.video.bangumi/icon.png
         sudo cp latest/plugin.video.bangumi.zip repo/plugin.video.bangumi/plugin.video.bangumi-$BANGUMI.zip
         sudo mkdir -p repo/plugin.video.bilibili
+        sudo cp plugin.video.bilibili/icon.png repo/plugin.video.bilibili/icon.png
+        sudo cp latest/plugin.video.bilibili.zip repo/plugin.video.bilibili/plugin.video.bilibili-$BILIBILI.zip
         sudo mkdir -p repo/plugin.video.changku
+        sudo cp plugin.video.changku/icon.png repo/plugin.video.changku/icon.png
+        sudo cp latest/plugin.video.changku.zip repo/plugin.video.changku/plugin.video.changku-$CHANGKU.zip
         sudo mkdir -p repo/plugin.video.cine
+        sudo cp plugin.video.cine/icon.png repo/plugin.video.cine/icon.png
+        sudo cp latest/plugin.video.cine.zip repo/plugin.video.cine/plugin.video.cine-$CINE.zip
         sudo mkdir -p repo/plugin.video.huanxi
+        sudo cp plugin.video.huanxi/icon.png repo/plugin.video.huanxi/icon.png
+        sudo cp latest/plugin.video.huanxi.zip repo/plugin.video.huanxi/plugin.video.huanxi-$HUANXI.zip
         sudo mkdir -p repo/plugin.video.kaiyan
+        sudo cp plugin.video.kaiyan/icon.png repo/plugin.video.kaiyan/icon.png
+        sudo cp latest/plugin.video.kaiyan.zip repo/plugin.video.kaiyan/plugin.video.kaiyan-$KAIYAN.zip
         sudo mkdir -p repo/plugin.video.medicalvideo
+        sudo cp plugin.video.medicalvideo/icon.png repo/plugin.video.medicalvideo/icon.png
+        sudo cp latest/plugin.video.medicalvideo.zip repo/plugin.video.medicalvideo/plugin.video.medicalvideo-$MEDICALVIDEO.zip
         sudo mkdir -p repo/plugin.video.reallive
+        sudo cp plugin.video.reallive/icon.png repo/plugin.video.reallive/icon.png
+        sudo cp latest/plugin.video.reallive.zip repo/plugin.video.reallive/plugin.video.reallive-$REALLIVE.zip
         sudo mkdir -p repo/plugin.video.skypixel
+        sudo cp plugin.video.skypixel/icon.png repo/plugin.video.skypixel/icon.png
+        sudo cp latest/plugin.video.skypixel.zip repo/plugin.video.skypixel/plugin.video.skypixel-$SKYPIXEL.zip
         sudo mkdir -p repo/plugin.video.taptap
+        sudo cp plugin.video.taptap/icon.png repo/plugin.video.taptap/icon.png
+        sudo cp latest/plugin.video.taptap.zip repo/plugin.video.taptap/plugin.video.taptap-$TAPTAP.zip
         sudo mkdir -p repo/plugin.video.vid
+        sudo cp plugin.video.vid/icon.png repo/plugin.video.vid/icon.png
+        sudo cp latest/plugin.video.vid.zip repo/plugin.video.vid/plugin.video.vid-$VID.zip
         sudo mkdir -p repo/plugin.video.weibotv
+        sudo cp plugin.video.weibotv/icon.png repo/plugin.video.weibotv/icon.png
+        sudo cp latest/plugin.video.weibotv.zip repo/plugin.video.weibotv/plugin.video.weibotv-$WEIBOTV.zip
         sudo mkdir -p repo/plugin.video.xinpianchang
+        sudo cp plugin.video.xinpianchang/icon.png repo/plugin.video.xinpianchang/icon.png
+        sudo cp latest/plugin.video.xinpianchang.zip repo/plugin.video.xinpianchang/plugin.video.xinpianchang-$XINPIANCHANG.zip
         sudo mkdir -p repo/service.subtitles.acfun
+        sudo cp service.subtitles.acfun/icon.png repo/service.subtitles.acfun/icon.png
+        sudo cp latest/service.subtitles.acfun.zip repo/service.subtitles.acfun/service.subtitles.acfun-$DANMU_ACFUN.zip
         sudo mkdir -p repo/service.subtitles.bilibili
+        sudo cp service.subtitles.bilibili/icon.png repo/service.subtitles.bilibili/icon.png
+        sudo cp latest/service.subtitles.bilibili.zip repo/service.subtitles.bilibili/service.subtitles.bilibili-$DANMU_BILIBILI.zip
         sudo cp -r /workdir/zip/. /workdir/kodi/latest
     - name: Create addons.xml
       run: |
@@ -127,7 +157,7 @@ jobs:
         git add latest
         git add repo
         git add addons.xml
-        git commit -m "Auto Create kodi addons zip"
+        git commit -m "[bot] Auto Package Kodi plug-ins and update plug-in library automatically"
         git init
     - name: Push changes
       uses: ad-m/github-push-action@master
