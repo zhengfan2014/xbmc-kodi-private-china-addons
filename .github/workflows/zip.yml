@@ -5,22 +5,22 @@ on: push
 env:
   REPO_URL: https://github.com/zhengfan2014/xbmc-kodi-private-china-addons
   REPO_BRANCH: master
-  DOUBAN_PYTHON:0.1.0
-  JSOSOSO:0.1.0
-  ACFUN:0.1.0
-  BANGUMI:0.1.0
-  BILIBILI:0.1.0
-  CHANGKU:0.1.0
-  CINE:0.1.0
-  HUANXI:0.1.0
-  KAIYAN:0.1.0
-  SKYPIXEL:0.1.0
-  TAPTAP:0.1.0
-  VID:0.1.0
-  WEIBOTV:0.1.0
-  XINPIANCHANG:0.1.0
-  DANMU_ACFUN:0.1.0
-  DANMU_BILIBILI:0.1.0
+  DOUBAN_PYTHON: 0.1.0
+  JSOSOSO: 0.1.0
+  ACFUN: 0.1.0
+  BANGUMI: 0.1.0
+  BILIBILI: 0.1.0
+  CHANGKU: 0.1.0
+  CINE: 0.1.0
+  HUANXI: 0.1.0
+  KAIYAN: 0.1.0
+  SKYPIXEL: 0.1.0
+  TAPTAP: 0.1.0
+  VID: 0.1.0
+  WEIBOTV: 0.1.0
+  XINPIANCHANG: 0.1.0
+  DANMU_ACFUN: 0.1.0
+  DANMU_BILIBILI: 0.1.0
   
 jobs: 
   my-job: 
