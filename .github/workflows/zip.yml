@@ -57,6 +57,26 @@ jobs:
         name: plugin.audio.jsososo.zip
         path: |
           /workdir/kodi/plugin.audio.jsososo
+    - uses: actions/upload-artifact@v2
+      with:
+        name: plugin.video.acfun.zip
+        path: |
+          /workdir/kodi/plugin.video.acfun
+    - uses: actions/upload-artifact@v2
+      with:
+        name: plugin.video.bilibili.zip
+        path: |
+          /workdir/kodi/plugin.video.bilibili
+    - uses: actions/upload-artifact@v2
+      with:
+        name: plugin.video.changku.zip
+        path: |
+          /workdir/kodi/plugin.video.changku
+    - uses: actions/upload-artifact@v2
+      with:
+        name: plugin.video.cine.zip
+        path: |
+          /workdir/kodi/plugin.video.cine
     - name: Commit files
       run: |
         cd /workdir/kodi
@@ -69,6 +89,6 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ steps.date.outputs.date }}
+        branch: master
         repository: zhengfan2014/xbmc-kodi-private-china-addons
         directory: /workdir/kodi
