@@ -37,7 +37,9 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add kodi.zip
         git commit -m "Auto Update kodi.zip"
-    - name: Push changes
-      run: |
         git init
-        git push -u origin repo
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
