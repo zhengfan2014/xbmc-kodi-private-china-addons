@@ -23,6 +23,7 @@ jobs:
     - name: Zip kodi addons
       run: |
         zip -r /workdir/kodi.zip /workdir/kodi
+        sudo cp /workdir/kodi.zip /workdir/kodi
     # - name: Archive production artifacts
     #   uses: actions/upload-artifact@v2
     #   with:
@@ -34,7 +35,7 @@ jobs:
         cd /workdir/kodi
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add /workdir/kodi.zip
+        git add kodi.zip
         git commit -m "Auto Update kodi.zip"
     - name: Push changes
       uses: ad-m/github-push-action@master
