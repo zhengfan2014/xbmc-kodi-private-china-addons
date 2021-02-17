@@ -31,14 +31,12 @@ jobs:
           /workdir/kodi.zip
     - name: Commit files
       run: |
-        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-        git config user.name "$GITHUB_ACTOR"
-        git add .
-        git status
-        git commit -a -m "Initialize new repository from template"
-        git push https://${{ secrets.GH_TOKEN_TEST }}@github.com/org/repoi.git
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add /workdir/kodi.zip
+        git commit -m "Auto Update kodi.zip"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
-        github_token: ${{ secrets.GH_TOKEN_TEST }}
-        branch: repo
+        repository: 'zhengfan2014/xbmc-kodi-private-china-addons'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
