@@ -7,13 +7,22 @@ jobs:
     runs-on: ubuntu-latest
     name: Zip Pack
     steps: 
-    - name: Compress
+    - name: Initialization environment
+      run: |
+        sudo mkdir -p /workdir
+    - name: Clone source code
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH kodi
+        ln -sf /workdir/kodi $GITHUB_WORKSPACE/kodi
+    - name: Zip kodi addons
       uses: TonyBogdanov/zip@1.0
       with:
-        args: zip -qq -r /archive.zip  /img
+        args: zip -qq -r /workdir/archive.zip  /workdir/kodi
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
         name: dist-without-markdown
         path: |
-          archive.zip
+          /workdir/archive.zip
