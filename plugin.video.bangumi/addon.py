@@ -205,7 +205,7 @@ damakulist = ['bimibimi','yhdm','agefans','silisili','iafuns','qinmei','srsg','n
 
 def get_categories():
     return [{'id':1,'name':'哔咪哔咪(bimibimi.tv)[COLOR pink][/COLOR]','link':'bimibimi','author':'zhengfan2014','upload':'2020-6-26','videos':24,'search':24,'plot':'更新速度比樱花稍慢，但是总体画质比樱花高'},
-            {'id':2,'name':'樱花动漫(yhdm.tv)','link':'yhdm','author':'zhengfan2014','upload':'2020-6-26','videos':15,'search':20,'plot':'昨晚b站23点发布的BNA，今天早上就可以在樱花看了,更新速度杠杠滴'},
+            {'id':2,'name':'樱花动漫(yhdm.io)','link':'yhdm','author':'zhengfan2014','upload':'2020-6-26','videos':15,'search':20,'plot':'昨晚b站23点发布的BNA，今天早上就可以在樱花看了,更新速度杠杠滴'},
             {'id':3,'name':'Age动漫(agefans.tw)','link':'agefans','author':'zhengfan2014','upload':'2020-6-30','videos':24,'search':15,'plot':'海外站点，虽然访问速度偏慢，但是番剧mp4是国内的观看并不卡。更新番剧速度一般'},
             {'id':4,'name':'嘶哩嘶哩(silisili.in)','link':'silisili','author':'zhengfan2014','upload':'2020-6-30','videos':10,'search':20,'plot':'大部分有1080p，但是番剧收录少，居然没有4月新番bna'},
             {'id':5,'name':'八重樱动漫(iafuns.com)','link':'iafuns','author':'zhengfan2014','upload':'2020-6-30','plot':'更新速度一般'},
@@ -319,12 +319,15 @@ def get_bimibimi_mp4(url):
     cutjson = r[str1+16:str2]
     #print(cutjson)
     j = json.loads(cutjson)
+    dialog = xbmcgui.Dialog()
+    dialog.textviewer('错误提示', str(cutjson))
     #向接口发送请求
     if j['from']:
-        if j['from'] == 'niux':
-            apiurl = 'http://182.254.167.161/danmu/niux.php?id=' + j['url']
-        else:
-            apiurl = 'http://182.254.167.161/danmu/play.php?url=' + j['url']
+        if j['from'] == 'wei':
+            apiurl = 'http://49.234.56.246/danmu/wy.php?url=' + j['url']
+        elif j['from'] == 'bimi':
+            apiurl = 'http://49.234.56.246/danmu/play.php?url=' + j['url']
+        apiurl += "&myurl=" + url
         r = get_html(apiurl)
         soup = BeautifulSoup(r, 'html.parser')
         source = soup.find('source',type='video/mp4')
@@ -363,14 +366,14 @@ def get_bimibimi_search(keyword,page):
     return videos
 #樱花
 def get_yhdm_categories():
-    return [{'name':'日本动漫','link':'http://www.yhdm.tv/japan/'},
-            {'name':'国产动漫','link':'http://www.yhdm.tv/china/'},
-            {'name':'美国动漫','link':'http://www.yhdm.tv/american/'},
-            {'name':'动漫电影','link':'http://www.yhdm.tv/movie/'},
-            {'name':'新番动漫','link':'http://www.yhdm.tv/2020/'},
-            {'name':'剧场版','link':'http://www.yhdm.tv/37/'},
-            {'name':'OVA版','link':'http://www.yhdm.tv/36/'},
-            {'name':'真人动漫','link':'http://www.yhdm.tv/38/'}]
+    return [{'name':'日本动漫','link':'http://www.yhdm.io/japan/'},
+            {'name':'国产动漫','link':'http://www.yhdm.io/china/'},
+            {'name':'美国动漫','link':'http://www.yhdm.io/american/'},
+            {'name':'动漫电影','link':'http://www.yhdm.io/movie/'},
+            {'name':'新番动漫','link':'http://www.yhdm.io/2020/'},
+            {'name':'剧场版','link':'http://www.yhdm.io/37/'},
+            {'name':'OVA版','link':'http://www.yhdm.io/36/'},
+            {'name':'真人动漫','link':'http://www.yhdm.io/38/'}]
 
 def get_yhdm_videos(url,page):
     videos = []
@@ -389,7 +392,7 @@ def get_yhdm_videos(url,page):
     for index in range(len(li)):
         videoitem = {}
         videoitem['name'] =  li[index].a.img['alt']
-        videoitem['href'] =  'http://www.yhdm.tv/' + li[index].a['href']
+        videoitem['href'] =  'http://www.yhdm.io/' + li[index].a['href']
         videoitem['thumb'] = li[index].a.img['src']
         videoitem['info'] =  {'plot' :li[index].p.text}
         videos.append(videoitem)
@@ -408,7 +411,7 @@ def get_yhdm_source(url):
     sourcelist = []
     duopdict = {}
     for index in range(len(li)):
-        duopdict[li[index].a.text] = 'http://www.yhdm.tv/' + li[index].a['href']
+        duopdict[li[index].a.text] = 'http://www.yhdm.io/' + li[index].a['href']
     sourcelist.append(duopdict)
 
     
@@ -455,7 +458,7 @@ def get_yhdm_mp4(url):
         if vid[1] == 'qz':
             apiurl = 'https://js.voooe.cn/jiexi/api.php'
             q = vid[0]
-            ref = 'http://tup.yhdm.tv/?vid=' + q +'$qz'
+            ref = 'http://tup.yhdm.io/?vid=' + q +'$qz'
             refb64 = base64.b64encode(ref.encode('utf-8'))
             qb64 = base64.b64encode(q.encode('utf-8'))
             data = {'url': vid[0], 'referer': refb64,'time':int(time.time()),'other':qb64,'ref':'0','type':'','ios':''}
@@ -464,7 +467,7 @@ def get_yhdm_mp4(url):
             mp4 = j['url']
             mp4 = mp4.replace('\\','')
             rt = mp4
-            return rt
+        return rt
     else:
         dialog = xbmcgui.Dialog()
         ok = dialog.ok('错误提示','不受支持的播放链接')
@@ -472,7 +475,7 @@ def get_yhdm_mp4(url):
 
 def get_yhdm_search(keyword,page):
     videos = []
-    url = 'http://www.yhdm.tv/search/' + keyword + '/'
+    url = 'http://www.yhdm.io/search/' + keyword + '/'
     r = get_html(url)
     soup = BeautifulSoup(r, 'html.parser')
     if soup.find('div',class_='lpic') or soup.find('div',class_='imgs'):
@@ -485,7 +488,7 @@ def get_yhdm_search(keyword,page):
     for index in range(len(li)):
         videoitem = {}
         videoitem['name'] =  li[index].a.img['alt']
-        videoitem['href'] =  'http://www.yhdm.tv/' + li[index].a['href']
+        videoitem['href'] =  'http://www.yhdm.io/' + li[index].a['href']
         videoitem['thumb'] = li[index].a.img['src']
         videoitem['info'] =  {'plot' :li[index].p.text}
         videos.append(videoitem)
