@@ -63,7 +63,7 @@ jobs:
         zip -r /workdir/zip/service.subtitles.acfun.zip service.subtitles.acfun
         zip -r /workdir/zip/service.subtitles.bilibili.zip service.subtitles.bilibili
         sudo cp -r /workdir/zip/. /workdir/kodi/latest
-    - name: Create Repo 
+    - name: Create Repo Dir
       run: |
         cd /workdir/kodi/
         sudo mkdir -p repo
@@ -74,13 +74,40 @@ jobs:
         sudo mkdir -p repo/plugin.audio.jsososo
         sudo cp plugin.audio.jsososo/icon.png repo/plugin.audio.jsososo/icon.png
         sudo cp latest/plugin.audio.jsososo.zip repo/plugin.audio.jsososo/plugin.audio.jsososo-$JSOSOSO.zip
+        sudo mkdir -p repo/plugin.video.acfun
+        sudo cp plugin.video.acfun/icon.png repo/plugin.video.acfun/icon.png
+        sudo cp latest/plugin.video.acfun.zip repo/plugin.video.acfun/plugin.video.acfun-$ACFUN.zip
+        sudo mkdir -p repo/plugin.video.bangumi
+        sudo cp plugin.video.bangumi/icon.png repo/plugin.video.bangumi/icon.png
+        sudo cp latest/plugin.video.bangumi.zip repo/plugin.video.bangumi/plugin.video.bangumi-$BANGUMI.zip
+        sudo mkdir -p repo/plugin.video.bilibili
+        sudo mkdir -p repo/plugin.video.changku
+        sudo mkdir -p repo/plugin.video.cine
+        sudo mkdir -p repo/plugin.video.huanxi
+        sudo mkdir -p repo/plugin.video.kaiyan
+        sudo mkdir -p repo/plugin.video.medicalvideo
+        sudo mkdir -p repo/plugin.video.reallive
+        sudo mkdir -p repo/plugin.video.skypixel
+        sudo mkdir -p repo/plugin.video.taptap
+        sudo mkdir -p repo/plugin.video.vid
+        sudo mkdir -p repo/plugin.video.weibotv
+        sudo mkdir -p repo/plugin.video.xinpianchang
+        sudo mkdir -p repo/service.subtitles.acfun
+        sudo mkdir -p repo/service.subtitles.bilibili
         sudo cp -r /workdir/zip/. /workdir/kodi/latest
+    - name: Create addons.xml
+      run: |
+        cd /workdir/kodi/
+        cat plugin.video.changku/addon.xml > tmp.txt
+        sed 's/<?xml version="1.0" encoding="UTF-8" standalone="yes"?>/\n/' tmp.txt
     - name: Commit files
       run: |
         cd /workdir/kodi
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add latest
+        git add repo
+        git add tmp.txt
         git commit -m "Auto Create kodi addons zip"
         git init
     - name: Push changes
@@ -90,12 +117,12 @@ jobs:
         branch: master
         repository: zhengfan2014/xbmc-kodi-private-china-addons
         directory: /workdir/kodi
-    - name: Mirror Github to Gitee with white list 
-      uses: Yikun/hub-mirror-action@master 
-      with: 
-        src: github/zhengfan2014
-        dst: gitee/zhengfan2014
-        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }} 
-        dst_token: ${{ secrets.GITEE_TOKEN }} 
-        static_list: 'xbmc-kodi-private-china-addons' 
-        force_update: true
+    # - name: Mirror Github to Gitee with white list 
+      # uses: Yikun/hub-mirror-action@master 
+      # with: 
+        # src: github/zhengfan2014
+        # dst: gitee/zhengfan2014
+        # dst_key: ${{ secrets.GITEE_PRIVATE_KEY }} 
+        # dst_token: ${{ secrets.GITEE_TOKEN }} 
+        # static_list: 'xbmc-kodi-private-china-addons' 
+        # force_update: true
