@@ -47,36 +47,6 @@ jobs:
         zip -r /workdir/zip/service.subtitles.acfun.zip service.subtitles.acfun
         zip -r /workdir/zip/service.subtitles.bilibili.zip service.subtitles.bilibili
         sudo cp -r /workdir/zip/. /workdir/kodi/dist
-    - uses: actions/upload-artifact@v2
-      with:
-        name: metadata.douban.com.python.zip
-        path: |
-          /workdir/kodi/metadata.douban.com.python
-    - uses: actions/upload-artifact@v2
-      with:
-        name: plugin.audio.jsososo.zip
-        path: |
-          /workdir/kodi/plugin.audio.jsososo
-    - uses: actions/upload-artifact@v2
-      with:
-        name: plugin.video.acfun.zip
-        path: |
-          /workdir/kodi/plugin.video.acfun
-    - uses: actions/upload-artifact@v2
-      with:
-        name: plugin.video.bilibili.zip
-        path: |
-          /workdir/kodi/plugin.video.bilibili
-    - uses: actions/upload-artifact@v2
-      with:
-        name: plugin.video.changku.zip
-        path: |
-          /workdir/kodi/plugin.video.changku
-    - uses: actions/upload-artifact@v2
-      with:
-        name: plugin.video.cine.zip
-        path: |
-          /workdir/kodi/plugin.video.cine
     - name: Commit files
       run: |
         cd /workdir/kodi
@@ -92,9 +62,12 @@ jobs:
         branch: master
         repository: zhengfan2014/xbmc-kodi-private-china-addons
         directory: /workdir/kodi
-    - uses: wearerequired/git-mirror-action@master
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_KEY }}
-      with:
-        source-repo: "git@gitee.com:zhengfan2014/xbmc-kodi-private-china-addons.git"
-        destination-repo: "git@gitee.com:zhengfan2014/xbmc-kodi-private-china-addons.git"
+    - name: Mirror Github to Gitee with white list 
+      uses: Yikun/hub-mirror-action@master 
+      with: 
+        src: github/zhengfan2014
+        dst: gitee/zhengfan2014
+        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }} 
+        dst_token: ${{ secrets.GITEE_TOKEN }} 
+        static_list: 'xbmc-kodi-private-china-addons' 
+        force_update: true
