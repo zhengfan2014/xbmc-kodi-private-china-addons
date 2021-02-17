@@ -46,12 +46,12 @@ jobs:
         zip -r /workdir/zip/service.subtitles.acfun.zip /workdir/kodi/service.subtitles.acfun
         zip -r /workdir/zip/service.subtitles.bilibili.zip /workdir/kodi/service.subtitles.bilibili
         sudo cp -r /workdir/zip/. /workdir/kodi/dist
-    # - name: Archive production artifacts
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: dist-without-markdown
-    #     path: |
-    #       /workdir/kodi.zip
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Packaged kodi plugin zip installation package
+        path: |
+          /workdir/zip/
     - name: Commit files
       run: |
         cd /workdir/kodi
