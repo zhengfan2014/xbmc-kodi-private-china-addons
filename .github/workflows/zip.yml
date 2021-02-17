@@ -14,7 +14,7 @@ jobs:
     - name: creat
       uses: djnicholson/release-action@v2.11
       with:
-        token: ${{ secrets.github }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         release-name: 'Latest rolling build'
         tag-name: 'repo'
         asset-name: 'archive.zip'
