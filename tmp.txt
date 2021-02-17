@@ -1,4 +1,25 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version=1.0 encoding=UTF-8 standalone=yes?><addons>
+<addon id="metadata.douban.com.python" name="豆瓣刮削器Python" version="0.1.0" provider-name="zhengfan">
+  <requires>
+    <import addon="xbmc.metadata" version="2.1.0"/>
+    <import addon="xbmc.python" version="2.26.0"/>
+    <import addon="script.module.xbmcswift2" version="2.4.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.5.3"/>
+    <import addon="script.module.requests" version="2.19.1"/>
+    <import addon="script.module.html5lib" version="0.999.0"/>
+  </requires>
+  <extension point="xbmc.metadata.scraper.movies" library="python/scraper.py"/>
+  <extension point="xbmc.addon.metadata">
+
+    <summary>豆瓣刮削器Python</summary>
+    <description>豆瓣电影提供最新的电影介绍及评论包括上映影片的影讯查询及购票服务。你可以记录想看、在看和看过的电影电视剧，顺便打分、写影评。根据你的口味，豆瓣电影会推荐好电影给你。</description>
+    <platform>all</platform>
+    <language></language>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>
 <addon id="plugin.video.changku" name="场库" version="0.1.0" provider-name="zhengfan">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
