@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?><addons>
-<addon id="metadata.douban.com.python" name="豆瓣刮削器Python" version="0.1.0" provider-name="zhengfan">
+<addon id="metadata.douban.com.python" name="豆瓣刮削器Python" version="0.1.1" provider-name="zhengfan">
   <requires>
     <import addon="xbmc.metadata" version="2.1.0"/>
     <import addon="xbmc.python" version="2.26.0"/>
@@ -16,7 +16,7 @@
     <platform>all</platform>
     <language></language>
     <assets>
-      <icon>resources/icon.png</icon>
+      <icon>icon.png</icon>
     </assets>
   </extension>
 </addon>
@@ -82,7 +82,7 @@
     <news>首个版本</news>
   </extension>
 </addon>
-<addon id="plugin.video.bilibili" name="Bilibili" version="0.5.7" provider-name="zhengfan">
+<addon id="plugin.video.bilibili" name="Bilibili" version="0.5.8" provider-name="zhengfan,shaolin-kongfu,YingjieSong,ArchieMeng">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.xbmcswift2" version="2.4.0"/>
