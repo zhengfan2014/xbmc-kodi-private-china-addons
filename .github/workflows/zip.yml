@@ -31,13 +31,14 @@ jobs:
           /workdir/kodi.zip
     - name: Commit files
       run: |
-        git init
-        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git commit -m "Add changes" -a
+        git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        git config --local user.name "$GITHUB_ACTOR"
+        git add .
+        git status
+        git commit -a -m "Initialize new repository from template"
+        git push https://${{ secrets.GH_TOKEN_TEST }}@github.com/org/repoi.git
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
-        repository: 'zhengfan2014/xbmc-kodi-private-china-addons'
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GH_TOKEN_TEST }}
         branch: repo
