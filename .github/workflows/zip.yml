@@ -11,3 +11,11 @@ jobs:
       uses: TonyBogdanov/zip@1.0
       with:
         args: zip -qq -r ./archive.zip . -i ./img
+    - name: creat
+      uses: djnicholson/release-action@v2.11
+      with:
+        token: ${{ secrets.github }}
+        release-name: 'Latest rolling build'
+        tag-name: 'repo'
+        asset-name: 'archive.zip'
+        file: 'out/dist/archive.zip'
