@@ -23,14 +23,15 @@ jobs:
     - name: Zip kodi addons
       run: |
         zip -r /workdir/kodi.zip /workdir/kodi
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist-without-markdown
-        path: |
-          /workdir/kodi.zip
+    # - name: Archive production artifacts
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: dist-without-markdown
+    #     path: |
+    #       /workdir/kodi.zip
     - name: Commit files
       run: |
+        git init
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add /workdir/kodi.zip
