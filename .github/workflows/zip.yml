@@ -46,7 +46,6 @@ jobs:
         zip -rj /workdir/zip/service.subtitles.acfun.zip /workdir/kodi/service.subtitles.acfun
         zip -rj /workdir/zip/service.subtitles.bilibili.zip /workdir/kodi/service.subtitles.bilibili
         sudo cp -r /workdir/zip/. /workdir/kodi/dist
-    - name: Archive production artifacts
     - uses: actions/upload-artifact@v2
       with:
         name: metadata.douban.com.python.zip
