@@ -69,5 +69,5 @@ jobs:
         dst: gitee/zhengfan2014
         dst_key: ${{ secrets.GITEE_PRIVATE_KEY }} 
         dst_token: ${{ secrets.GITEE_TOKEN }} 
-        static_list: 'xbmc-kodi-private-china-addons' 
+        white_list: "xbmc-kodi-private-china-addons"
         force_update: true
