@@ -252,7 +252,7 @@
     <news>首个版本</news>
   </extension>
 </addon>
-<addon id="plugin.video.taptap" name="Taptap" version="0.2.1" provider-name="zhengfan">
+<addon id="plugin.video.taptap" name="Taptap" version="0.2.2" provider-name="zhengfan">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.xbmcswift2" version="2.4.0"/>
