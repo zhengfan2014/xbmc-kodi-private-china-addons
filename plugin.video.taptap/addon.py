@@ -567,8 +567,8 @@ def play(name,url):
             #print(pname)
             urlrule = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')   # 查找数字
             m3u8url = urlrule.findall(r)
-            dialog = xbmcgui.Dialog()
-            ok = dialog.ok('错误',str(pname))
+            # dialog = xbmcgui.Dialog()
+            # ok = dialog.ok('错误',str(pname))
             for index in range(len(pname)):
                 item = {'is_playable': True}
                 #item['label'] = j['data']['video']['video_resource']['info']['best_format_name']  + ' - '
