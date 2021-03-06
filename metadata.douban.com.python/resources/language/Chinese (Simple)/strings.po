@@ -1,0 +1,16 @@
+msgid ""
+msgstr ""
+
+#Chinese Simplified
+
+msgctxt "#33001"
+msgid "proxy"
+msgstr "代理设置"
+
+msgctxt "#33002"
+msgid "cloudflareproxy"
+msgstr "启用豆瓣代理(cloudflare worker)"
+
+msgctxt "#33003"
+msgid "cloudflareproxyurl"
+msgstr "代理url"

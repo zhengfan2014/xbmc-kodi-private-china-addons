@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="33001" id="proxy">
+		<setting label="33002" type="bool" id="cloudflareproxy" default="true"/>
+		<setting label="33003" type="text" id="cloudflareproxyurl" default="https://proud-band-6b60.zhengfan2014.workers.dev/" />
+	</category>
+</settings>
