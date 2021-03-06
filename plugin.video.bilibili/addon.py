@@ -322,7 +322,7 @@ def get_upinfo(uid):
         text += u'TA是主要活跃在「' + hotp[0]['name'] + u'区」的UP主，在该分区共投稿「' + str(hotp[0]['count']) + u' 个稿件」' + '\n'
 
         if two_one(click['list']['vlist'][0]['typeid']) != hotp[0]['name']:
-            text += u'然而TA在「' + two_one(click['list']['vlist'][0]['typeid']).decode('utf-8') + '」拥有着表现最好的作品' + '\n'
+            text += u'然而TA在「' + two_one(click['list']['vlist'][0]['typeid']) + '」拥有着表现最好的作品' + '\n'
         text += u'代表作是《 ' + click['list']['vlist'][0]['title'] + u'》。' + '\n'
 
         jinqi = []
@@ -334,19 +334,19 @@ def get_upinfo(uid):
                 jinqi2.append(jinqi[index])
         if jinqi2 != []:
             if jinqi2.count(max(jinqi2, key=jinqi2.count)) < jinqi.count(max(jinqi, key=jinqi.count)):
-                text += u'近期，TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count).decode('utf-8') + u'区」。' + '\n\n'
+                text += u'近期，TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count) + u'区」。' + '\n\n'
             else:
-                text += u'虽然TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count).decode('utf-8') + u'」,不过TA有向「' + max(jinqi2,
+                text += u'虽然TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count) + u'」,不过TA有向「' + max(jinqi2,
                                                                                                             key=jinqi2.count).decode(
                     'utf-8') + u'」转型的可能性。' + '\n\n'
         else:
-            text += u'近期，TA的投稿1000%在「' + max(jinqi, key=jinqi.count).decode('utf-8') + u'区」。' + '\n\n'
+            text += u'近期，TA的投稿1000%在「' + max(jinqi, key=jinqi.count) + u'区」。' + '\n\n'
     except AttributeError:
         text += u'没有更多关于TA的情报信息了\n\n'
     text += u'----------' * 5 + u'up主最新数据' + u'----------' * 5 + '\n\n'
     if di['follower'] != -1:
-        text += u'粉丝总数:' + zh(di['follower']).decode('utf-8') + u'     播放总数:' + zh(di['archive']).decode(
-            'utf-8') + u'     获赞总数:' + zh(di['likes']).decode('utf-8') + u'     专栏阅读:' + zh(di['article']).decode(
+        text += u'粉丝总数:' + zh(di['follower']) + u'     播放总数:' + zh(di['archive']).decode(
+            'utf-8') + u'     获赞总数:' + zh(di['likes']) + u'     专栏阅读:' + zh(di['article']).decode(
             'utf-8') + '\n\n'
     else:
         text += u'请设置sessdata后显示\n\n'
@@ -562,10 +562,10 @@ def get_bgsearch(keyword, page):
         # ok = dialog.ok('错误提示', arcurl)
         for index in range(len(bgm)):
             if bgm[index]['ep_size'] != 0:
-                title = bgm[index]['title'] + ' [更新到第'.decode('utf-8') + str(bgm[index]['ep_size']) + '集]'.decode(
+                title = bgm[index]['title'] + ' [更新到第' + str(bgm[index]['ep_size']) + '集]'.decode(
                     'utf-8')
             else:
-                title = bgm[index]['title'] + ' [未开播]'.decode('utf-8')
+                title = bgm[index]['title'] + ' [未开播]'
 
             surl = 'https://www.bilibili.com/bangumi/play/ss' + str(bgm[index]['season_id'])
 
@@ -612,10 +612,10 @@ def get_movsearch(keyword, page):
         # ok = dialog.ok('错误提示', arcurl)
         for index in range(len(bgm)):
             if bgm[index]['ep_size'] != 0:
-                title = bgm[index]['title'] + ' [更新到第'.decode('utf-8') + str(bgm[index]['ep_size']) + '集]'.decode(
+                title = bgm[index]['title'] + ' [更新到第' + str(bgm[index]['ep_size']) + '集]'.decode(
                     'utf-8')
             else:
-                title = bgm[index]['title'] + ' [未开播]'.decode('utf-8')
+                title = bgm[index]['title'] + ' [未开播]'
 
             surl = 'https://www.bilibili.com/bangumi/play/ss' + str(bgm[index]['season_id'])
 
@@ -664,7 +664,7 @@ def get_livesearch(keyword, page):
             title = bgm[index]['title']
             if int(bgm[index]['live_status']) == 1:
                 title += u' [COLOR pink][LIVE][/COLOR]'
-            title += u' [在线' + zh(bgm[index]['online']).decode('utf-8') + u']'
+            title += u' [在线' + zh(bgm[index]['online']) + u']'
             pic = bgm[index]['cover']
             # 清除b站api数据污染
             title = title.replace('<em class="keyword">', '')
@@ -836,8 +836,8 @@ def get_bangumiinfo(url):
     cast1 = j2['mediaInfo']['actors']
     cast1 = cast1.split('\n')
     for index in range(len(cast1)):
-        if cast1[index].find('：'.decode('utf-8')) != -1:
-            cast2 = cast1[index].split('：'.decode('utf-8'))
+        if cast1[index].find('：') != -1:
+            cast2 = cast1[index].split('：')
             cast.append((cast2[0], cast2[1]))
         else:
             cast.append(cast1[index])
@@ -1580,7 +1580,6 @@ def get_roominfo(id):
     j = json.loads(get_up_baseinfo(ro['uid']))
     # up主 cast
     fan = zh(ro['attention']) + '粉丝'
-    # fan = fan.decode('utf-8')
     flvdict['cast'] = [(j['data']['name'], fan)]
 
     flvdict['mediatype'] = 'video'
@@ -2865,7 +2864,7 @@ def up(uid, page):
                        r['data']['title']
         else:
             livename = u'[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' + u'[在线' + zh(
-                r['data']['online']).decode('utf-8') + u']' + u'[COLOR green][Close][/COLOR]' + r['data']['title']
+                r['data']['online']) + u']' + u'[COLOR green][Close][/COLOR]' + r['data']['title']
         items.append({
             'label': livename,
             'path': plugin.url_for(room, id=r['data']['roomid']),
