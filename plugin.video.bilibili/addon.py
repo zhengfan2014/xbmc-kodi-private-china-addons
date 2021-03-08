@@ -410,7 +410,7 @@ def up_allnum(uid):
 
 
 def get_search(keyword, page):
-    serachUrl = 'https://api.bilibili.com/x/web-interface/search/all/v2?keyword=' + keyword + '&page=' + str(page)
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/all/v2?keyword=' + urllib.parse.quote(keyword) + '&page=' + str(page)
 
     r = get_html(serachUrl, t=10)
     j = json.loads(r)
@@ -489,11 +489,11 @@ def get_search(keyword, page):
 
 
 def get_vidsearch(keyword, page):
-    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=video&order=&keyword=' + keyword + '&page=' + str(
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=video&order=&keyword=' + urllib.parse.quote(keyword) + '&page=' + str(
         page) + '&duration=&category_id=&tids_1=&tids_2=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -544,11 +544,11 @@ def get_vidsearch(keyword, page):
 
 
 def get_bgsearch(keyword, page):
-    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=media_bangumi&order=&keyword=' + keyword + '&page=' + str(
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=media_bangumi&order=&keyword=' + urllib.parse.quote(keyword) + '&page=' + str(
         page) + '&category_id=&__refresh__=true&_extra=&highlight=1&single_column=1&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -594,11 +594,11 @@ def get_bgsearch(keyword, page):
 
 
 def get_movsearch(keyword, page):
-    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=media_ft&order=&keyword=' + keyword + '&page=' + str(
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=media_ft&order=&keyword=' + urllib.parse.quote(keyword) + '&page=' + str(
         page) + '&category_id=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -644,11 +644,11 @@ def get_movsearch(keyword, page):
 
 
 def get_livesearch(keyword, page):
-    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&keyword=' + keyword + '&page=' + str(
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&keyword=' + urllib.parse.quote(keyword) + '&page=' + str(
         page) + '&order=&category_id=&duration=&user_type=&order_sort=&tids_1=&tids_2=&search_type=live&changing=id&cover_type=user_cover&__refresh__=true&__reload__=false&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -689,11 +689,11 @@ def get_livesearch(keyword, page):
 
 
 def get_upsearch(keyword, page):
-    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=bili_user&order=&keyword=' + keyword + '&page=' + str(
+    serachUrl = 'https://api.bilibili.com/x/web-interface/search/type?context=&search_type=bili_user&order=&keyword=' + urllib.parse.quote(keyword) + '&page=' + str(
         page) + '&category_id=&user_type=&order_sort=&changing=mid&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
