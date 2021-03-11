@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.bilibili" name="Bilibili" version="0.5.8" provider-name="zhengfan,shaolin-kongfu,YingjieSong,ArchieMeng">
+<addon id="plugin.video.bilibili" name="Bilibili" version="0.5.9" provider-name="zhengfan,shaolin-kongfu,YingjieSong,ArchieMeng">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.xbmcswift2" version="2.4.0"/>
   <import addon="script.module.beautifulsoup4" version="4.5.3"/>
   <import addon="script.module.requests" version="2.19.1"/>
@@ -14,7 +14,10 @@
   <extension point="xbmc.python.module" library="xml2ass.py"/>
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
-    <language></language>
+    <language/>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
     <description>bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐</description>
   </extension>
 </addon>

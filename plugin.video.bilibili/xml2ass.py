@@ -23,9 +23,6 @@ import sys
 import time
 import xml.dom.minidom
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 # if sys.version_info < (3,):
 #     raise RuntimeError('at least Python 3.0 is required')
 
@@ -663,7 +660,7 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 Style: %(styleid)s, %(fontface)s, %(fontsize)s, &H%(alpha)02XFFFFFF, &H%(alpha)02XFFFFFF, &H%(alpha)02X000000, &H%(alpha)02X000000, 0, 0, 0, 0, 100, 100, 0.00, 0.00, 1, %(outline)s, 0, 7, 0, 0, 0, 0
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-''' % {'width': width, 'height': height, 'fontface': fontface, 'fontsize': round(fontsize), 'alpha': 255-round(alpha*255), 'outline': round(fontsize/25), 'styleid': styleid}).decode('utf-8'))
+''' % {'width': width, 'height': height, 'fontface': fontface, 'fontsize': round(fontsize), 'alpha': 255-round(alpha*255), 'outline': round(fontsize/25), 'styleid': styleid}))
 
 
 def WriteComment(f, c, row, width, height, bottomReserved, fontsize, lifetime, styleid):
@@ -683,7 +680,7 @@ def WriteComment(f, c, row, width, height, bottomReserved, fontsize, lifetime, s
         styles.append('\\c&H%02X%02X%02X&' % (c[5] & 0xff, (c[5] >> 8) & 0xff, (c[5] >> 16) & 0xff))
         if c[5] == 0x000000:
             styles.append('\\3c&HFFFFFF&')
-    f.write(('Dialogue: 2,%(start)s,%(end)s,%(styleid)s,,0000,0000,0000,,{%(styles)s}%(text)s\n' % {'start': ConvertTimestamp(c[0]), 'end': ConvertTimestamp(c[0]+lifetime), 'styles': ''.join(styles), 'text': text, 'styleid': styleid}).decode('utf-8'))
+    f.write(('Dialogue: 2,%(start)s,%(end)s,%(styleid)s,,0000,0000,0000,,{%(styles)s}%(text)s\n' % {'start': ConvertTimestamp(c[0]), 'end': ConvertTimestamp(c[0]+lifetime), 'styles': ''.join(styles), 'text': text, 'styleid': styleid}))
 
 
 def ASSEscape(s):
