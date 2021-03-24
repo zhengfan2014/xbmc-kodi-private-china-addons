@@ -8,33 +8,23 @@ import xbmcgui
 import time
 import base64
 import json
-import urllib2
 import sys
-import HTMLParser
+import html
 import re
 import cfscrape
 import random
 import urllib
 import xml.etree.ElementTree as ET
 import difflib
-
-from requests.adapters import HTTPAdapter
-from requests.auth import HTTPBasicAuth
  
-from urllib import unquote
-
 def diff_float(s1, s2):
     return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
 
-def urldecode(fname):
-    fname = unquote(fname.encode('utf-8'))
-    fname = unicode(fname.decode('utf-8'))
-    return fname
-# def unescape(string):
-#     string = urllib2.unquote(string).decode('utf8')
-#     quoted = HTMLParser.HTMLParser().unescape(string).encode('utf-8')
-#     #转成中文
-#     return re.sub(r'%u([a-fA-F0-9]{4}|[a-fA-F0-9]{2})', lambda m: unichr(int(m.group(1), 16)), quoted)
+def unescape(string):
+    string = urllib.parse.unquote(string)
+    quoted = html.unescape(string)
+    #转成中文
+    return re.sub(r'%u([a-fA-F0-9]{4}|[a-fA-F0-9]{2})', lambda m: unichr(int(m.group(1), 16)), quoted)
 
 
 plugin = Plugin()
@@ -67,113 +57,78 @@ def chushihua(key,default):
 
 @plugin.cached(TTL=2)
 def get_html(url,ua='pc',cf='',mode='html',encode='utf-8'):
-    #UA相关
-    if ua == 'pc':
-        head = headers
-    if ua == 'mobile':
-        head = mheaders
-    if ua == 'iphone':
-        head = iphoneheaders
-    if ua == 'ipad':
-        head = ipadheaders
-    if ua == 'mac':
-        head = macheaders
-    
-    #超时重试3次
-    s0 = requests.Session()
-    s0.mount('http://', HTTPAdapter(max_retries=3))
-    s0.mount('https://', HTTPAdapter(max_retries=3))
-
-    #获取网页源代码
-    if mode == 'html':
-        #cloudflare相关
-        if cf == '':
-            r = s0.get(url,headers=head)
+    if cf == '':
+        if ua == 'pc':
+            r = requests.get(url,headers=headers)
+        if ua == 'mobile':
+            r = requests.get(url,headers=mheaders)
+        if ua == 'iphone':
+            r = requests.get(url,headers=iphoneheaders)
+        if ua == 'ipad':
+            r = requests.get(url,headers=ipadheaders)
+        if ua == 'mac':
+            r = requests.get(url,headers=macheaders)
+        if encode == 'utf-8':
+            r.encoding = 'utf-8'
+        if encode == 'gbk':
+            r.encoding = 'gbk'
+        if mode == 'url':
+            html = r.url
         else:
-            scraper = cfscrape.create_scraper()
-            s = scraper.get_tokens(url,headers=head)
-            r = s0.get(url,headers=head,cookies=s[0])
-        #编码相关
+            html = r.text
+    else:
+        scraper = cfscrape.create_scraper()
+        if ua == 'pc':
+            s = scraper.get_tokens(url,headers=headers)
+            r = requests.get(url,headers=headers,cookies=s[0])
+        if ua == 'mobile':
+            s = scraper.get_tokens(url,headers=mheaders)
+            r = requests.get(url,headers=mheaders,cookies=s[0])
+        if ua == 'iphone':
+            s = scraper.get_tokens(url,headers=iphoneheaders)
+            r = requests.get(url,headers=iphoneheaders,cookies=s[0])
+        if ua == 'ipad':
+            s = scraper.get_tokens(url,headers=ipadheaders)
+            r = requests.get(url,headers=ipadheaders,cookies=s[0])
+        if ua == 'mac':
+            s = scraper.get_tokens(url,headers=macheaders)
+            r = requests.get(url,headers=macheaders,cookies=s[0])
+
+        if encode == 'utf-8':
+            r.encoding = 'utf-8'
+        if encode == 'gbk':
+            r.encoding = 'gbk'
+
+        if mode == 'url':
+            html = r.url
+        else:
+            html = r.text
+    return html
+
+@plugin.cached(TTL=2)
+def post_html(url,data,ua='pc',cf='',encode='utf-8'):
+    data =eval(data)
+    if cf == '':
+        if ua == 'pc':
+            r = requests.post(url,headers=headers,data=data)
+        if ua == 'mobile':
+            r = requests.post(url,headers=mheaders,data=data)
+        if ua == 'iphone':
+            r = requests.post(url,headers=iphoneheaders,data=data)
+        if ua == 'ipad':
+            r = requests.post(url,headers=ipadheaders,data=data)
+        if ua == 'mac':
+            r = requests.post(url,headers=macheaders,data=data)
+        
         if encode == 'utf-8':
             r.encoding = 'utf-8'
         if encode == 'gbk':
             r.encoding = 'gbk'
         html = r.text
-    
-    #用于获取302跳转网页的真实url
-    if mode == 'url':
-        #cloudflare相关
-        if cf == '':
-            r = s0.get(url,headers=head,timeout=5,stream=True)
-        else:
-            scraper = cfscrape.create_scraper()
-            s = scraper.get_tokens(url,headers=head)
-            r = s0.get(url,headers=head,cookies=s[0],timeout=5,stream=True)
-        
-        html = r.url
-        
+    else:
+        scraper = cfscrape.create_scraper()
+        html = scraper.post(url,data).content
     return html
-
-@plugin.cached(TTL=2)
-def post_html(url,data='',ua='pc',cf='',mode='html',encode='utf-8',jsons=''):
-    if data != '':
-        data =eval(data)
-    if jsons != '':
-        jsons =eval(jsons)
-
-    #UA相关
-    if ua == 'pc':
-        head = headers
-    if ua == 'mobile':
-        head = mheaders
-    if ua == 'iphone':
-        head = iphoneheaders
-    if ua == 'ipad':
-        head = ipadheaders
-    if ua == 'mac':
-        head = macheaders
-
-    #超时重试3次
-    s0 = requests.Session()
-    s0.mount('http://', HTTPAdapter(max_retries=3))
-    s0.mount('https://', HTTPAdapter(max_retries=3))
-
-    #cloudflare相关
-    if data != '' or jsons != '':
-        if cf == '':
-            if data != '':
-                r = s0.post(url,headers=head,data=data)
-            if jsons != '':
-                r = s0.post(url,headers=head,json=jsons)
-
-            if encode == 'utf-8':
-                r.encoding = 'utf-8'
-            if encode == 'gbk':
-                r.encoding = 'gbk'
-            html = r.text
-
-            if mode == 'url':
-                html = r.url
-            else:
-                html = r.text
-        else:
-            scraper = cfscrape.create_scraper()
-            s = scraper.get_tokens(url,headers=head)
-            if data != '':
-                r = s0.post(url,data=data,headers=head,cookies=s[0])
-            if jsons != '':
-                r = s0.post(url,json=jsons,headers=head,cookies=s[0])
-
-            if encode == 'utf-8':
-                r.encoding = 'utf-8'
-            if encode == 'gbk':
-                r.encoding = 'gbk'
-
-            if mode == 'url':
-                html = r.url
-            else:
-                html = r.text
-        return html
 
 def unix_to_data(uptime,format='data'):
     if len(str(uptime)) > 10:
@@ -228,86 +183,100 @@ def get_search_mode(keyword,page,mode):
 ##########################################################
 
 def get_categories():
-    return [{'id':1,'name':'喜欢看影视(138vcd.com)','link':'138vcd','author':'zhengfan2014','upload':'2020-5-7','videos':48,'search':36},
-            {'id':2,'name':'片库(pianku.tv)','link':'pianku','author':'zhengfan2014','upload':'2020-5-7','videos':42,'search':10},
+    return [{'id':1,'name':'爱尚影视(ku2000.com)','link':'ku2000','author':'zhengfan2014','upload':'2020-5-7','videos':48,'search':8},
+            {'id':2,'name':'片库(pianku.li)','link':'pianku','author':'zhengfan2014','upload':'2020-5-7','videos':42,'search':10},
             {'id':3,'name':'老豆瓣(laodouban.com)','link':'laodouban','author':'zhengfan2014','upload':'2020-5-7','videos':12,'search':10},
             {'id':4,'name':'美剧天堂(meijutt.tv)','link':'meijutt','author':'zhengfan2014','upload':'2020-5-23','videos':20,'search':20},
-            {'id':5,'name':'豆瓣电影资源(douban777.com)','link':'douban777','author':'zhengfan2014','upload':'2020-6-10','videos':20},
-            {'id':6,'name':'快影资源(kyzy.tv)','link':'kyzy','author':'zhengfan2014','upload':'2020-6-10','videos':20},
-            {'id':7,'name':'卧龙资源(wlzy.tv)','link':'wlzy','author':'zhengfan2014','upload':'2020-6-10','videos':25},
-            {'id':8,'name':'OK资源(okzyw.com)','link':'okzy','author':'zhengfan2014','upload':'2020-6-11','videos':30},
-            {'id':9,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
-            {'id':10,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40},
-            {'id':11,'name':'采集资源(caijizy.vip)','link':'caijizy','author':'zhengfan2014','upload':'2020-6-12','videos':35},
-            {'id':12,'name':'哈酷资源(666zy.com)','link':'666zy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
-            {'id':13,'name':'kuku(pan.kuku.me)','link':'kukume','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':14,'name':'Share With You(ty.let-me-try.com)','link':'letmetry','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':15,'name':'goindex测试','link':'ddosi','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':16,'name':'goindex多盘版测试','link':'yanzai','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':17,'name':'goindex多盘版acrou','link':'acrou','author':'zhengfan2014','upload':'2020-9-26'}]
+            {'id':5,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':6,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
 ##########################################################
 
-#138vcd
-def get_138vcd_categories():
-    return [{"name": "动作片", "link": "https://www.138vcd.com/index.php/vod/show/id/26"},
-          {"name": "喜剧片", "link": "https://www.138vcd.com/index.php/vod/show/id/27"}, 
-          {"name": "爱情片", "link": "https://www.138vcd.com/index.php/vod/show/id/28"}, 
-          {"name": "科幻片", "link": "https://www.138vcd.com/index.php/vod/show/id/29"},
-          {"name": "剧情片", "link": "https://www.138vcd.com/index.php/vod/show/id/30"},
-          {"name": "战争片", "link": "https://www.138vcd.com/index.php/vod/show/id/31"},
-          {"name": "恐怖片", "link": "https://www.138vcd.com/index.php/vod/show/id/36"}]
+#ku2000
+def get_ku2000_categories():
+    return [{"name": "综艺片", "link": "https://www.ku2000.com/vodtype/3"},
+          {"name": "动漫片", "link": "https://www.ku2000.com/vodtype/4"}, 
+          {"name": "解说中", "link": "https://www.ku2000.com/vodtype/20"},
+          {"name": "体育台", "link": "https://www.ku2000.com/vodtype/26"},
+          {"name": "动作片", "link": "https://www.ku2000.com/vodtype/6"},
+          {"name": "喜剧片", "link": "https://www.ku2000.com/vodtype/7"},
+          {"name": "爱情片", "link": "https://www.ku2000.com/vodtype/8"},
+          {"name": "科幻片", "link": "https://www.ku2000.com/vodtype/9"},
+          {"name": "恐怖片", "link": "https://www.ku2000.com/vodtype/10"},
+          {"name": "剧情片", "link": "https://www.ku2000.com/vodtype/11"},
+          {"name": "战争片", "link": "https://www.ku2000.com/vodtype/12"},
+          {"name": "纪录片", "link": "https://www.ku2000.com/vodtype/21"},
+          {"name": "国产剧", "link": "https://www.ku2000.com/vodtype/13"},
+          {"name": "港台剧", "link": "https://www.ku2000.com/vodtype/14"},
+          {"name": "日韩剧", "link": "https://www.ku2000.com/vodtype/15"},
+          {"name": "海外剧", "link": "https://www.ku2000.com/vodtype/16"},
+          {"name": "福利片", "link": "https://www.ku2000.com/vodtype/23"},
+          {"name": "微电影", "link": "https://www.ku2000.com/vodtype/24"}]
 
-def get_138vcd_videos(url,page):
+def get_ku2000_videos(url,page):
     videos = []
     if page == 1:
         r = get_html(url + '.html')
     else:
-        r = get_html(url + '/page/' +str(page) +'.html')
+        r = get_html(url + '-' +str(page) +'.html')
     soup = BeautifulSoup(r, "html5lib")
     ul = soup.find('ul',class_='myui-vodlist clearfix')
     alist = ul.find_all('a',class_='myui-vodlist__thumb lazyload')
     for i in range(len(alist)):
         videoitem = {}
         videoitem['name'] =  alist[i]['title'] 
-        videoitem['href'] =  'https://www.138vcd.com/' + alist[i]['href']
+        videoitem['href'] =  'https://www.ku2000.com' + alist[i]['href']
         videoitem['thumb'] = alist[i]['data-original']
         videos.append(videoitem)
     return videos
 
-def get_138vcd_source(url):
+def get_ku2000_source(url):
     videos = []
     r = get_html(url)
+    #dialog = xbmcgui.Dialog()
+    #dialog.textviewer('错误提示', url)
+
     soup = BeautifulSoup(r, 'html.parser')
-    ul = soup.find('ul',class_='myui-content__list sort-list clearfix')
-    alist = ul.find_all('a')
-    
-    duopdict = {}
-    for i in range(len(alist)):
-        duopdict[alist[i].text] = 'https://www.138vcd.com' + alist[i]['href']
+    ul = soup.find_all('ul',class_='nav nav-tabs active')
+    li = ul[0].find_all('li')
+    vlist =soup.find_all('ul',class_='myui-content__list sort-list scrollbar clearfix')
+    for index in range(len(li)):
+        duopname = li[index].text
+        alist = vlist[index].find_all('a')
+        duopdict = {}
+        for i in range(len(alist)):
+            duopdict[alist[i].text] = 'https://www.ku2000.com' + alist[i]['href']
         
-    videoitem = {}
-    videoitem['name'] = '播放线路1'
-    videoitem['href'] = str(duopdict)
-    videos.append(videoitem)
+        videoitem = {}
+        videoitem['name'] = duopname
+        videoitem['href'] = str(duopdict)
+        videos.append(videoitem)
     tmp['bghtml'] = r
     return videos
 
-def get_138vcd_mp4(url):
+def get_ku2000_mp4(url):
     r = get_html(url)
-    mp4 = re.search('(?<=link_pre\":\"\",\"url\":\").*?(?=\",\"url_next)',r).group()
+    str1 = r.find('var player_aaaa=')
+    cut = r[str1:]
+    mp4 = re.search('url\":\"(.*?)\"',cut).group(1)
     mp4 = mp4.replace('\\','')
+    if not mp4.endswith('m3u8'):
+        r = get_html(mp4)
+        m3u8 = re.search('url:\'(.*?)\'',r).group(1)
+        mp4 = re.search('(.*?)/share',mp4).group(1) + m3u8
+    dialog = xbmcgui.Dialog()
+    dialog.textviewer('错误提示', mp4)
     return mp4
 
-def get_138vcd_search(keyword,page):
+def get_ku2000_search(keyword,page):
     videos = []
     
     if page == 1:
-        r = get_html('https://www.138vcd.com/vodsearch.html?wd='+keyword+'&submit=')
+        r = get_html('https://www.ku2000.com/vodsearch.html?wd='+keyword+'&submit=')
     else:
-        r = get_html('https://www.138vcd.com/vodsearch/page/'+str(page)+'/wd/'+keyword+'.html')
+        r = get_html('https://www.ku2000.com/vodsearch/page/'+str(page)+'/wd/'+keyword+'.html')
     soup = BeautifulSoup(r, "html5lib")
     ul = soup.find('ul',id='searchList')
     alist = ul.find_all('a',class_='myui-vodlist__thumb img-lg-150 img-md-150 img-sm-150 img-xs-100 lazyload')
@@ -321,9 +290,9 @@ def get_138vcd_search(keyword,page):
 
 #pianku
 def get_pianku_categories():
-    return [{"name": "电影", "link": "https://www.pianku.tv/mv/-----1-"},
-          {"name": "剧集", "link": "https://www.pianku.tv/tv/-----1-"}, 
-          {"name": "动漫", "link": "https://www.pianku.tv/ac/-----1-"}]
+    return [{"name": "电影", "link": "https://www.pianku.li/mv/------"},
+          {"name": "剧集", "link": "https://www.pianku.li/tv/------"}, 
+          {"name": "动漫", "link": "https://www.pianku.li/ac/------"}]
 
 def get_pianku_videos(url,page):
     videos = []
@@ -337,20 +306,22 @@ def get_pianku_videos(url,page):
     for i in range(len(ilist)):
         videoitem = {}
         videoitem['name'] =  ilist[i].a['title'] 
-        videoitem['href'] =  'https://www.pianku.tv' + ilist[i].a['href']
-        videoitem['thumb'] = ilist[i].a.img['src']
+        videoitem['href'] =  'https://www.pianku.li' + ilist[i].a['href']
+        videoitem['thumb'] = ilist[i].a.img['data-funlazy']
         videos.append(videoitem)
     return videos
-
+        
 def get_pianku_source(url):
     videos = []
-    r1 = get_html(url)
-    vtype = re.search('(?<=pianku.tv\/)[a-zA-Z]+(?=\/)',url).group()
-    vid = re.search('[a-zA-Z]+(?=.html)',url).group()
-    apiurl = 'https://www.pianku.tv/ajax/downurl/'+vid+'_'+vtype+'/'
-    r = get_html(apiurl)
-    
-    soup = BeautifulSoup(r, 'html.parser')
+    vtype = re.search('(?<=pianku.li\/)[a-zA-Z]+(?=\/)',url).group()
+    vid = re.search('([a-zA-Z]|\d)+(?=.html)',url).group()
+    apiurl = 'https://www.pianku.li/ajax/downurl/'+vid+'_'+vtype+'/'
+    videoheaders = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36'
+    }
+    r1 = requests.get(url,headers=videoheaders)
+    r = requests.get(apiurl,headers=videoheaders,cookies=r1.cookies)
+    soup = BeautifulSoup(r.text, "html.parser")
     ul = soup.find('ul',class_='py-tabs')
     # dialog = xbmcgui.Dialog()
     # dialog.textviewer('错误提示', str(r.encode('utf-8')))
@@ -362,7 +333,7 @@ def get_pianku_source(url):
         alist = vlist[index].find_all('a')
         duopdict = {}
         for i in range(len(alist)):
-            duopdict[alist[i].text] = 'https://www.pianku.tv' + alist[i]['href']
+            duopdict[alist[i].text] = 'https://www.pianku.li' + alist[i]['href']
         
         videoitem = {}
         videoitem['name'] = duopname
@@ -385,7 +356,7 @@ def get_pianku_search(keyword,page):
     videos = []
     
     if page == 1:
-        url = get_html('https://www.pianku.tv/s/go.php?q='+keyword,mode='url')
+        url = get_html('https://www.pianku.li/s/go.php?q='+keyword,mode='url')
         tmp['piankusearch'] = url
     else:
         url = tmp['piankusearch'][:-5] + '-' + str(page) + '.html'
@@ -401,8 +372,8 @@ def get_pianku_search(keyword,page):
         a = vlist[i].dd.find('a')
         videoitem = {}
         videoitem['name'] =  a.text
-        videoitem['href'] =  'https://www.pianku.tv' + a['href']
-        videoitem['thumb'] = img['src']
+        videoitem['href'] =  'https://www.pianku.li' + a['href']
+        videoitem['thumb'] = img['data-funlazy']
         videos.append(videoitem)
     return videos
 
@@ -563,7 +534,7 @@ def get_meijutt_source(url):
     
 
     for index in range(len(j)):
-        if j[index][0] != u'百度网盘' and j[index][0] != u'西瓜影音':
+        if j[index][0] != u'百度云':
             duopname = j[index][0]
             duopdict = {}
             for i in range(len(j[index][1])):
@@ -577,8 +548,8 @@ def get_meijutt_source(url):
 
 def get_meijutt_mp4(url):
     if re.search('m3u8',url):
-        if re.search('9m3u8',url):
-            url = url.replace('9m3u8','m3u8')
+        if re.search('6m3u8',url):
+            url = url.replace('6m3u8','m3u8')
     else:
         url = url[:-5] + url[-4:]
         
@@ -593,10 +564,10 @@ def get_meijutt_search(keyword,page):
     videos = []
     if page == 1:
         url = 'https://www.meijutt.tv/search/index.asp'
-        data = {'searchword':keyword.decode('utf-8').encode('gbk')}
+        data = {'searchword':keyword.encode('gbk')}
         r = post_html(url,data=str(data),encode='gbk')
     else:
-        url = 'https://www.meijutt.tv/search/index.asp?page='+str(page)+'&searchword='+(urllib.quote(keyword.decode('utf-8').encode('gbk')).encode('utf-8'))+'&searchtype=-1'
+        url = 'https://www.meijutt.tv/search/index.asp?page='+str(page)+'&searchword='+(urllib.parse.quote(keyword.encode('gbk')).encode('utf-8'))+'&searchtype=-1'
         r = get_html(url,encode='gbk')
     soup = BeautifulSoup(r, "html5lib")
     ilist = soup.find_all('div',class_='cn_box2')
@@ -610,84 +581,6 @@ def get_meijutt_search(keyword,page):
         videos.append(videoitem)
     return videos
 
-#豆瓣资源
-def get_douban777_categories():
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',banid='1,2')
-
-def get_douban777_videos(url,page):
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url,page=page)
-
-def get_douban777_source(url):
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url)
-
-def get_douban777_mp4info(url):
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url,keyword='douban777')
-
-def get_douban777_mp4(url):
-    if url[:5] == 'https':
-        url = 'http' + url[5:]
-    return url
-
-# def get_douban777_search(keyword,page):
-#     return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',keyword=keyword,page=page)
-
-
-#快影资源
-def get_kyzy_categories():
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',banid='1,2,20')
-
-def get_kyzy_videos(url,page):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,page=page)
-
-def get_kyzy_source(url):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url)
-
-def get_kyzy_mp4info(url):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,keyword='douban777')
-
-def get_kyzy_mp4(url):
-    return url
-
-def get_kyzy_search(keyword,page):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',keyword=keyword,page=page)
-
-#卧龙资源
-def get_wlzy_categories():
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',banid='2,26,30,31')
-
-def get_wlzy_videos(url,page):
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url,page=page)
-
-def get_wlzy_source(url):
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url)
-
-def get_wlzy_mp4info(url):
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url,keyword='douban777')
-
-def get_wlzy_mp4(url):
-    return url
-
-# def get_wlzy_search(keyword,page):
-#     return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',keyword=keyword,page=page)
-
-#ok资源
-def get_okzy_categories():
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',banid='1,2,3,4,20,33')
-
-def get_okzy_videos(url,page):
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url,page=page)
-
-def get_okzy_source(url):
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url)
-
-def get_okzy_mp4info(url):
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url,keyword='douban777')
-
-def get_okzy_mp4(url):
-    return url
-
-# def get_okzy_search(keyword,page):
-#     return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',keyword=keyword,page=page)
 
 #麻花资源
 def get_mahuazy_categories():
@@ -705,8 +598,6 @@ def get_mahuazy_mp4info(url):
 def get_mahuazy_mp4(url):
     return url
 
-# def get_mahuazy_search(keyword,page):
-#     return get_maccms_xml('https://www.mhapi123.com/inc/api.php',keyword=keyword,page=page)
 
 #最大资源
 def get_zdziyuan_categories():
@@ -724,52 +615,7 @@ def get_zdziyuan_mp4info(url):
 def get_zdziyuan_mp4(url):
     return url
 
-#采集资源
-def get_caijizy_categories():
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',banid='1,2,27')
 
-def get_caijizy_videos(url,page):
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,page=page)
-
-def get_caijizy_source(url):
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url)
-
-def get_caijizy_mp4info(url):
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,keyword='douban777')
-
-def get_caijizy_mp4(url):
-    return url
-
-#哈酷资源
-def get_666zy_categories():
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',banid='1,2,27,36')
-
-def get_666zy_videos(url,page):
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url,page=page)
-
-def get_666zy_source(url):
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url)
-
-def get_666zy_mp4info(url):
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url,keyword='douban777')
-
-def get_666zy_mp4(url):
-    return url
-
-
-def get_kukume_categories():
-    return get_sharelist('https://pan.kuku.me/')
-
-def get_letmetry_categories():
-    return get_sharelist('https://ty.let-me-try.com/')
-
-def get_ddosi_categories():
-    return get_goindex('https://w.ddosi.workers.dev/')
-
-def get_yanzai_categories():
-    return get_yanzaigoindex('https://yanzai-goindex.java.workers.dev/')
-def get_acrou_categories():
-    return get_yanzaigoindex('https://oss.achirou.workers.dev/')
 ########################################################################################################################################
 ########################################################################################################################################
 ###以下是核心代码区，看不懂的请勿修改
@@ -819,7 +665,7 @@ def duop(name,list,mode):
     kongge = kongge.encode('utf-8')
     items = []
     for index in range(len(slist)):
-        item = {'label':slist[index].encode('utf-8'),'path':plugin.url_for('play',name=slist[index].encode('utf-8')+ kongge +name,url= list[slist[index]],mode=mode)}
+        item = {'label':slist[index].encode('utf-8'),'path':plugin.url_for('play',name=slist[index].encode('utf-8')+ kongge +name.encode('utf-8'),url= list[slist[index]],mode=mode)}
         items.append(item)
     return items
 
@@ -876,89 +722,19 @@ def category(name,url,mode,page):
 @plugin.route('/home/<mode>/')
 def home(mode):
     categories = get_categories_mode(mode)
-    if categories[0]['name'] == 'mode':
-        items = []
-        netdiskmod = categories[0]['link']
-        del categories[0]
-        pnum = 0
-        allnum = len(categories)
-        pDialog = xbmcgui.DialogProgress()
-        pDialog.create('解析网盘文件下载地址', '准备开始发送请求...')
-            
-        for category in categories:
-            
-            if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',urldecode(category['name'])):
-                #解析文件
-                pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：解析文件地址中...  [' + str(pnum+1) + '/' + str(allnum) + ']')
-                r = requests.get(category['link'], stream=True,headers=headers)
-                items.append({'label': category['name'],'path': r.url,'is_playable':True})
-            else:
-                #判断是否文件夹，是继续循环调用
-                pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：判断为文件夹,跳过...  [' + str(pnum+1) + '/' + str(allnum) + ']')
-                items.append({'label': category['name'],
-                'path': plugin.url_for('onetogo', name=category['name'].encode('utf-8'), url=category['link'].encode('utf-8'),mode=netdiskmod,page=1),
-                })
-            pnum += 1
-    else:
-        items = [{
-            'label': category['name'],
-            'path': plugin.url_for('category', name=category['name'] , url=category['link'],mode=mode,page=1),
-        } for category in categories]
-        try:
-            eval('get_' + mode + '_search')
-            items.append({
-                'label': '[COLOR yellow]搜索[/COLOR]',
-                'path': plugin.url_for('history',name='搜索',url='search',mode=mode),
-           })
-        except NameError:
-            pass
-    return items
-
-@plugin.route('/onetogo/<name>/<url>/<mode>/<page>/')
-def onetogo(name,url,mode,page):
+    items = [{
+        'label': category['name'],
+        'path': plugin.url_for('category', name=category['name'] , url=category['link'],mode=mode,page=1),
+    } for category in categories]
     try:
-        categories = eval('get_' + mode)(url)
-    
-        if categories[0]['name'] == 'mode':
-            items = []
-            del categories[0]
-            pnum = 0
-            allnum = len(categories)
-            pDialog = xbmcgui.DialogProgress()
-            pDialog.create('解析网盘文件下载地址', '准备开始发送请求...')
-            
-            for category in categories:
-            
-                if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',urldecode(category['name'])):
-                    #解析文件
-                    pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：解析文件地址中...  [' + str(pnum+1) + '/' + str(allnum) + ']')
-
-                    # s = requests.Session()
-                    # s.mount('http://', HTTPAdapter(max_retries=3))
-                    # s.mount('https://', HTTPAdapter(max_retries=3))
-
-                    # try:
-                    #     r = s.get(category['link'],timeout=5,stream=True,headers=headers)
-                    # except requests.exceptions.RequestException as e:
-                    #     dialog = xbmcgui.Dialog()
-                    #     dialog.textviewer('错误提示',str(e))
-                    # r = requests.get(category['link'], stream=True,headers=headers)
-                    r = get_html(category['link'],mode='url')
-                    items.append({'label': category['name'],'path':r,'is_playable':True})
-                else:
-                    #判断是否文件夹，是继续循环调用
-                    pDialog.update(int(float(pnum)/float(allnum)*100), '解析网盘文件地址：判断为文件夹,跳过...  [' + str(pnum+1) + '/' + str(allnum) + ']')
-                    items.append({'label': category['name'],
-                    'path': plugin.url_for('onetogo', name=category['name'].encode('utf-8'), url=category['link'].encode('utf-8'),mode=mode,page=1),
-                    })
-                pnum += 1
-    
+        eval('get_' + mode + '_search')
+        items.append({
+            'label': '[COLOR yellow]搜索[/COLOR]',
+            'path': plugin.url_for('history',name='搜索',url='search',mode=mode),
+        })
     except NameError:
         pass
-
     return items
-
-
 
 @plugin.route('/search/<value>/<page>/<mode>/')
 def search(value,page,mode):
@@ -1337,7 +1113,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                 
                 videoitem['info'] = {}
                 videoitem['info']['title'] = vide.find('name').text
-                plot = unicode(vide.find('des').text)
+                plot = str(vide.find('des').text)
                 plot = re.sub('<.*?>','',plot)
                 plot = re.sub('&#?[a-z0-9]+;','',plot)
                 plot = plot.replace(u'None','')
@@ -1348,7 +1124,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                 videoitem['info']['year'] = vide.find('year').text
 
                 #演员
-                acto = unicode(vide.find('actor').text)
+                acto = str(vide.find('actor').text)
                 if acto.find(u',') != -1:
                     actor = acto.split(u',')
                 else:
@@ -1356,7 +1132,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                 videoitem['info']['cast'] = actor
 
                 #导演
-                directo = unicode(vide.find('director').text)
+                directo = str(vide.find('director').text)
                 if directo.find(u',') != -1:
                     director = directo.split(u',')
                 else:
@@ -1382,7 +1158,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                 
                     videoitem['info'] = {}
                     videoitem['info']['title'] = vide.find('name').text
-                    plot = unicode(vide.find('des').text)
+                    plot = str(vide.find('des').text)
                     plot = re.sub('<.*?>','',plot)
                     plot = re.sub('&#?[a-z0-9]+;','',plot)
                     plot = plot.replace(u'None','')
@@ -1393,7 +1169,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                     videoitem['info']['year'] = vide.find('year').text
 
                     #演员
-                    acto = unicode(vide.find('actor').text)
+                    acto = str(vide.find('actor').text)
                     if acto.find(u',') != -1:
                         actor = acto.split(u',')
                     else:
@@ -1401,7 +1177,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                     videoitem['info']['cast'] = actor
 
                     #导演
-                    directo = unicode(vide.find('director').text)
+                    directo = str(vide.find('director').text)
                     if directo.find(u',') != -1:
                         director = directo.split(u',')
                     else:
@@ -1418,7 +1194,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                 
                 for dd in dl.findall('dd'):
                     duopname = dd.get('flag')
-                    strduop = unicode(dd.text)
+                    strduop = str(dd.text)
                     duopdict = {}
                     if strduop.find(u'#') != -1:
                         duoplist = strduop.split(u'#')
@@ -1493,7 +1269,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                     root = get_xml(api + '?ac=videolist&ids=' + tmp['maccmsids'],debug=debug,t=24)
                     vide = root.find('list').find('video')
                     info['title'] = vide.find('name').text
-                    plot = unicode(vide.find('des').text)
+                    plot = str(vide.find('des').text)
                     plot = re.sub('<.*?>','',plot)
                     plot = re.sub('&#?[a-z0-9]+;','',plot)
                     plot = plot.replace(u'None','')
@@ -1504,7 +1280,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                     info['year'] = vide.find('year').text
 
                     #演员
-                    acto = unicode(vide.find('actor').text)
+                    acto = str(vide.find('actor').text)
                     if acto.find(u',') != -1:
                         actor = acto.split(u',')
                     else:
@@ -1512,7 +1288,7 @@ def get_maccms_xml(api,url=0,keyword=0,page=0,banid='',debug='no'):
                     info['cast'] = actor
 
                     #导演
-                    directo = unicode(vide.find('director').text)
+                    directo = str(vide.find('director').text)
                     if directo.find(u',') != -1:
                         director = directo.split(u',')
                     else:
@@ -1781,239 +1557,5 @@ def get_maccms_json(api,url=0,keyword=0,page=0,banid='',debug='no'):
     # dialog.textviewer('错误提示', str(xx.encode('utf-8')))
 
     return typelist
-
-
-
-
-#对接sharelist搭建的网盘站
-def get_sharelist(home):
-    typelist = []
-    typelist.append({'name':'mode','link':'sharelist'})
-    r = get_html(home)
-    rurl = get_html(home,mode='url')
-    soup = BeautifulSoup(r, "html5lib")
-    files = soup.find_all('a')
-
-    baseurl = re.search('(http(s)?:\/\/).*?\/',rurl).group()
-    
-    if baseurl[-1:] == '/':
-        baseurl = baseurl[:-1]
-
-    for index in range(len(files)):
-        try:
-            x = 0
-            if files[index]['href'] != '/':
-                files[index]['href'] = files[index]['href'].replace('?preview','')
-                if files[index]['href'][:4] != 'http':
-                    flink = baseurl + files[index]['href']
-                else:
-                    flink = files[index]['href']
-
-                if files[index]['href'][-1:] == '/':
-                    fname = files[index]['href'][:-1]
-                else:
-                    fname = files[index]['href']
-                
-                if fname != '':
-                    fname = re.search('[^/]+(?!.*/)',fname).group()
-                fname = urldecode(fname)
-
-                if typelist != []:
-                    #对比和已有列表是否有重复项
-                    for i in range(len(typelist)):
-                        if typelist[i]['link'] != flink:
-                            x = x+1
-                    
-                    if x ==  len(typelist) and fname != '':
-                        typelist.append({'name':fname + ' - [COLOR gray]' + urldecode(flink) + '[/COLOR]','link':flink})
-                            
-                else:
-                    typelist.append({'name':fname + ' - [COLOR gray]' + urldecode(flink) + '[/COLOR]','link':flink})
-                    # nowlist.append(fname)
-                
-                
-        except KeyError:
-            pass
-    # lastlist = nowlist
-    # dialog = xbmcgui.Dialog()
-    # dialog.textviewer('错误提示', str(lastlist))
-    return typelist
-
-
-#对接原版goindex
-def get_goindex(home):
-    typelist = []
-    typelist.append({'name':'mode','link':'goindex'})
-    if re.search('workers.dev',home):
-        r = post_html(home,str({"password":"null"}),cf=1)
-    else:
-        r = post_html(home,str({"password":"null"}))
-
-    j = json.loads(r)
-    fl = j['files']
-    for i in range(len(fl)):
-        if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',fl[i]['name']):
-            #文件
-            typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'[/COLOR]','link':home.decode('utf-8') + fl[i]['name']})
-        else:
-            #文件夹
-            typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'/[/COLOR]','link':home.decode('utf-8') + fl[i]['name'] + u'/'})
-    return typelist
-
-#对接yanzai修改版goindex - 官网demo 2020-4-28版本测试通过
-def get_yanzaigoindex(home):
-    if re.search('\|',home):
-        
-        ho = home.split('|')
-        home = ho[0]
-        if len(ho) == 3:
-            pindex = int(ho[1])
-            ptoken = ho[2]
-    else:
-        pindex = 0
-        ptoken = ''
-
-    typelist = []
-    typelist.append({'name':'mode','link':'yanzaigoindex'})
-
-    if re.search('\/[0-9]+\:\/',home):
-        #不是首页，不检索有几个网盘
-        if re.search('workers.dev',home):
-            r0 = requests.get(home)
-            if r0.status_code != requests.codes.ok:
-                #检测到状态码401 需要登录
-
-                # dialog = xbmcgui.Dialog()
-                # dialog.textviewer('错误提示', str(r0.status_code))
-                if tmp['yanzaiuser'] and tmp['yanzaipass']:
-                    #尝试用缓存的账号密码登录
-                    scraper = cfscrape.create_scraper()
-                    s = scraper.get_tokens(home,headers=headers,auth=HTTPBasicAuth(tmp['yanzaiuser'], tmp['yanzaipass']))
-
-                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,cookies=s[0],auth=HTTPBasicAuth(tmp['yanzaiuser'], tmp['yanzaipass']))
-                    if r.status_code == 200:
-                        #登录成功
-                        j = json.loads(r.text)
-                    else:
-                        #失败，要求输入账号密码
-                        dialog = xbmcgui.Dialog()
-                        username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM)
-                        password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM)
-                        scraper = cfscrape.create_scraper()
-                        s = scraper.get_tokens(home,headers=headers,auth=HTTPBasicAuth(username, password))
-                        r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,cookies=s[0],auth=HTTPBasicAuth(username, password))
-                        j = json.loads(r.text)
-                        tmp['yanzaiuser'] = username
-                        tmp['yanzaipass'] = password
-                else:
-                    dialog = xbmcgui.Dialog()
-                    username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM)
-                    password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM)
-                    scraper = cfscrape.create_scraper()
-                    s = scraper.get_tokens(home,headers=headers,auth=HTTPBasicAuth(username, password))
-                
-                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,cookies=s[0],auth=HTTPBasicAuth(username, password))
-                    # dialog = xbmcgui.Dialog()
-                    # dialog.textviewer('错误提示', str(r.status_code))
-                    j = json.loads(r.text)
-                    tmp['yanzaiuser'] = username
-                    tmp['yanzaipass'] = password
-            else:
-                #网盘没有加密
-                r = post_html(home,str({"password":"","page_token":ptoken,"page_index":pindex}),cf=1)
-                try:
-                    j = json.loads(r)
-                except ValueError:
-                    r = post_html(home,jsons=str({"password":"","page_token":ptoken,"page_index":pindex,"q": ""}),cf=1)
-                    j = json.loads(r)
-        else:
-            r0 = requests.get(home)
-            if r0.status_code != requests.codes.ok:
-                #检测到状态码401 需要登录
-                if tmp['yanzaiuser'] and tmp['yanzaipass']:
-                    #尝试用缓存的账号密码登录
-                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,auth=HTTPBasicAuth(tmp['yanzaiuser'],tmp['yanzaipass']))
-                    if r.status_code == 200:
-                        #登录成功
-                        j = json.loads(r.text)
-                    else:
-                        #失败，要求输入账号密码
-                        dialog = xbmcgui.Dialog()
-                        username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
-                        password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
-                        r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,auth=HTTPBasicAuth(username, password))
-                        j = json.loads(r.text)
-                        tmp['yanzaiuser'] = username
-                        tmp['yanzaipass'] = password
-                else:
-                    dialog = xbmcgui.Dialog()
-                    username = dialog.input('查看加密文件夹(1/2)\n-- 请输入用户名 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
-                    password = dialog.input('查看加密文件夹(2/2)\n-- 请输入密码 --', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
-                    r = requests.post(home,data={"password":"","page_token":ptoken,"page_index":pindex},headers=headers,auth=HTTPBasicAuth(username, password))
-                    j = json.loads(r.text)
-                    tmp['yanzaiuser'] = username
-                    tmp['yanzaipass'] = password
-            else:
-                #网盘没有加密
-                r = post_html(home,str({"password":"","page_token":ptoken,"page_index":pindex}))
-                try:
-                    j = json.loads(r)
-                except ValueError:
-                    r = post_html(home,jsons=str({"password":"","page_token":ptoken,"page_index":pindex,"q": ""}))
-                    j = json.loads(r)
-        
-        
-        fl = j['data']['files']
-        for i in range(len(fl)):
-            if re.match('[^/]+\.[a-zA-Z0-9]{1,4}',fl[i]['name']):
-                #文件
-                typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'[/COLOR]','link':home.decode('utf-8') + fl[i]['name']})
-            else:
-                #文件夹
-                typelist.append({'name':fl[i]['name'] + u' - [COLOR gray]' + home.decode('utf-8') + urldecode(fl[i]['name']) + u'/[/COLOR]','link':home.decode('utf-8') + fl[i]['name'] + u'/'})
-        if j['nextPageToken']:
-            # dialog = xbmcgui.Dialog()
-            # dialog.textviewer('错误提示', str(j['nextPageToken'].encode('utf-8')))
-            typelist.append({'name':u'[COLOR yellow]下一页[/COLOR]','link':home + '|' + str(pindex+1) + '|' + j['nextPageToken'].encode('utf-8')})
-        
-    else:
-        #检索有几个网盘
-        if re.search('workers.dev',home):
-            r = get_html(home,cf=1)
-        else:
-            r = get_html(home)
-        try:
-            ser = re.search('\[(\"|\').*?(\"|\')\]',r).group()
-            dlist = eval(ser)
-            for i in range(len(dlist)):
-                typelist.append({'name':dlist[i].decode('utf-8') + u' - [COLOR gray]' + home.decode('utf-8') + str(i) +  u':/[/COLOR]','link':home.decode('utf-8') + str(i) +  u':/'})
-        except NameError:
-            pass
-    return typelist
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     plugin.run()
