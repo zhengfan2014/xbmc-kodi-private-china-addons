@@ -228,86 +228,103 @@ def get_search_mode(keyword,page,mode):
 ##########################################################
 
 def get_categories():
-    return [{'id':1,'name':'喜欢看影视(138vcd.com)','link':'138vcd','author':'zhengfan2014','upload':'2020-5-7','videos':48,'search':36},
-            {'id':2,'name':'片库(pianku.tv)','link':'pianku','author':'zhengfan2014','upload':'2020-5-7','videos':42,'search':10},
+    return [{'id':1,'name':'爱尚影视(ku2000.com)','link':'ku2000','author':'zhengfan2014','upload':'2020-5-7','videos':48,'search':8},
+            {'id':2,'name':'片库(pianku.li)','link':'pianku','author':'zhengfan2014','upload':'2020-5-7','videos':42,'search':10},
             {'id':3,'name':'老豆瓣(laodouban.com)','link':'laodouban','author':'zhengfan2014','upload':'2020-5-7','videos':12,'search':10},
             {'id':4,'name':'美剧天堂(meijutt.tv)','link':'meijutt','author':'zhengfan2014','upload':'2020-5-23','videos':20,'search':20},
-            {'id':5,'name':'豆瓣电影资源(douban777.com)','link':'douban777','author':'zhengfan2014','upload':'2020-6-10','videos':20},
-            {'id':6,'name':'快影资源(kyzy.tv)','link':'kyzy','author':'zhengfan2014','upload':'2020-6-10','videos':20},
-            {'id':7,'name':'卧龙资源(wlzy.tv)','link':'wlzy','author':'zhengfan2014','upload':'2020-6-10','videos':25},
-            {'id':8,'name':'OK资源(okzyw.com)','link':'okzy','author':'zhengfan2014','upload':'2020-6-11','videos':30},
-            {'id':9,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
-            {'id':10,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40},
-            {'id':11,'name':'采集资源(caijizy.vip)','link':'caijizy','author':'zhengfan2014','upload':'2020-6-12','videos':35},
-            {'id':12,'name':'哈酷资源(666zy.com)','link':'666zy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
-            {'id':13,'name':'kuku(pan.kuku.me)','link':'kukume','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':14,'name':'Share With You(ty.let-me-try.com)','link':'letmetry','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':15,'name':'goindex测试','link':'ddosi','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':16,'name':'goindex多盘版测试','link':'yanzai','author':'zhengfan2014','upload':'2020-9-26'},
-            {'id':17,'name':'goindex多盘版acrou','link':'acrou','author':'zhengfan2014','upload':'2020-9-26'}]
+            {'id':5,'name':'麻花资源(mahuazy.net)','link':'mahuazy','author':'zhengfan2014','upload':'2020-6-12','videos':20},
+            {'id':6,'name':'最大资源(zuidazy3.net)','link':'zdziyuan','author':'zhengfan2014','upload':'2020-6-12','videos':40},
+            {'id':7,'name':'kuku(pan.kuku.me)','link':'kukume','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':8,'name':'Share With You(ty.let-me-try.com)','link':'letmetry','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':9,'name':'goindex测试','link':'ddosi','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':10,'name':'goindex多盘版测试','link':'yanzai','author':'zhengfan2014','upload':'2020-9-26'},
+            {'id':11,'name':'goindex多盘版acrou','link':'acrou','author':'zhengfan2014','upload':'2020-9-26'}]
 
 ##########################################################
 ###以下是模块，网站模块请粘贴在这里面
 ##########################################################
 
-#138vcd
-def get_138vcd_categories():
-    return [{"name": "动作片", "link": "https://www.138vcd.com/index.php/vod/show/id/26"},
-          {"name": "喜剧片", "link": "https://www.138vcd.com/index.php/vod/show/id/27"}, 
-          {"name": "爱情片", "link": "https://www.138vcd.com/index.php/vod/show/id/28"}, 
-          {"name": "科幻片", "link": "https://www.138vcd.com/index.php/vod/show/id/29"},
-          {"name": "剧情片", "link": "https://www.138vcd.com/index.php/vod/show/id/30"},
-          {"name": "战争片", "link": "https://www.138vcd.com/index.php/vod/show/id/31"},
-          {"name": "恐怖片", "link": "https://www.138vcd.com/index.php/vod/show/id/36"}]
+#ku2000
+def get_ku2000_categories():
+    return [{"name": "综艺片", "link": "https://www.ku2000.com/vodtype/3"},
+          {"name": "动漫片", "link": "https://www.ku2000.com/vodtype/4"}, 
+          {"name": "解说中", "link": "https://www.ku2000.com/vodtype/20"},
+          {"name": "体育台", "link": "https://www.ku2000.com/vodtype/26"},
+          {"name": "动作片", "link": "https://www.ku2000.com/vodtype/6"},
+          {"name": "喜剧片", "link": "https://www.ku2000.com/vodtype/7"},
+          {"name": "爱情片", "link": "https://www.ku2000.com/vodtype/8"},
+          {"name": "科幻片", "link": "https://www.ku2000.com/vodtype/9"},
+          {"name": "恐怖片", "link": "https://www.ku2000.com/vodtype/10"},
+          {"name": "剧情片", "link": "https://www.ku2000.com/vodtype/11"},
+          {"name": "战争片", "link": "https://www.ku2000.com/vodtype/12"},
+          {"name": "纪录片", "link": "https://www.ku2000.com/vodtype/21"},
+          {"name": "国产剧", "link": "https://www.ku2000.com/vodtype/13"},
+          {"name": "港台剧", "link": "https://www.ku2000.com/vodtype/14"},
+          {"name": "日韩剧", "link": "https://www.ku2000.com/vodtype/15"},
+          {"name": "海外剧", "link": "https://www.ku2000.com/vodtype/16"},
+          {"name": "福利片", "link": "https://www.ku2000.com/vodtype/23"},
+          {"name": "微电影", "link": "https://www.ku2000.com/vodtype/24"}]
 
-def get_138vcd_videos(url,page):
+def get_ku2000_videos(url,page):
     videos = []
     if page == 1:
         r = get_html(url + '.html')
     else:
-        r = get_html(url + '/page/' +str(page) +'.html')
+        r = get_html(url + '-' +str(page) +'.html')
     soup = BeautifulSoup(r, "html5lib")
     ul = soup.find('ul',class_='myui-vodlist clearfix')
     alist = ul.find_all('a',class_='myui-vodlist__thumb lazyload')
     for i in range(len(alist)):
         videoitem = {}
         videoitem['name'] =  alist[i]['title'] 
-        videoitem['href'] =  'https://www.138vcd.com/' + alist[i]['href']
+        videoitem['href'] =  'https://www.ku2000.com' + alist[i]['href']
         videoitem['thumb'] = alist[i]['data-original']
         videos.append(videoitem)
     return videos
 
-def get_138vcd_source(url):
+def get_ku2000_source(url):
     videos = []
     r = get_html(url)
+    #dialog = xbmcgui.Dialog()
+    #dialog.textviewer('错误提示', url)
+
     soup = BeautifulSoup(r, 'html.parser')
-    ul = soup.find('ul',class_='myui-content__list sort-list clearfix')
-    alist = ul.find_all('a')
-    
-    duopdict = {}
-    for i in range(len(alist)):
-        duopdict[alist[i].text] = 'https://www.138vcd.com' + alist[i]['href']
+    ul = soup.find_all('ul',class_='nav nav-tabs active')
+    li = ul[0].find_all('li')
+    vlist =soup.find_all('ul',class_='myui-content__list sort-list scrollbar clearfix')
+    for index in range(len(li)):
+        duopname = li[index].text
+        alist = vlist[index].find_all('a')
+        duopdict = {}
+        for i in range(len(alist)):
+            duopdict[alist[i].text] = 'https://www.ku2000.com' + alist[i]['href']
         
-    videoitem = {}
-    videoitem['name'] = '播放线路1'
-    videoitem['href'] = str(duopdict)
-    videos.append(videoitem)
+        videoitem = {}
+        videoitem['name'] = duopname
+        videoitem['href'] = str(duopdict)
+        videos.append(videoitem)
     tmp['bghtml'] = r
     return videos
 
-def get_138vcd_mp4(url):
+def get_ku2000_mp4(url):
     r = get_html(url)
-    mp4 = re.search('(?<=link_pre\":\"\",\"url\":\").*?(?=\",\"url_next)',r).group()
+    str1 = r.find('var player_aaaa=')
+    cut = r[str1:]
+    mp4 = re.search('url\":\"(.*?)\"',cut).group(1)
     mp4 = mp4.replace('\\','')
+    if not mp4.endswith('m3u8'):
+        r = get_html(mp4)
+        m3u8 = re.search('url:\'(.*?)\'',r).group(1)
+        mp4 = re.search('(.*?)/share',mp4).group(1) + m3u8
     return mp4
 
-def get_138vcd_search(keyword,page):
+def get_ku2000_search(keyword,page):
     videos = []
     
     if page == 1:
-        r = get_html('https://www.138vcd.com/vodsearch.html?wd='+keyword+'&submit=')
+        r = get_html('https://www.ku2000.com/vodsearch.html?wd='+keyword+'&submit=')
     else:
-        r = get_html('https://www.138vcd.com/vodsearch/page/'+str(page)+'/wd/'+keyword+'.html')
+        r = get_html('https://www.ku2000.com/vodsearch/page/'+str(page)+'/wd/'+keyword+'.html')
     soup = BeautifulSoup(r, "html5lib")
     ul = soup.find('ul',id='searchList')
     alist = ul.find_all('a',class_='myui-vodlist__thumb img-lg-150 img-md-150 img-sm-150 img-xs-100 lazyload')
@@ -321,9 +338,9 @@ def get_138vcd_search(keyword,page):
 
 #pianku
 def get_pianku_categories():
-    return [{"name": "电影", "link": "https://www.pianku.tv/mv/-----1-"},
-          {"name": "剧集", "link": "https://www.pianku.tv/tv/-----1-"}, 
-          {"name": "动漫", "link": "https://www.pianku.tv/ac/-----1-"}]
+    return [{"name": "电影", "link": "https://www.pianku.li/mv/------"},
+          {"name": "剧集", "link": "https://www.pianku.li/tv/------"}, 
+          {"name": "动漫", "link": "https://www.pianku.li/ac/------"}]
 
 def get_pianku_videos(url,page):
     videos = []
@@ -337,20 +354,22 @@ def get_pianku_videos(url,page):
     for i in range(len(ilist)):
         videoitem = {}
         videoitem['name'] =  ilist[i].a['title'] 
-        videoitem['href'] =  'https://www.pianku.tv' + ilist[i].a['href']
-        videoitem['thumb'] = ilist[i].a.img['src']
+        videoitem['href'] =  'https://www.pianku.li' + ilist[i].a['href']
+        videoitem['thumb'] = ilist[i].a.img['data-funlazy']
         videos.append(videoitem)
     return videos
-
+        
 def get_pianku_source(url):
     videos = []
-    r1 = get_html(url)
-    vtype = re.search('(?<=pianku.tv\/)[a-zA-Z]+(?=\/)',url).group()
-    vid = re.search('[a-zA-Z]+(?=.html)',url).group()
-    apiurl = 'https://www.pianku.tv/ajax/downurl/'+vid+'_'+vtype+'/'
-    r = get_html(apiurl)
-    
-    soup = BeautifulSoup(r, 'html.parser')
+    vtype = re.search('(?<=pianku.li\/)[a-zA-Z]+(?=\/)',url).group()
+    vid = re.search('([a-zA-Z]|\d)+(?=.html)',url).group()
+    apiurl = 'https://www.pianku.li/ajax/downurl/'+vid+'_'+vtype+'/'
+    videoheaders = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36'
+    }
+    r1 = requests.get(url,headers=videoheaders)
+    r = requests.get(apiurl,headers=videoheaders,cookies=r1.cookies)
+    soup = BeautifulSoup(r.text, "html.parser")
     ul = soup.find('ul',class_='py-tabs')
     # dialog = xbmcgui.Dialog()
     # dialog.textviewer('错误提示', str(r.encode('utf-8')))
@@ -362,7 +381,7 @@ def get_pianku_source(url):
         alist = vlist[index].find_all('a')
         duopdict = {}
         for i in range(len(alist)):
-            duopdict[alist[i].text] = 'https://www.pianku.tv' + alist[i]['href']
+            duopdict[alist[i].text] = 'https://www.pianku.li' + alist[i]['href']
         
         videoitem = {}
         videoitem['name'] = duopname
@@ -385,7 +404,7 @@ def get_pianku_search(keyword,page):
     videos = []
     
     if page == 1:
-        url = get_html('https://www.pianku.tv/s/go.php?q='+keyword,mode='url')
+        url = get_html('https://www.pianku.li/s/go.php?q='+keyword,mode='url')
         tmp['piankusearch'] = url
     else:
         url = tmp['piankusearch'][:-5] + '-' + str(page) + '.html'
@@ -401,8 +420,8 @@ def get_pianku_search(keyword,page):
         a = vlist[i].dd.find('a')
         videoitem = {}
         videoitem['name'] =  a.text
-        videoitem['href'] =  'https://www.pianku.tv' + a['href']
-        videoitem['thumb'] = img['src']
+        videoitem['href'] =  'https://www.pianku.li' + a['href']
+        videoitem['thumb'] = img['data-funlazy']
         videos.append(videoitem)
     return videos
 
@@ -563,7 +582,7 @@ def get_meijutt_source(url):
     
 
     for index in range(len(j)):
-        if j[index][0] != u'百度网盘' and j[index][0] != u'西瓜影音':
+        if j[index][0] != u'百度云':
             duopname = j[index][0]
             duopdict = {}
             for i in range(len(j[index][1])):
@@ -577,8 +596,8 @@ def get_meijutt_source(url):
 
 def get_meijutt_mp4(url):
     if re.search('m3u8',url):
-        if re.search('9m3u8',url):
-            url = url.replace('9m3u8','m3u8')
+        if re.search('6m3u8',url):
+            url = url.replace('6m3u8','m3u8')
     else:
         url = url[:-5] + url[-4:]
         
@@ -593,10 +612,10 @@ def get_meijutt_search(keyword,page):
     videos = []
     if page == 1:
         url = 'https://www.meijutt.tv/search/index.asp'
-        data = {'searchword':keyword.decode('utf-8').encode('gbk')}
+        data = {'searchword':keyword.encode('gbk')}
         r = post_html(url,data=str(data),encode='gbk')
     else:
-        url = 'https://www.meijutt.tv/search/index.asp?page='+str(page)+'&searchword='+(urllib.quote(keyword.decode('utf-8').encode('gbk')).encode('utf-8'))+'&searchtype=-1'
+        url = 'https://www.meijutt.tv/search/index.asp?page='+str(page)+'&searchword='+(urllib.parse.quote(keyword.encode('gbk')).encode('utf-8'))+'&searchtype=-1'
         r = get_html(url,encode='gbk')
     soup = BeautifulSoup(r, "html5lib")
     ilist = soup.find_all('div',class_='cn_box2')
@@ -610,84 +629,6 @@ def get_meijutt_search(keyword,page):
         videos.append(videoitem)
     return videos
 
-#豆瓣资源
-def get_douban777_categories():
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',banid='1,2')
-
-def get_douban777_videos(url,page):
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url,page=page)
-
-def get_douban777_source(url):
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url)
-
-def get_douban777_mp4info(url):
-    return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',url=url,keyword='douban777')
-
-def get_douban777_mp4(url):
-    if url[:5] == 'https':
-        url = 'http' + url[5:]
-    return url
-
-# def get_douban777_search(keyword,page):
-#     return get_maccms_xml('http://v.1988cj.com/inc/dbm3u8.php',keyword=keyword,page=page)
-
-
-#快影资源
-def get_kyzy_categories():
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',banid='1,2,20')
-
-def get_kyzy_videos(url,page):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,page=page)
-
-def get_kyzy_source(url):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url)
-
-def get_kyzy_mp4info(url):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',url=url,keyword='douban777')
-
-def get_kyzy_mp4(url):
-    return url
-
-def get_kyzy_search(keyword,page):
-    return get_maccms_json('https://www.kyzy.tv/api.php/kym3u8/vod/',keyword=keyword,page=page)
-
-#卧龙资源
-def get_wlzy_categories():
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',banid='2,26,30,31')
-
-def get_wlzy_videos(url,page):
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url,page=page)
-
-def get_wlzy_source(url):
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url)
-
-def get_wlzy_mp4info(url):
-    return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',url=url,keyword='douban777')
-
-def get_wlzy_mp4(url):
-    return url
-
-# def get_wlzy_search(keyword,page):
-#     return get_maccms_xml('http://cj.wlzy.tv/inc/api_mac_m3u8.php',keyword=keyword,page=page)
-
-#ok资源
-def get_okzy_categories():
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',banid='1,2,3,4,20,33')
-
-def get_okzy_videos(url,page):
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url,page=page)
-
-def get_okzy_source(url):
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url)
-
-def get_okzy_mp4info(url):
-    return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',url=url,keyword='douban777')
-
-def get_okzy_mp4(url):
-    return url
-
-# def get_okzy_search(keyword,page):
-#     return get_maccms_xml('http://cj.okzy.tv/inc/apickm3u8s.php',keyword=keyword,page=page)
 
 #麻花资源
 def get_mahuazy_categories():
@@ -705,8 +646,6 @@ def get_mahuazy_mp4info(url):
 def get_mahuazy_mp4(url):
     return url
 
-# def get_mahuazy_search(keyword,page):
-#     return get_maccms_xml('https://www.mhapi123.com/inc/api.php',keyword=keyword,page=page)
 
 #最大资源
 def get_zdziyuan_categories():
@@ -722,38 +661,6 @@ def get_zdziyuan_mp4info(url):
     return get_maccms_xml('http://www.zdziyuan.com/inc/api_zuidam3u8.php',url=url,keyword='douban777')
 
 def get_zdziyuan_mp4(url):
-    return url
-
-#采集资源
-def get_caijizy_categories():
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',banid='1,2,27')
-
-def get_caijizy_videos(url,page):
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,page=page)
-
-def get_caijizy_source(url):
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url)
-
-def get_caijizy_mp4info(url):
-    return get_maccms_xml('http://ts.caijizy.vip/api.php/provide/vod/at/xml/',url=url,keyword='douban777')
-
-def get_caijizy_mp4(url):
-    return url
-
-#哈酷资源
-def get_666zy_categories():
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',banid='1,2,27,36')
-
-def get_666zy_videos(url,page):
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url,page=page)
-
-def get_666zy_source(url):
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url)
-
-def get_666zy_mp4info(url):
-    return get_maccms_xml('http://api.666zy.com/inc/hkm3u8.php',url=url,keyword='douban777')
-
-def get_666zy_mp4(url):
     return url
 
 
