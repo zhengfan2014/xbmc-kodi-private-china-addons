@@ -8,19 +8,19 @@ import xbmcgui
 import time
 import base64
 import json
-import urllib2
+import urllib
 import sys
-import HTMLParser
+import html
 import re
 import random
 import hashlib
-import execjs
+import js2py
 
 
 
 def unescape(string):
-    string = urllib2.unquote(string).decode('utf8')
-    quoted = HTMLParser.HTMLParser().unescape(string).encode('utf-8')
+    string = urllib.unquote(string).decode('utf8')
+    quoted = html.unescape(string).encode('utf-8')
     #转成中文
     return re.sub(r'%u([a-fA-F0-9]{4}|[a-fA-F0-9]{2})', lambda m: unichr(int(m.group(1), 16)), quoted)
 
@@ -145,7 +145,7 @@ def zh(num):
             p = str(p) + '万'
         else:
             p = str(num)
-    return p.decode('utf-8')
+    return p.encode('utf-8').decode('utf-8')
 
 def tiqu_num(string):
     try:
@@ -184,7 +184,7 @@ def get_categories():
             {'id':8,'name':'快手直播','link':'kuaishou','author':'zhengfan2014','upload':'2020-5-18','rooms':60},
             {'id':9,'name':'Acfun直播','link':'acfun','author':'zhengfan2014','upload':'2020-5-18'},
             {'id':10,'name':'it之家直播','link':'ithome','author':'zhengfan2014','upload':'2020-6-8','rooms':20},
-            {'id':11,'name':'央视频(非永久)','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'},
+            {'id':11,'name':'电视直播','link':'yangshipin','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'},
             {'id':12,'name':'直播中国','link':'livechina','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'},
             {'id':13,'name':'熊猫频道','link':'ipanda','author':'zhengfan2014','upload':'2020-6-8','roomid':'false'}]
 
@@ -373,18 +373,18 @@ def get_homejs(rid):
     homejs = str1 + result[0][1]
     return homejs, real_rid
 
-def get_sign(rid, post_v, tt, ub9):
-    docjs = execjs.compile(ub9)
-    res2 = docjs.call('ub98484234')
-    str3 = re.sub(r'\(function[\s\S]*toString\(\)', '\'', res2)
-    md5rb = hashlib.md5((rid + '10000000000000000000000000001501' + tt + '2501' +
-                         post_v).encode('utf-8')).hexdigest()
-    str4 = 'function get_sign(){var rb=\'' + md5rb + str3
-    str5 = re.sub(r'return rt;}[\s\S]*','return re;};', str4) 
-    str6 = re.sub(r'"v=.*&sign="\+', '', str5)
-    docjs1 = execjs.compile(str6)
-    sign = docjs1.call(
-        'get_sign', rid, '10000000000000000000000000001501', tt)
+def get_sign(rid, post_v, tt, ub9): 
+    context = js2py.EvalJs()
+    context.execute(ub9)
+    res = context.ub98484234()
+    v = re.search(r'v=(\d+)', res).group(1)
+    rb = hashlib.md5((rid + '10000000000000000000000000001501' + tt + v).encode('utf-8')).hexdigest()
+    func_sign = re.sub(r'return rt;}\);?', 'return rt;}', res)
+    func_sign = func_sign.replace('(function (', 'function sign(')
+    func_sign = func_sign.replace('CryptoJS.MD5(cb).toString()', '"' + rb + '"')
+    print(func_sign)
+    js = js2py.eval_js(func_sign)
+    sign = js(rid, '10000000000000000000000000001501', tt)
     return sign
 
 def get_tt():
@@ -420,35 +420,21 @@ def get_pre_url(rid, tt):
 
 def get_sign_url(post_v, rid, tt, ub9):
     sign = get_sign(rid, post_v, tt, ub9)
+    params = sign + '&ver=219032101&rid={}&rate=-1'.format(rid)
     request_url = 'https://m.douyu.com/api/room/ratestream'
-    post_data = {
-        'v': '2501' + post_v,
-        'did': '10000000000000000000000000001501',
-        'tt': tt,
-        'sign': sign,
-        'ver': '219032101',
-        'rid': rid,
-        'rate': '-1'
-    }
     header = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Mobile Safari/537.36'
     }
-    response = requests.post(url=request_url, headers=header, data=post_data).json()
+    response = requests.post(url=request_url, headers=header, params=params).json()
     if response.get('code') == 0:
         real_url = (response.get('data')).get('url')
-        if 'mix=1' in real_url:
-            result1 = mix_room(rid)
-        else:
-            pattern = r'/(\d{1,8}[0-9a-zA-Z]+)_?[\d]{0,4}.m3u8'
-            result1 = re.search(pattern, real_url).group(1)
+        pattern = r'(\d{1,7}[0-9a-zA-Z]+)_?\d{0,4}(.m3u8|/playlist)'
+        result1 = re.search(pattern, real_url).group(1)
     else:
         result1 = 0
     return result1
 
-def mix_room(rid):
-    result1 = 'PKing'
-    return result1
 
 #触手
 def get_chushou_categories():
@@ -1009,58 +995,28 @@ def get_yangshipin_categories():
     return [{'name':'直播列表','link':'x'}]
     
 def get_yangshipin_rooms(url,page):
-    m3u = '''超高清 4K,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000266303.m3u8
-CCTV 1,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000210103.m3u8
-CCTV 2,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203603.m3u8
-CCTV 3,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203803.m3u8
-CCTV 4,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204803.m3u8
-CCTV 5,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000205103.m3u8
-CCTV 5+,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204503.m3u8
-CCTV 6,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203303.m3u8
-CCTV 7,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000510003.m3u8
-CCTV 8,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203903.m3u8
-CCTV 9,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000499403.m3u8
-CCTV 10,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000203503.m3u8
-CCTV 11,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204103.m3u8
-CCTV 12,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000202603.m3u8
-CCTV 13,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204603.m3u8
-CCTV 14,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204403.m3u8
-CCTV 15,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000205003.m3u8
-CCTV 17,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000204203.m3u8
-CGTN,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2001656801.m3u8
-湖南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000296203.m3u8
-东方卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292403.m3u8
-黑龙江卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000293903.m3u8
-广东卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292703.m3u8
-深圳卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292203.m3u8
-江苏卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295603.m3u8
-浙江卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295503.m3u8
-江苏卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295603.m3u8
-深圳卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292201.m3u8
-北京卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000272101.m3u8
-海南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000291501.m3u8
-山东卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294801.m3u8
-江西卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294101.m3u8
-湖北卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294501.m3u8
-河南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000296101.m3u8
-河北卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000293401.m3u8
-贵州卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000293301.m3u8
-东南卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000292501.m3u8
-广西卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000294201.m3u8
-四川卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000295001.m3u8
-辽宁卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000281301.m3u8
-重庆卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000297801.m3u8
-安徽卫视,http://120.241.133.167/outlivecloud-cdn.ysp.cctv.cn/cctv/2000298001.m3u8'''
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like HeiNiaoPlayer) Chrome/72.0.3626.119 Safari/537.36',
+        'Accept': '*/*',
+        'Referer': 'https://www.guihet.com/',
+        'Accept-Language': 'zh-cn,en-us;q=0.5',
+        'Boke': 'https://www.guihet.com/',
+        'Host': 'guihet.com'
+    }
+    html = requests.get('https://guihet.com/download/teleplayer/bin/netlist.php',headers = headers)
+    #html = requests.get('https://gitee.com/FadedJay/reallive/raw/master/tv.m3u8')
+    m3u = html.text
     rooms = []
     rlist = m3u.split('\n')
     for i in range(len(rlist)):
         roomitem = {}
-        rr = rlist[i].split(',')
-        roomitem['name'] = rr[0]
-        roomitem['href'] =  rr[1]
-        roomitem['thumb'] = ''
-        roomitem['info'] = {}
-        rooms.append(roomitem)
+        if "," in rlist[i]:
+            rr = rlist[i].split(',')
+            roomitem['name'] = rr[0]
+            roomitem['href'] = re.search(r'((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?)',rlist[i]).group()
+            roomitem['thumb'] = ''
+            roomitem['info'] = {}
+            rooms.append(roomitem)
     return rooms
 
 def get_yangshipin_roomid(url):
@@ -1420,7 +1376,10 @@ def roomid(value,mode):
                 })
         except NameError:
             items = []
+            rinfo = {}
+            rinfo['mediatype'] = 'video'
             items.append({'label': '直播间',
+                    'info' : rinfo,
                     'path': liveurl + '|User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
                     'is_playable': True,
             })
