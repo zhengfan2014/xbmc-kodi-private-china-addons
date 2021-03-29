@@ -5,8 +5,9 @@
         provider-name="zhengfan2014">
     <extension point="xbmc.addon.repository"
             name="Chinese Add-ons">
-        <info compressed="true">https://github.com/zhengfan2014/xbmc-kodi-private-china-addons/raw/py2/addons.xml</info>
-        <datadir zip="true">https://github.com/zhengfan2014/xbmc-kodi-private-china-addons/raw/py2/repo</datadir>
+        <info compressed="true">https://github.com/FadeJay/xbmc-kodi-private-china-addons/raw/py2/addons.xml</info>
+		<checksum>https://github.com/FadeJay/xbmc-kodi-private-china-addons/raw/py2/addons.xml.md5</checksum>
+        <datadir zip="true">https://github.com/FadeJay/xbmc-kodi-private-china-addons/raw/py2/repo</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary>Chinese Add-ons Repository</summary>
