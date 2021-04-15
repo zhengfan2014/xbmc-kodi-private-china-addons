@@ -159,7 +159,11 @@ def one63ritui():
             #         gdurl = mp3urls[i]['url']
             # if gdurl == '':
             #     gd['name'] += ' - [无版权]'
-            gdurl =  'https://music.163.com/song/media/outer/url?id='+str(glist[index]['id'])+'.mp3'
+            if xbmcplugin.getSetting(int(sys.argv[1]), 'httpswitch') == 'true':
+                gdurl =  'http'
+            else:
+                gdurl = 'https'
+            gdurl += '://music.163.com/song/media/outer/url?id='+str(glist[index]['id'])+'.mp3'
             gd['url'] = gdurl
             gd['info'] = {'title':glist[index]['name'],'album':glist[index]['album']['name'],'artist':glist[index]['artists'][0]['name'],'mediatype':'song'}
             #gd['url'] = j2['data'][0]['url']
@@ -301,7 +305,11 @@ def one63playlist(id):
         # if gdurl == '':
         #     gd['name'] += ' - [无版权]'
         # gd['url'] = gdurl
-        gd['url'] = 'http://music.163.com/song/media/outer/url?id=' + str(mp3detail[index]['id']) + '.mp3'
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'httpswitch') == 'true':
+            gd['url'] = 'http'
+        else:
+            gd['url'] = 'https'
+        gd['url'] += '://music.163.com/song/media/outer/url?id=' + str(mp3detail[index]['id']) + '.mp3'
         gd['info'] = {'title':mp3detail[index]['name'],'album':mp3detail[index]['al']['name'],'artist':mp3detail[index]['ar'][0]['name'],'mediatype':'song'}
         #gd['url'] = j2['data'][0]['url']
         gedans.append(gd)
@@ -358,7 +366,11 @@ def one63album(id):
         gd['name'] = mp3detail[index]['name']
         gd['thumb'] = mp3detail[index]['al']['picUrl']
         # gd['url'] = mp3url[index]['url']
-        gd['url'] = 'https://music.163.com/song/media/outer/url?id=' + str(mp3detail[index]['id']) + '.mp3'
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'httpswitch') == 'true':
+            gd['url'] = 'http'
+        else:
+            gd['url'] = 'https'
+        gd['url'] += '://music.163.com/song/media/outer/url?id=' + str(mp3detail[index]['id']) + '.mp3'
         gedans.append(gd)
     return gedans
 
@@ -483,7 +495,11 @@ def one63rank(value):
             gd['label'] +=  u'(' + glist[index]['alia'][0] + u')'
         gd['thumb'] = glist[index]['al']['picUrl']
         # gd['url'] = mp3url[index]['url']
-        gd['url'] = 'https://music.163.com/song/media/outer/url?id=' + str(glist[index]['id']) + '.mp3'
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'httpswitch') == 'true':
+            gd['url'] = 'http'
+        else:
+            gd['url'] = 'https'
+        gd['url'] += '://music.163.com/song/media/outer/url?id=' + str(glist[index]['id']) + '.mp3'
         gedans.append(gd)
     return gedans
 
