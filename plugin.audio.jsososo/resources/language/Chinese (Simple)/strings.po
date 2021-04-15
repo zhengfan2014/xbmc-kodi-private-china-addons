@@ -1,0 +1,76 @@
+msgid ""
+msgstr ""
+
+#Chinese Simplified
+
+msgctxt "#32001"
+msgid "api Setting"
+msgstr "Api设置"
+
+msgctxt "#32002"
+msgid "api"
+msgstr "Api 接口相关"
+
+msgctxt "#32003"
+msgid "neteasemusicapiurl"
+msgstr "网易云音乐Api接口Url"
+
+msgctxt "#32004"
+msgid "qqmusicapiurl"
+msgstr "QQ音乐Api接口Url"
+
+msgctxt "#32005"
+msgid "miguapiurl"
+msgstr "咪咕音乐Api接口Url"
+
+msgctxt "#32006"
+msgid "mixapiswitch"
+msgstr "启用Mix统一Api接口(启用后以上设置失效)"
+
+msgctxt "#32007"
+msgid "mixapiurl"
+msgstr "Mix统一Api接口Url"
+
+msgctxt "#32101"
+msgid "163 Setting"
+msgstr "网易云设置"
+
+msgctxt "#32102"
+msgid "cookie Setting"
+msgstr "cookie相关"
+
+msgctxt "#32103"
+msgid "neteasemusicuid"
+msgstr "Uid"
+
+msgctxt "#32104"
+msgid "neteasemusicu"
+msgstr "MUSIC_U"
+
+msgctxt "#32105"
+msgid "neteasemusiccookieswitch"
+msgstr "启用cookie(会将您的cookie发送到您设置的api服务器)"
+
+msgctxt "#32106"
+msgid "setting"
+msgstr "功能设置"
+
+msgctxt "#32107"
+msgid "httpswitch"
+msgstr "如果使用解锁网易云灰色后无法播放音乐请打开"
+
+msgctxt "#32201"
+msgid "qq Setting"
+msgstr "QQ音乐设置"
+
+msgctxt "#32203"
+msgid "qqmusicid"
+msgstr "QQ号"
+
+msgctxt "#32204"
+msgid "qqmusiccookie"
+msgstr "QQ音乐cookie"
+
+msgctxt "#32205"
+msgid "qqmusiccookieswitch"
+msgstr "启用cookie(会将您的cookie发送到您设置的api服务器)"

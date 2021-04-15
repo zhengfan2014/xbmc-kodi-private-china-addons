@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32001">
+      <setting label="32002" type="lsep"/>
+
+      <setting id="neteasemusicapiurl" type="text" label="32003" default="http://music.jsososo.com/api"/>
+      <setting id="qqmusicapiurl" type="text" label="32004" default="http://music.jsososo.com/apiQ"/>
+      <setting id="miguapiurl" type="text" label="32005" default="http://api.migu.jsososo.com"/>
+
+
+    </category>   
+    <category label="32101">
+      <setting label="32102" type="lsep"/>
+      <setting label="32105" type="bool" id="neteasemusiccookieswitch" default="false"/>
+      <setting id="neteasemusicuid" type="text" label="32103" default=""/>
+      <setting id="neteasemusicu" type="text" label="32104" default=""/>
+      <setting label="32106" type="lsep"/>
+      <setting label="32107" type="bool" id="httpswitch" default="false"/>
+
+    </category> 
+    <category label="32201">
+      <setting label="32102" type="lsep"/>
+      <setting label="32205" type="bool" id="qqmusiccookieswitch" default="false"/>
+      <setting id="qqmusicid" type="text" label="32203" default=""/>
+      <setting id="qqmusiccookie" type="text" label="32204" default=""/>
+    </category> 
+</settings>

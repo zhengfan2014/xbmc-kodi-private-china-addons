@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import re
-from xbmcswift2 import Plugin
+from xbmcswift2 import Plugin, xbmcgui, xbmc, xbmcaddon, xbmcplugin
 #from xbmcswift2 import Actions
 import requests
 from bs4 import BeautifulSoup
@@ -13,41 +13,6 @@ import sys
 import HTMLParser
 import re
 import time
-
-wyrankdict = {u'云音乐新歌榜':u'0',
-                    u'云音乐热歌榜':u'1',
-                    u'网易原创歌曲榜':u'2',
-                    u'云音乐飙升榜':u'3',
-                    u'云音乐电音榜':u'4',
-                    u'UK排行榜周榜':u'5',
-                    u'美国Billboard周榜':u'6',
-                    u'KTV嗨榜':u'7',
-                    u'iTunes榜':u'8',
-                    u'Hit FM Top榜':u'9',
-                    u'日本Oricon周榜':u'10',
-                    u'韩国Melon排行榜周榜':u'11',
-                    u'韩国Mnet排行榜周榜':u'12',
-                    u'韩国Melon原声周榜':u'13',
-                    u'中国TOP排行榜(港台榜)':u'14',
-                    u'中国TOP排行榜(内地榜)':u'15',
-                    u'香港电台中文歌曲龙虎榜':u'16',
-                    u'华语金曲榜':u'17',
-                    u'中国嘻哈榜':u'18',
-                    u'法国 NRJ EuroHot 30周榜':u'19',
-                    u'台湾Hito排行榜':u'20',
-                    u'Beatport全球电子舞曲榜':u'21',
-                    u'云音乐ACG音乐榜':u'22',
-                    u'云音乐说唱榜':u'23',
-                    u'云音乐古典音乐榜':u'24',
-                    u'云音乐电音榜':u'25',
-                    u'抖音排行榜':u'26',
-                    u'新声榜':u'27',
-                    u'云音乐韩语榜':u'28',
-                    u'英国Q杂志中文版周榜':u'29',
-                    u'电竞音乐榜':u'30',
-                    u'云音乐欧美热歌榜':u'31',
-                    u'云音乐欧美新歌榜':u'32',
-                    u'说唱TOP榜':u'33'}
 
 def unix_to_data(uptime,format='data'):
     if len(str(uptime)) > 10:
@@ -98,27 +63,27 @@ def unescape(string):
 plugin = Plugin()
 
 
-headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36'}
 cache = plugin.get_storage('cache')
 his = plugin.get_storage('his')
 
 #初始化api
-if 'one63api' not in cache:
-    cache['one63api'] = 'http://music.jsososo.com/api'
-if 'qqapi' not in cache:
-    cache['qqapi'] = 'http://music.jsososo.com/apiQ'
-if 'miguapi' not in cache:
-    cache['miguapi'] = 'http://api.migu.jsososo.com'
-if 'myqq' not in cache:
-    cache['myqq'] = ''
-if 'my163' not in cache:
-    cache['my163'] = ''
-if 'my163num' not in cache:
-    cache['my163num'] = ''
-if 'myqqnum' not in cache:
-    cache['myqqnum'] = ''
+# if 'myqq' not in cache:
+#     cache['myqq'] = ''
+# if 'my163' not in cache:
+#     cache['my163'] = ''
+# if 'my163num' not in cache:
+#     cache['my163num'] = ''
+# if 'myqqnum' not in cache:
+#     cache['myqqnum'] = ''
+xbmcplugin.setContent(int(sys.argv[1]), 'musicvideos')
 
-#@plugin.cached(TTL=10)
+netease_api = xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicapiurl')
+qqmusic_api = xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusicapiurl')
+migu_api = xbmcplugin.getSetting(int(sys.argv[1]), 'miguapiurl')
+
+
+@plugin.cached(TTL=1)
 def get_html(url,cookie=''):
     if cookie != '':
         h = headers
@@ -128,10 +93,10 @@ def get_html(url,cookie=''):
         r = requests.get(url,headers=headers)
     return r.text
 
-#为你推荐歌单api-------------------------------------------------------------------------------------------------------------------
+########################################### 为你推荐歌单api ###########################################
 def one63weinituijian():
     gedans = []
-    r = get_html(cache['one63api'] + '/recommend/resource','MUSIC_U=' + cache['my163'])
+    r = get_html(netease_api + '/recommend/resource','MUSIC_U=' + xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicu'))
     j = json.loads(r)
     if j['code'] == 200:
         glist = j['recommend']
@@ -154,7 +119,7 @@ def one63weinituijian():
 
 def qqweinituijian():
     gedans = []
-    r = get_html(cache['qqapi'] + '/recommend/playlist/u')
+    r = get_html(qqmusic_api + '/recommend/playlist/u')
     j = json.loads(r)
     glist = j['data']['list']
     for index in range(len(glist)):
@@ -166,10 +131,10 @@ def qqweinituijian():
         gd['info']['cast']= [glist[index]['username']]
         gedans.append(gd)
     return gedans
-#日推api--------------------------------------------------------------------
+########################################### 日推api ###########################################
 def one63ritui():
     gedans = []
-    r = get_html(cache['one63api'] + '/recommend/songs','MUSIC_U='+cache['my163'])
+    r = get_html(netease_api + '/recommend/songs','MUSIC_U='+xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicu'))
     j = json.loads(r)
     if j['code'] == 200:
         gedans = []
@@ -181,7 +146,7 @@ def one63ritui():
         #     else:
         #         songs += ',' + str(glist[index]['id'])
         # #mp3 url
-        # r2 = get_html(cache['one63api'] + '/song/url?id=' + songs)
+        # r2 = get_html(netease_api + '/song/url?id=' + songs)
         # j2 = json.loads(r2)
         # mp3urls = j2['data']
         for index in range(len(glist)):
@@ -207,7 +172,7 @@ def one63ritui():
 
 def qqritui():
     gedans = []
-    r = get_html(cache['qqapi'] + '/recommend/daily',cache['myqq'])
+    r = get_html(qqmusic_api + '/recommend/daily',xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusiccookie'))
     j = json.loads(r)
     if j['result'] == 100:
         glist = j['data']['songlist']
@@ -217,7 +182,7 @@ def qqritui():
                 songs += glist[index]['songmid']
             else:
                 songs += ',' + glist[index]['songmid']
-        r1 = get_html(cache['qqapi'] + '/song/urls?id=' + songs)
+        r1 = get_html(qqmusic_api + '/song/urls?id=' + songs)
         j1 = json.loads(r1)
         mp3urls = j1['data']
         for index in range(len(glist)):
@@ -234,10 +199,10 @@ def qqritui():
             dialog = xbmcgui.Dialog()
             dialog.notification('请求失败','请尝试更换QQ音乐的 cookie', xbmcgui.NOTIFICATION_INFO, 5000)    
 
-#我的歌单api-------------------------------------------------------------------------------------------------------------------
+########################################### 我的歌单api ###########################################
 def one63gedan():
     gedans = []
-    r = get_html(cache['one63api'] + '/user/playlist?uid=' + str(cache['my163num']))
+    r = get_html(netease_api + '/user/playlist?uid=' + str(xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicuid')))
     j = json.loads(r)
     glist = j['playlist']
     for index in range(len(glist)):
@@ -255,7 +220,7 @@ def one63gedan():
 
 def qqgedan():
     gedans = []
-    r = get_html(cache['qqapi'] + '/user/songlist?id=' + str(cache['myqqnum']))
+    r = get_html(qqmusic_api + '/user/songlist?id=' + str(xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusicid')))
     j = json.loads(r)
     glist = j['data']['list']
     for index in range(len(glist)):
@@ -268,11 +233,11 @@ def qqgedan():
             gd['info']['cast'] = [j['data']['creator']['hostname']]
             gedans.append(gd)
     return gedans
-#推荐歌单api-------------------------------------------------------------------------------------------------------
+########################################### 推荐歌单api ###########################################
 
 def one63tuijiangedan():
     gedans = []
-    r = get_html(cache['one63api'] + '/personalized')
+    r = get_html(netease_api + '/personalized')
     j = json.loads(r)
     glist = j['result']
     for index in range(len(glist)):
@@ -287,7 +252,7 @@ def one63tuijiangedan():
 
 def qqtuijiangedan():
     gedans = []
-    r = get_html(cache['qqapi'] + '/recommend/playlist/')
+    r = get_html(qqmusic_api + '/recommend/playlist/')
     j = json.loads(r)
     glist = j['data']['list']
     for index in range(len(glist)):
@@ -300,10 +265,10 @@ def qqtuijiangedan():
         gedans.append(gd)
     return gedans
 
-#歌单详细信息api-----------------------------------------------------------
+########################################### 歌单详细信息api ###########################################
 def one63playlist(id):
     gedans = []
-    r = get_html(cache['one63api'] + '/playlist/detail?id=' + str(id))
+    r = get_html(netease_api + '/playlist/detail?id=' + str(id))
     j = json.loads(r)
     glist = j['playlist']['trackIds']
     songs = ''
@@ -313,18 +278,18 @@ def one63playlist(id):
         else:
             songs += ',' + str(glist[index]['id'])
     #mp3详情
-    r1 = get_html(cache['one63api'] + '/song/detail?ids=' + songs)
+    r1 = get_html(netease_api + '/song/detail?ids=' + songs)
     j1 = json.loads(r1)
     mp3detail = j1['songs']
     # #mp3 url
-    # r2 = get_html(cache['one63api'] + '/song/url?id=' + songs)
+    # r2 = get_html(netease_api + '/song/url?id=' + songs)
     # j2 = json.loads(r2)
     # mp3urls = j2['data']
     # pDialog = xbmcgui.DialogProgress()
     # pDialog.create('网易云音乐', '努力从母猪厂的土豆服务器偷mp3中...(0%)')
     for index in range(len(mp3detail)):
         # pDialog.update(int(100*(float(index)/float(len(mp3detail)))), '努力从母猪厂的土豆服务器偷mp3中...('+str(int(100*(float(index)/float(len(mp3detail)))))+'%)')
-        # #r2 = get_html(cache['one63api'] + '/song/url?id=' + str(mp3detail[index]['id']))
+        # #r2 = get_html(netease_api + '/song/url?id=' + str(mp3detail[index]['id']))
         # #j2 = json.loads(r2)
         gd ={}
         gd['name'] = mp3detail[index]['name']
@@ -336,7 +301,7 @@ def one63playlist(id):
         # if gdurl == '':
         #     gd['name'] += ' - [无版权]'
         # gd['url'] = gdurl
-        gd['url'] = 'https://music.163.com/song/media/outer/url?id=' + str(mp3detail[index]['id']) + '.mp3'
+        gd['url'] = 'http://music.163.com/song/media/outer/url?id=' + str(mp3detail[index]['id']) + '.mp3'
         gd['info'] = {'title':mp3detail[index]['name'],'album':mp3detail[index]['al']['name'],'artist':mp3detail[index]['ar'][0]['name'],'mediatype':'song'}
         #gd['url'] = j2['data'][0]['url']
         gedans.append(gd)
@@ -344,7 +309,7 @@ def one63playlist(id):
 
 def qqplaylist(id):
     gedans = []
-    r = get_html(cache['qqapi'] + '/songlist?id=' + str(id))
+    r = get_html(qqmusic_api + '/songlist?id=' + str(id))
     j = json.loads(r)
     glist = j['data']['songlist']
     songs= ''
@@ -353,7 +318,7 @@ def qqplaylist(id):
             songs += glist[index]['songmid']
         else:
             songs += ',' + glist[index]['songmid']
-    r1 = get_html(cache['qqapi'] + '/song/urls?id=' + songs)
+    r1 = get_html(qqmusic_api + '/song/urls?id=' + songs)
     j1 = json.loads(r1)
     mp3urls = j1['data']
     
@@ -368,10 +333,10 @@ def qqplaylist(id):
             gedans.append(gd)
     return gedans
 
-#专辑详细信息api-----------------------------------------------------------
+########################################### 专辑详细信息api ###########################################
 def one63album(id):
     gedans = []
-    r = get_html(cache['one63api'] + '/playlist/detail?id=' + str(id))
+    r = get_html(netease_api + '/playlist/detail?id=' + str(id))
     j = json.loads(r)
     glist = j['playlist']['trackIds']
     songs = ''
@@ -381,11 +346,11 @@ def one63album(id):
         else:
             songs += ',' + str(glist[index]['id'])
     #mp3详情
-    r1 = get_html(cache['one63api'] + '/song/detail?ids=' + songs)
+    r1 = get_html(netease_api + '/song/detail?ids=' + songs)
     j1 = json.loads(r1)
     mp3detail = j1['songs']
     # #mp3 url
-    # r2 = get_html(cache['one63api'] + '/song/url?id=' + songs)
+    # r2 = get_html(netease_api + '/song/url?id=' + songs)
     # j2 = json.loads(r2)
     # mp3url = j2['data']
     for index in range(len(mp3detail)):
@@ -399,7 +364,7 @@ def one63album(id):
 
 def qqalbum(id):
     gedans = []
-    r = get_html(cache['qqapi'] + '/album/songs?albummid=' + str(id))
+    r = get_html(qqmusic_api + '/album/songs?albummid=' + str(id))
     j = json.loads(r)
     glist = j['data']['list']
     songs= ''
@@ -408,7 +373,7 @@ def qqalbum(id):
             songs += glist[index]['mid']
         else:
             songs += ',' + glist[index]['mid']
-    r1 = get_html(cache['qqapi'] + '/song/urls?id=' + songs)
+    r1 = get_html(qqmusic_api + '/song/urls?id=' + songs)
     j1 = json.loads(r1)
     mp3urls = j1['data']
     
@@ -422,10 +387,10 @@ def qqalbum(id):
             gedans.append(gd)
     return gedans
 
-#歌手热门歌曲api-----------------------------------------------------------
+########################################### 歌手热门歌曲api ###########################################
 def one63singer(id):
     gedans = []
-    r = get_html(cache['one63api'] + '/artists?id=' + str(id))
+    r = get_html(netease_api + '/artists?id=' + str(id))
     j = json.loads(r)
     glist = j['hotSongs']
     for index in range(len(glist)):
@@ -433,7 +398,7 @@ def one63singer(id):
         gd['name'] = glist[index]['name']
         gd['thumb'] = glist[index]['al']['picUrl']
         #mp3 url
-        r2 = get_html(cache['one63api'] + '/song/url?id=' + str(glist[index]['id']))
+        r2 = get_html(netease_api + '/song/url?id=' + str(glist[index]['id']))
         j2 = json.loads(r2)
         gd['url'] = j2['data'][0]['url']
         gedans.append(gd)
@@ -441,7 +406,7 @@ def one63singer(id):
 
 def qqsinger(id):
     gedans = []
-    r = get_html(cache['qqapi'] + '/singer/songs?num=50&singermid=' + str(id))
+    r = get_html(qqmusic_api + '/singer/songs?num=50&singermid=' + str(id))
     j = json.loads(r)
     glist = j['data']['list']
     songs= ''
@@ -450,7 +415,7 @@ def qqsinger(id):
             songs += glist[index]['mid']
         else:
             songs += ',' + glist[index]['mid']
-    r1 = get_html(cache['qqapi'] + '/song/urls?id=' + songs)
+    r1 = get_html(qqmusic_api + '/song/urls?id=' + songs)
     j1 = json.loads(r1)
     mp3urls = j1['data']
     
@@ -463,23 +428,21 @@ def qqsinger(id):
             gd['url'] = mp3urls[glist[index]['mid']]
             gedans.append(gd)
     return gedans
-#排行--------------------------------------------------------------------
+########################################### 排行 ###########################################
 def get_rank():
     items = []
-    r1 = get_html(cache['one63api'] + '/toplist')
+    r1 = get_html(netease_api + '/toplist')
     j1 = json.loads(r1)
     one63list = j1['list']
     for index in range(len(one63list)):
-        if one63list[index]['name'] in wyrankdict:
-            if int(wyrankdict[one63list[index]['name']]) < 24:
-                gd = {}
-                gd['name'] = u'网易云音乐 · '+ one63list[index]['name']
-                gd['thumb'] = one63list[index]['coverImgUrl']
-                gd['url'] = one63list[index]['name']
-                gd['desc'] = one63list[index]['description']
-                items.append(gd)
+        gd = {}
+        gd['name'] = u'网易云音乐 · '+ one63list[index]['name']
+        gd['thumb'] = one63list[index]['coverImgUrl']
+        gd['url'] = '163|' + str(one63list[index]['id'])
+        gd['desc'] = one63list[index]['description']
+        items.append(gd)
 
-    r2 = get_html(cache['qqapi'] + '/top/category')
+    r2 = get_html(qqmusic_api + '/top/category')
     j2 = json.loads(r2)
     qqlist = j2['data']
     for index in range(len(qqlist)):
@@ -489,14 +452,17 @@ def get_rank():
                 gd = {}
                 gd['name'] = u'QQ音乐 · '+ listlist[i]['label']
                 gd['thumb'] = listlist[i]['picUrl']
-                gd['url'] = str(listlist[i]['topId'])
+                gd['url'] = 'qq|' + str(listlist[i]['topId'])
                 gd['desc'] = listlist[i]['updateTime'] + u'更新'
                 items.append(gd)
     return items
-#排行详细--------------------------------------------------------------------
+########################################### 排行详细 ###########################################
 def one63rank(value):
     gedans = []
-    r = get_html(cache['one63api'] + '/top/list?idx=' + value)
+    # r = get_html(netease_api + '/top/list?idx=' + value)
+    r = get_html(netease_api + '/related/playlist?id=' + value)
+    dialog = xbmcgui.Dialog()
+    dialog.textviewer('错误提示', str(value))
     j = json.loads(r)
     glist = j['playlist']['tracks']
     # songs = ''
@@ -506,7 +472,7 @@ def one63rank(value):
     #     else:
     #         songs += ',' + str(glist[index]['id'])
     # #mp3 url
-    # r2 = get_html(cache['one63api'] + '/song/url?id=' + songs)
+    # r2 = get_html(netease_api + '/song/url?id=' + songs)
     # j2 = json.loads(r2)
     # mp3url = j2['data']
     for index in range(len(glist)):
@@ -525,7 +491,7 @@ def qqrank(value):
     gedans = []
     # dialog = xbmcgui.Dialog()
     # dialog.textviewer('错误提示', str(value))
-    r = get_html(cache['qqapi'] + '/top?id=' + str(value))
+    r = get_html(qqmusic_api + '/top?id=' + str(value))
     j = json.loads(r)
     glist = j['data']['list']
     songs= ''
@@ -534,7 +500,7 @@ def qqrank(value):
             songs += glist[index]['mid']
         else:
             songs += ',' + glist[index]['mid']
-    r1 = get_html(cache['qqapi'] + '/song/urls?id=' + songs)
+    r1 = get_html(qqmusic_api + '/song/urls?id=' + songs)
     j1 = json.loads(r1)
     mp3urls = j1['data']
     
@@ -559,10 +525,10 @@ def qqrank(value):
             gd['url'] = mp3urls[glist[index]['mid']]
             gedans.append(gd)
     return gedans
-#mv---------------------------------------------------------------------------------------------------------------------------
+########################################### mv ###########################################
 def one63mvlist(page):
     items = []
-    r = get_html(cache['one63api'] + '/mv/all?limit=50&offset=' + str( ( int(page)-1 ) *50 ) )
+    r = get_html(netease_api + '/mv/all?limit=50&offset=' + str( ( int(page)-1 ) *50 ) )
     j = json.loads(r)
     one63list = j['data']
     for index in range(len(one63list)):
@@ -575,7 +541,7 @@ def one63mvlist(page):
 
 def qqmvlist(page):
     items = []
-    r = get_html(cache['qqapi'] + '/mv/list?pageSize=50&pageNo=' + str(page))
+    r = get_html(qqmusic_api + '/mv/list?pageSize=50&pageNo=' + str(page))
     j = json.loads(r)
     listlist = j['data']['list']
     for i in range(len(listlist)):
@@ -587,20 +553,20 @@ def qqmvlist(page):
     return items
 
 def one63playmv(vid):
-    r = get_html(cache['one63api'] + '/mv/url?id=' + str(vid))
+    r = get_html(netease_api + '/mv/url?id=' + str(vid))
     j = json.loads(r)
     mp4 = j['data']['url']
     return mp4
 
 def qqplaymv(vid):
-    r = get_html(cache['qqapi'] + '/mv/url?id=' + str(vid))
+    r = get_html(qqmusic_api + '/mv/url?id=' + str(vid))
     j = json.loads(r)
     mp4 = j['data'][vid][len( j['data'][vid])-1]
     return mp4
 
 def one63mvinfo(vid):
     vdict = {}
-    r = get_html(cache['one63api'] + '/mv/detail?mvid=' + str(vid))
+    r = get_html(netease_api + '/mv/detail?mvid=' + str(vid))
     j = json.loads(r)
     i = j['data']
     vdict['title'] = i['name']
@@ -619,7 +585,7 @@ def one63mvinfo(vid):
 
 def qqmvinfo(vid):
     vdict = {}
-    r = get_html(cache['qqapi'] + '/mv?id=' + str(vid))
+    r = get_html(qqmusic_api + '/mv?id=' + str(vid))
     j = json.loads(r)
     i = j['data']['info']
     vdict['title'] = i['name']
@@ -635,10 +601,10 @@ def qqmvinfo(vid):
         cast.append(i['singers'][index]['name'])
     vdict['cast'] = cast
     return vdict
-#搜索------------------------------------------------------
+########################################### 搜索 ###########################################
 def one63search(keyword,type,page):
     gedans = []
-    r = get_html(cache['one63api'] + '/search?keywords=' + keyword + '&offset='+str((int(page)-1)*30)+'&type='+type)
+    r = get_html(netease_api + '/search?keywords=' + keyword + '&offset='+str((int(page)-1)*30)+'&type='+type)
     j = json.loads(r)
     glist = j['result']
     #单曲
@@ -652,7 +618,7 @@ def one63search(keyword,type,page):
                 else:
                     songs += ',' + str(glist[index]['id'])
             #mp3详情
-            r2 = get_html(cache['one63api'] + '/song/detail?ids=' + songs)
+            r2 = get_html(netease_api + '/song/detail?ids=' + songs)
             j2 = json.loads(r2)
             mp3detail = j2['songs']
     
@@ -661,7 +627,7 @@ def one63search(keyword,type,page):
                 gd['name'] = mp3detail[index]['name']
                 gd['thumb'] = mp3detail[index]['al']['picUrl']
                 #mp3url
-                r1 = get_html(cache['one63api'] + '/song/url?id=' + str(mp3detail[index]['id']))
+                r1 = get_html(netease_api + '/song/url?id=' + str(mp3detail[index]['id']))
                 j1 = json.loads(r1)
                 gdurl = j1['data'][0]['url']
                 gd['url'] = gdurl
@@ -748,7 +714,7 @@ def one63search(keyword,type,page):
 
 def qqsearch(keyword,type,page):
     gedans = []
-    r = get_html(cache['qqapi'] + '/search?key=' + keyword + '&pageSize=30&pageNo='+str(page)+'&t='+type)
+    r = get_html(qqmusic_api + '/search?key=' + keyword + '&pageSize=30&pageNo='+str(page)+'&t='+type)
     j = json.loads(r)
     glist = j['data']['list']
     #单曲
@@ -759,7 +725,7 @@ def qqsearch(keyword,type,page):
                 songs += glist[index]['songmid']
             else:
                 songs += ',' + glist[index]['songmid']
-        r1 = get_html(cache['qqapi'] + '/song/urls?id=' + songs)
+        r1 = get_html(qqmusic_api + '/song/urls?id=' + songs)
         j1 = json.loads(r1)
         mp3urls = j1['data']
     
@@ -809,16 +775,16 @@ def qqsearch(keyword,type,page):
             gd['info'] = {'title':glist[index]['mv_name'],'duration':glist[index]['duration']}
             gedans.append(gd)
     return gedans
-#网易云视频-----------------------------------------------------------------------------------------------------
+########################################### 网易云视频 ###########################################
 def one63playvideo(vid):
-    r = get_html(cache['one63api'] + '/video/url?id=' + str(vid))
+    r = get_html(netease_api + '/video/url?id=' + str(vid))
     j = json.loads(r)
     mp4 = j['urls'][0]['url']
     return mp4
 
 def one63videoinfo(vid):
     vdict = {}
-    r = get_html(cache['one63api'] + '/video/detail?id=' + str(vid))
+    r = get_html(netease_api + '/video/detail?id=' + str(vid))
     j = json.loads(r)
     i = j['data']
     vdict['title'] = i['title']
@@ -865,10 +831,10 @@ def index():
         'label': '日推',
         'path': plugin.url_for('ritui'),
     })
-    items.append({
-        'label': '设置',
-        'path': plugin.url_for('setting'),
-    })
+    # items.append({
+    #     'label': '设置',
+    #     'path': plugin.url_for('setting'),
+    # })
     return items
 
 @plugin.route('/tuijian/')
@@ -886,14 +852,14 @@ def tuijian():
 
 @plugin.route('/ritui/')
 def ritui():
-    if cache['myqq'] or cache['my163']:
+    if xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusiccookieswitch') == 'true' or xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusiccookieswitch') == 'true':
         items = []
-        if cache['my163']:
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicu') != '' and xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusiccookieswitch') == 'true':
             items.append({
                 'label': '网易云 · 私人推荐',
                 'path': plugin.url_for('get_ritui',mode='163'),
             })
-        if cache['myqq']:
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusiccookie') != '' and xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusiccookieswitch') == 'true':
             items.append({
                 'label': 'QQ音乐 · 私人推荐',
                 'path': plugin.url_for('get_ritui',mode='qq'),
@@ -902,7 +868,7 @@ def ritui():
         return items
     else:
         dialog = xbmcgui.Dialog()
-        dialog.notification('该功能未解锁','请设置QQ cookie或者网易云 MUSIC_U', xbmcgui.NOTIFICATION_INFO, 5000)
+        dialog.notification('该功能未解锁','请先启用QQ音乐或者网易云的cookie功能', xbmcgui.NOTIFICATION_INFO, 5000)
 
 @plugin.route('/mv/')
 def mv():
@@ -980,14 +946,14 @@ def so():
 
 @plugin.route('/gedang/')
 def gedang():
-    if cache['myqqnum'] or cache['my163num']:
+    if xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusiccookieswitch') == 'true' or xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusiccookieswitch') == 'true':
         items = []
-        if cache['my163num']:
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicuid') != '' and xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusiccookieswitch') == 'true':
             items.append({
                 'label': '网易云 · 我的歌单',
                 'path': plugin.url_for('get_gedang',mode='163'),
             })
-        if cache['myqqnum']:
+        if xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusicid') != '' and xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusiccookieswitch') == 'true':
             items.append({
                 'label': 'QQ音乐 · 我的歌单',
                 'path': plugin.url_for('get_gedang',mode='qq'),
@@ -995,7 +961,7 @@ def gedang():
         return items
     else:
         dialog = xbmcgui.Dialog()
-        dialog.notification('该功能未解锁','请设置QQ号或者网易云uid', xbmcgui.NOTIFICATION_INFO, 5000)
+        dialog.notification('该功能未解锁','请先启用QQ音乐或者网易云的cookie功能', xbmcgui.NOTIFICATION_INFO, 5000)
 
 @plugin.route('/rank/')
 def rank():
@@ -1012,19 +978,28 @@ def rank():
 
 @plugin.route('/ranklist/<value>/')
 def ranklist(value):
-    if re.match('\d+',value):
-        gdlist = qqrank(value)
-    else:
-        gdlist = one63rank(wyrankdict[value.decode('utf-8')])
-    items = [{
-        'label': video['label'],
+    # 通过传递 qq|排行榜id 或 163|排行榜id 的value值 来区分不同的排行榜
+    value = value.split("|")
+    if value[0] == '163':
+        gdlist = one63playlist(value[1])
+    if value[0] == 'qq':
+        gdlist = qqrank(value[1])
+    
+    items = []
+    for video in gdlist:
+        try:
+            label = video['label']
+        except:
+            label = video['name']
+        items.append({
+        'label': label,
         'path': video['url'],
 	'thumbnail': video['thumb'],
         'icon': video['thumb'],
         'is_playable': True,
         'info':{'title':video['name'],'mediatype':'music'},
         'info_type':'music',
-    } for video in gdlist]
+    } )
     return items
 
 @plugin.route('/get_mv/<mode>/<page>/')
@@ -1313,62 +1288,62 @@ def show_label(label):
     ]
     return items
 
-@plugin.route('/setting')
-def setting():
-    items = []
-    items.append({
-        'label': u'设置网易云音乐API (API:'+cache['one63api'] +')',
-        'path': plugin.url_for('input',key='one63api',value='请输入网易云音乐API地址：'),
-    })
-    items.append({
-        'label': u'设置QQ音乐API (API:'+cache['qqapi'] +')',
-        'path': plugin.url_for('input',key='qqapi',value='请输入QQ音乐API地址：'),
-    })
-    # items.append({
-    #     'label': u'设置咪咕音乐API (API:'+cache['miguapi'] +')',
-    #     'path': plugin.url_for('input',key='miguapi',value='请输入咪咕音乐API地址：'),
-    # })
-    if cache['my163num'] == '':
-        items.append({
-            'label': u'设置网易云uid - 解锁基础功能(获取公开歌单，喜欢的歌等)',
-            'path': plugin.url_for('input',key='my163num',value='请输入网易云uid的值：'),
-        })
-    else:
-        items.append({
-            'label': u'设置网易云uid (uid:'+cache['my163num'] +')',
-            'path': plugin.url_for('input',key='my163num',value='请输入网易云uid的值：'),
-        })
-    if cache['myqqnum'] == '':
-        items.append({
-            'label': u'设置QQ号 - 解锁基础功能(获取公开歌单，喜欢的歌等)',
-            'path': plugin.url_for('input',key='myqqnum',value='请输入QQ号：'),
-        })
-    else:
-        items.append({
-            'label': u'设置QQ号 (QQ号：'+ cache['myqqnum'] +')',
-            'path': plugin.url_for('input',key='myqqnum',value='请输入QQ号：'),
-        })
-    if cache['my163'] == '':
-        items.append({
-            'label': u'设置网易云MUSIC_U - 解锁高级功能(专属日推)',
-            'path': plugin.url_for('input',key='my163',value='请输入网易云MUSIC_U的值：'),
-        })
-    else:
-        items.append({
-            'label': u'设置网易云MUSIC_U (MUSIC_U:'+cache['my163'] +')',
-            'path': plugin.url_for('input',key='my163',value='请输入网易云MUSIC_U的值：'),
-        })
-    if cache['myqq'] == '':
-        items.append({
-            'label': u'设置QQ cookie - 解锁高级功能(专属日推)',
-            'path': plugin.url_for('input',key='myqq',value='请输入QQ cookie：'),
-        })
-    else:
-        items.append({
-            'label': u'设置QQ cookie (QQ cookies：'+ cache['myqq'] +')',
-            'path': plugin.url_for('input',key='myqq',value='请输入QQ cookie：'),
-        })
-    return items
+# @plugin.route('/setting')
+# def setting():
+#     items = []
+#     items.append({
+#         'label': u'设置网易云音乐API (API:'+netease_api +')',
+#         'path': plugin.url_for('input',key='one63api',value='请输入网易云音乐API地址：'),
+#     })
+#     items.append({
+#         'label': u'设置QQ音乐API (API:'+qqmusic_api +')',
+#         'path': plugin.url_for('input',key='qqapi',value='请输入QQ音乐API地址：'),
+#     })
+#     # items.append({
+#     #     'label': u'设置咪咕音乐API (API:'+cache['miguapi'] +')',
+#     #     'path': plugin.url_for('input',key='miguapi',value='请输入咪咕音乐API地址：'),
+#     # })
+#     if cache['my163num'] == '':
+#         items.append({
+#             'label': u'设置网易云uid - 解锁基础功能(获取公开歌单，喜欢的歌等)',
+#             'path': plugin.url_for('input',key='my163num',value='请输入网易云uid的值：'),
+#         })
+#     else:
+#         items.append({
+#             'label': u'设置网易云uid (uid:'+cache['my163num'] +')',
+#             'path': plugin.url_for('input',key='my163num',value='请输入网易云uid的值：'),
+#         })
+#     if cache['myqqnum'] == '':
+#         items.append({
+#             'label': u'设置QQ号 - 解锁基础功能(获取公开歌单，喜欢的歌等)',
+#             'path': plugin.url_for('input',key='myqqnum',value='请输入QQ号：'),
+#         })
+#     else:
+#         items.append({
+#             'label': u'设置QQ号 (QQ号：'+ cache['myqqnum'] +')',
+#             'path': plugin.url_for('input',key='myqqnum',value='请输入QQ号：'),
+#         })
+#     if cache['my163'] == '':
+#         items.append({
+#             'label': u'设置网易云MUSIC_U - 解锁高级功能(专属日推)',
+#             'path': plugin.url_for('input',key='my163',value='请输入网易云MUSIC_U的值：'),
+#         })
+#     else:
+#         items.append({
+#             'label': u'设置网易云MUSIC_U (MUSIC_U:'+cache['my163'] +')',
+#             'path': plugin.url_for('input',key='my163',value='请输入网易云MUSIC_U的值：'),
+#         })
+#     if cache['myqq'] == '':
+#         items.append({
+#             'label': u'设置QQ cookie - 解锁高级功能(专属日推)',
+#             'path': plugin.url_for('input',key='myqq',value='请输入QQ cookie：'),
+#         })
+#     else:
+#         items.append({
+#             'label': u'设置QQ cookie (QQ cookies：'+ cache['myqq'] +')',
+#             'path': plugin.url_for('input',key='myqq',value='请输入QQ cookie：'),
+#         })
+#     return items
 
 @plugin.route('/input/<key>/<value>/')
 def input(key,value):
@@ -1397,89 +1372,90 @@ def search(value,page,type,mode):
                 hi[keyword] = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     else:
         keyword = value
-    if mode == '163':
-        videos = one63search(keyword,type,page)
-    else:
-        videos = qqsearch(keyword,type,page)
-    items = []
+    if 'keyword' in dir():
+        if mode == '163':
+            videos = one63search(keyword,type,page)
+        else:
+            videos = qqsearch(keyword,type,page)
+        items = []
     
-    for video in videos:
-        info = video['info']
-        #mv
-        if type == '1004' or type == '12':
-            info['mediatype'] = 'video'
-            info_type = 'video'
-            items.append({'label': video['name'],
+        for video in videos:
+            info = video['info']
+            #mv
+            if type == '1004' or type == '12':
+                info['mediatype'] = 'video'
+                info_type = 'video'
+                items.append({'label': video['name'],
                 'path': plugin.url_for('playmv', url=video['url']),
             'thumbnail': video['thumb'],
                 'icon': video['thumb'],
                 'info': info,
                 'info_type':info_type,
-            })
-        #歌单
-        if type == '2' or type == '1000':
-            info['mediatype'] = 'video'
-            info_type = 'video'
-            items.append({'label': video['name'],
+                })
+            #歌单
+            if type == '2' or type == '1000':
+                info['mediatype'] = 'video'
+                info_type = 'video'
+                items.append({'label': video['name'],
                 'path': plugin.url_for('playlist', url=video['url']),
             'thumbnail': video['thumb'],
                 'icon': video['thumb'],
                 'info': info,
                 'info_type':info_type,
-            })
-        #单曲
-        if type == '0' or type == '1':
-            info['mediatype'] = 'song'
-            info_type = 'music'
-            items.append({'label': video['name'],
+                })
+            #单曲
+            if type == '0' or type == '1':
+                info['mediatype'] = 'song'
+                info_type = 'music'
+                items.append({'label': video['name'],
                 'path': video['url'],
             'thumbnail': video['thumb'],
                 'icon': video['thumb'],
                 'info': info,
                 'info_type':info_type,
                 'is_playable': True,
-            })
-        #专辑
-        if type == '8' or type == '10':
-            info['mediatype'] = 'album'
-            info_type = 'music'
-            items.append({'label': video['name'],
+                })
+            #专辑
+            if type == '8' or type == '10':
+                info['mediatype'] = 'album'
+                info_type = 'music'
+                items.append({'label': video['name'],
                 'path': plugin.url_for('playalbum', url=video['url']),
             'thumbnail': video['thumb'],
                 'icon': video['thumb'],
                 'info': info,
                 'info_type':info_type,
-            })
-        #歌手
-        if type == '9' or type == '100':
-            info['mediatype'] = 'artist'
-            info_type = 'music'
-            items.append({'label': video['name'],
+                })
+            #歌手
+            if type == '9' or type == '100':
+                info['mediatype'] = 'artist'
+                info_type = 'music'
+                items.append({'label': video['name'],
                 'path': plugin.url_for('playsinger', url=video['url']),
             'thumbnail': video['thumb'],
                 'icon': video['thumb'],
                 'info': info,
                 'info_type':info_type,
-            })
-        #视频
-        if type == '1014':
-            info['mediatype'] = 'video'
-            info_type = 'video'
-            items.append({'label': video['name'],
+                })
+            #视频
+            if type == '1014':
+                info['mediatype'] = 'video'
+                info_type = 'video'
+                items.append({'label': video['name'],
                 'path': plugin.url_for('playvideo', url=video['url']),
             'thumbnail': video['thumb'],
                 'icon': video['thumb'],
                 'info': info,
                 'info_type':info_type,
+                })
+        if len(videos) == 30:
+            items.append({
+                'label': '下一页',
+                'path': plugin.url_for('search',value=value,page=(int(page)+1),mode=mode,type=type),
             })
-    if len(videos) == 30:
-        items.append({
-            'label': '下一页',
-            'path': plugin.url_for('search',value=value,page=(int(page)+1),mode=mode,type=type),
-        })
         
     
-    return items
+        return items
 
 def get_key (dict, value):
   return [k for k, v in dict.items() if v == value]
