@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.xbmc-kodi-private-china-addons"
+        name="Chinese Add-ons"
+        version="1.0.0"
+        provider-name="zhengfan2014">
+    <extension point="xbmc.addon.repository"
+            name="Chinese Add-ons">
+        <info compressed="true">https://github.com/FadeJay/xbmc-kodi-private-china-addons/raw/py2/addons.xml</info>
+		<checksum>https://github.com/FadeJay/xbmc-kodi-private-china-addons/raw/py2/addons.xml.md5</checksum>
+        <datadir zip="true">https://github.com/FadeJay/xbmc-kodi-private-china-addons/raw/py2/repo</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Chinese Add-ons Repository</summary>
+        <summary lang="zh">面向中文用户的插件库</summary>
+        <description>xbmc-kodi-private-china-addons is a GitHub repository for Kodi add-ons written and maintained by zhengfan2014. Kodi can be added to play video sites such as Bilibili and mount barrage and other weird functions.</description>
+        <description lang="zh">xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的Kodi插件的GitHub仓库。可以为Kodi增加播放Bilibili等视频网站和挂载弹幕等奇奇怪怪的功能。</description>
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
