@@ -51,7 +51,7 @@ tree.write(workpath + '/addons.xml', "UTF-8",xml_declaration=True)
 f = open(workpath + '/addons.xml')
 m2 = hashlib.md5()
 text = f.read()
-m2.update(text.encode("utf-8").decode("utf-8"))
+m2.update(text)
 f.close()
 with open(workpath + '/addons.xml.md5','w') as f: # 如果filename不存在会自动创建， 'w'表示写数据，写之前会清空文件中的原有数据！
     f.write(m2.hexdigest())
