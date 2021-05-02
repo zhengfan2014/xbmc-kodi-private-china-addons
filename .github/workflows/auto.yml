@@ -15,7 +15,7 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $GITHUB_URL -b py2 python2
+        git clone https://github.com/zhengfan2014/xbmc-kodi-private-china-addons -b py2 python2
     - name: 运行python
       run: |
         python /workdir/python2/.github/auto.py
