@@ -20,15 +20,15 @@ xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的K
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ----
- plugin.video.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/><br>bilibili | 0.5.8 | 2021-02-18 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
- plugin.video.taptap | <img src="icons/taptap.png" width = "50" height = "50"/><br>Taptap | 0.2.2 | 2021-02-17 | TapTap是一个推荐高品质手游的手游分享社区，实时同步全球各大应用市场游戏排行榜，与全球玩家共同交流并发掘高品质手游。每一款推荐游戏，都是由专业的测评团队从全球海量的游戏中精选而出，只为你提供好玩的手机游戏。
- plugin.video.acfun | <img src="icons/acfun.png" width = "50" height = "50"/><br>acfun | 0.2.3 | 2020-09-15 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
- plugin.video.changku | <img src="icons/changku.png" width = "50" height = "50"/><br>场库 | 0.1.0 | 2020-03-29 | 高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影
- plugin.video.huanxi | <img src="icons/huanxi.png" width = "50" height = "50"/><br>欢喜首映 | 0.1.0 | 2020-03-29 | 欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影
- plugin.video.skypixel | <img src="icons/skypixel.png" width = "50" height = "50"/><br>天空之城 | 0.1.0 | 2020-03-29 | 世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中
- plugin.video.xinpianchang | <img src="icons/xinpianchang.png" width = "50" height = "50"/><br>新片场 | 0.1.0 | 2020-03-29 | 新片场汇聚全球原创优质视频及创作人，提供4K、无广告、无水印视频观看，专业的视频艺术学习教程，正版视觉素材交易等，与数百万创作人一起用作品打动世界
- plugin.video.weibotv | <img src="icons/weibo.png" width = "50" height = "50"/><br>微博视频 | 0.1.1 | 2020-03-16 | 随时随地发现新鲜事！微博带你欣赏世界上每一个精彩瞬间，了解每一个幕后故事。
- plugin.video.kaiyan | <img src="icons/kaiyan.png" width = "50" height = "50"/><br>开眼 | 0.1.0 | 2020-03-10 | 精选视频推荐，每日大开眼界
+ plugin.video.bilibili | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.bilibili/icon.png" width = "50" height = "50"/><br>bilibili | 0.5.8 | 2021-02-18 | bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
+ plugin.video.taptap | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.taptap/icon.png" width = "50" height = "50"/><br>Taptap | 0.2.2 | 2021-02-17 | TapTap是一个推荐高品质手游的手游分享社区，实时同步全球各大应用市场游戏排行榜，与全球玩家共同交流并发掘高品质手游。每一款推荐游戏，都是由专业的测评团队从全球海量的游戏中精选而出，只为你提供好玩的手机游戏。
+ plugin.video.acfun | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.acfun/icon.png" width = "50" height = "50"/><br>acfun | 0.2.3 | 2020-09-15 | AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐
+ plugin.video.changku | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.changku/icon.png" width = "50" height = "50"/><br>场库 | 0.1.0 | 2020-03-29 | 高品质短片分享平台,汇集优秀视频短片及微电影创作人,实时不断分享全球优秀视频短片,微电影
+ plugin.video.huanxi | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.huanxi/icon.png" width = "50" height = "50"/><br>欢喜首映 | 0.1.0 | 2020-03-29 | 欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影
+ plugin.video.skypixel | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.skypixel/icon.png" width = "50" height = "50"/><br>天空之城 | 0.1.0 | 2020-03-29 | 世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中
+ plugin.video.xinpianchang | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.xinpianchang/icon.png" width = "50" height = "50"/><br>新片场 | 0.1.0 | 2020-03-29 | 新片场汇聚全球原创优质视频及创作人，提供4K、无广告、无水印视频观看，专业的视频艺术学习教程，正版视觉素材交易等，与数百万创作人一起用作品打动世界
+ plugin.video.weibotv | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.weibotv/icon.png" width = "50" height = "50"/><br>微博视频 | 0.1.1 | 2020-03-16 | 随时随地发现新鲜事！微博带你欣赏世界上每一个精彩瞬间，了解每一个幕后故事。
+ plugin.video.kaiyan | <img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.kaiyan/icon.png" width = "50" height = "50"/><br>开眼 | 0.1.0 | 2020-03-10 | 精选视频推荐，每日大开眼界
  
  ----
 
@@ -36,14 +36,14 @@ xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的K
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.audio.jsososo | <img width = "200" height = "0"/><img src="icons/jsososo.png" width = "50" height = "50"/><br>jsososo | 0.1.0 | 2020-05-15 |music.jsososo.com的音乐插件，播放你自己的网易云和QQ音乐歌单和日推
+ plugin.audio.jsososo | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.audio.jsososo/icon.png" width = "50" height = "50"/><br>jsososo | 0.1.0 | 2020-05-15 |music.jsososo.com的音乐插件，播放你自己的网易云和QQ音乐歌单和日推
 
  ### 弹幕插件
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- service.subtitles.acfun | <img width = "200" height = "0"/><img src="icons/acfun.png" width = "50" height = "50"/><br>Acfun 弹幕 | 0.1.1 | 2020-07-19 |获取并挂载acfun任意视频和番剧的弹幕，支持配合acfun插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
-  service.subtitles.bilibili | <img width = "200" height = "0"/><img src="icons/bilibili.png" width = "50" height = "50"/><br>Bilibili 弹幕 | 0.1.1 | 2020-07-19 |获取并挂载b站任意视频和番剧的弹幕，支持配合b站插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
+ service.subtitles.acfun | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.acfun/icon.png" width = "50" height = "50"/><br>Acfun 弹幕 | 0.1.1 | 2020-07-19 |获取并挂载acfun任意视频和番剧的弹幕，支持配合acfun插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
+  service.subtitles.bilibili | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.bilibili/icon.png" width = "50" height = "50"/><br>Bilibili 弹幕 | 0.1.1 | 2020-07-19 |获取并挂载b站任意视频和番剧的弹幕，支持配合b站插件显示弹幕，也可以用于本地nas上的番剧或者bangumi插件显示弹幕
 
 ----
 
@@ -53,7 +53,7 @@ xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的K
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.bangumi | <img width = "200" height = "0"/><img src="icons/bangumi.png" width = "50" height = "50"/><br>bangumi | 0.2.1 | 2021-02-18 |模块化的小众番剧网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配番剧网站
+ plugin.video.bangumi | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.bangumi/icon.png" width = "50" height = "50"/><br>bangumi | 0.2.1 | 2021-02-18 |模块化的小众番剧网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配番剧网站
 
 
 
@@ -63,7 +63,7 @@ xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的K
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.cine | <img width = "200" height = "0"/><img src="icons/cine.png" width = "50" height = "50"/><br>cine | 0.2.0 | 2020-06-14 |模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
+ plugin.video.cine | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.cine/icon.png" width = "50" height = "50"/><br>cine | 0.2.0 | 2020-06-14 |模块化的小众电影/电视剧/综艺网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配电影网站
 
 
 
@@ -73,7 +73,7 @@ xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的K
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.vid | <img width = "200" height = "0"/><img src="icons/vid.png" width = "50" height = "50"/><br>vid | 0.1.0 | 2020-05-03 |模块化的新闻/自媒体等单一视频网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配新闻/自媒体等网站
+ plugin.video.vid | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.vid/icon.png" width = "50" height = "50"/><br>vid | 0.1.0 | 2020-05-03 |模块化的新闻/自媒体等单一视频网站聚合插件，提供开发文档，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配新闻/自媒体等网站
 
 
 
@@ -83,7 +83,7 @@ xbmc-kodi-private-china-addons 是一个存放由zhengfan2014编写和维护的K
 
 插件目录              | 插件名 | 版本 | 最后更新 | 简介
  :------------------ | :----: | ---- | ---- | ---- 
- plugin.video.reallive | <img width = "200" height = "0"/><img src="icons/reallive.png" width = "50" height = "50"/><br>reallive | 0.1.1 | 2020-06-09 |模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
+ plugin.video.reallive | <img width = "200" height = "0"/><img src="https://cdn.jsdelivr.net/gh/zhengfan2014/xbmc-kodi-private-china-addons@py2/repo/plugin.video.reallive/icon.png" width = "50" height = "50"/><br>reallive | 0.1.1 | 2020-06-09 |模块化的直播网站聚合插件，让有python基础的用户无需学习kodi插件开发知识，为本插件快速适配各大直播网站
 
 ## 插件库(New)
 
@@ -95,25 +95,23 @@ Gitee:
 
 ### Github Action全自动打包(New)
 
-国内 - Gitee(推荐):  
-推送经过测试基本无Bug的版本  
+国内 - Gitee:  
 https://gitee.com/zhengfan2014/xbmc-kodi-private-china-addons/tree/master/latest
 
 国外 - Github:  
-能获得最新的版本(代码提交上来一分钟左右就能收到更新)，但是代码没有经过测试，可能Bug很多  
 https://github.com/zhengfan2014/xbmc-kodi-private-china-addons/tree/master/latest
 
 ### 手动打包
 
-国内 - 爱发电
+国内 - 爱发电  
 https://afdian.net/@zhengfan2014
 
-国外 - GitHub
-推荐，更新比较及时
+国外 - GitHub  
+推荐，更新比较及时  
 博客地址：https://zhengfan2014.github.io/
 
-国内 - Gitee
-是GitHub的手动克隆站，因为是手动克隆，所以更新频率肯定会比GitHub慢，建议无法访问GitHub才使用
+国内 - Gitee  
+推荐，目前采用github action，两个博客内容会自动同步
 博客地址：https://zhengfan2014.gitee.io/
 
 

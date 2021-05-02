@@ -22,9 +22,12 @@ for pluginname in os.listdir(workpath):
         parser = et.parse(workpath + "/" + pluginname + "/addon.xml")
         root = parser.getroot()
         version = root.attrib['version']
+        # 创建repo
+        basepath = workpath + "/repo/" + pluginname + '/'
+        if not os.path.exists(basepath):
+            os.makedirs(basepath)
         # 压缩
-        zippath = workpath + '/latest/' + \
-            str(pluginname) + '-' + version + '.zip'
+        zippath = basepath + str(pluginname) + '-' + version + '.zip'
         f = zipfile.ZipFile(zippath, 'w', zipfile.ZIP_DEFLATED)
         for dirpath, dirnames, filenames in os.walk(workpath + '/' + pluginname):
             # 这一句很重要，不replace的话，就从根目录开始复制
@@ -34,14 +37,8 @@ for pluginname in os.listdir(workpath):
                 f.write(os.path.join(dirpath, filename), fpath+filename)
         print(pluginname + '压缩成功')
         f.close()
-        # 拷贝zip到对应repo
-        basepath = workpath + "/repo/" + pluginname + '/'
-        if not os.path.exists(basepath):
-            os.makedirs(basepath)
-        shutil.copy(zippath, basepath + pluginname + '-' + version + '.zip')
         # 拷贝icon
-        shutil.copy(workpath + '/' + str(pluginname) +
-                    '/icon.png', basepath + 'icon.png')
+        shutil.copy(workpath + '/' + str(pluginname) + '/icon.png', basepath + 'icon.png')
         # 合并xml
         addons_xml.append(root)
 # 输出addons.xml
