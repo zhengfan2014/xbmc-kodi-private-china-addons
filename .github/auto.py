@@ -8,7 +8,7 @@ import shutil
 import hashlib
 
 
-workpath = '/config/workspace/kodi/xbmc-kodi-private-china-addons'
+workpath = '/workdir/python2/'
 
 addons_xml = et.Element('addons')
 
