@@ -76,7 +76,7 @@ his = plugin.get_storage('his')
 #     cache['my163num'] = ''
 # if 'myqqnum' not in cache:
 #     cache['myqqnum'] = ''
-xbmcplugin.setContent(int(sys.argv[1]), 'musicvideos')
+# xbmcplugin.setContent(int(sys.argv[1]), 'musicvideos')
 
 netease_api = xbmcplugin.getSetting(int(sys.argv[1]), 'neteasemusicapiurl')
 qqmusic_api = xbmcplugin.getSetting(int(sys.argv[1]), 'qqmusicapiurl')
