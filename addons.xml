@@ -1,63 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<addons><addon id="plugin.video.weibotv" name="微博视频" provider-name="zhengfan" version="0.1.1">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0" />
-    <import addon="script.module.xbmcswift2" version="2.4.0" />
-  <import addon="script.module.beautifulsoup4" version="4.5.3" />
-  <import addon="script.module.requests" version="2.19.1" />
-  <import addon="script.module.html5lib" version="0.999.0" />
-  </requires>
-  <extension library="addon.py" point="xbmc.python.pluginsource">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <language />
-    <description>随时随地发现新鲜事！微博带你欣赏世界上每一个精彩瞬间，了解每一个幕后故事。</description>
-  </extension>
-</addon><addon id="service.subtitles.bilibili" name="Bilibili 弹幕" provider-name="xodidox,zhengfan,shaolin-kongfu" version="0.1.1">
-    <requires>
-        <import addon="xbmc.python" version="2.1.0" />
-        <import addon="script.module.requests" version="1.1.0" />
-        <import addon="script.module.beautifulsoup4" version="4.3.2" />
-        <import addon="vfs.rar" version="2.3.0" />
-    </requires>
-    <extension library="service.py" point="xbmc.subtitle.module" />
-    <extension point="xbmc.addon.metadata">
-        <summary lang="zh">哔哩哔哩 弹幕插件</summary>
-        <description lang="zh">从 哔哩哔哩 下载弹幕</description>
-        <assets>
-            <icon>icon.png</icon>
-            <clearlogo>logo.png</clearlogo>
-            <fanart>resources/media/fanart.jpg</fanart>
-            <screenshot>resources/media/screenshot_1.png</screenshot>
-            <screenshot>resources/media/screenshot_2.png</screenshot>
-            <screenshot>resources/media/screenshot_3.png</screenshot>
-        </assets>
-        <news />
-    </extension>
-</addon><addon id="plugin.video.taptap" name="Taptap" provider-name="zhengfan" version="0.2.2">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0" />
-    <import addon="script.module.xbmcswift2" version="2.4.0" />
-  <import addon="script.module.beautifulsoup4" version="4.5.3" />
-  <import addon="script.module.requests" version="2.19.1" />
-  <import addon="script.module.html5lib" version="0.999.0" />
-  </requires>
-  <extension library="addon.py" point="xbmc.python.pluginsource">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <language />
-    <description>TapTap是一个推荐高品质手游的手游分享社区，实时同步全球各大应用市场游戏排行榜，与全球玩家共同交流并发掘高品质手游。每一款推荐游戏，都是由专业的测评团队从全球海量的游戏中精选而出，只为你提供好玩的手机游戏。</description>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.png</fanart> 
-    </assets>
-    <news>首个版本</news>
-  </extension>
-</addon><addon id="plugin.audio.jsososo" name="Jsososo" provider-name="zhengfan" version="0.1.1">
+<addons><addon id="plugin.audio.jsososo" name="Jsososo" provider-name="zhengfan" version="0.1.1">
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
     <import addon="script.module.xbmcswift2" version="2.4.0" />
@@ -78,27 +20,7 @@
     </assets>
     <news>首个版本</news>
   </extension>
-</addon><addon id="metadata.douban.com.python" name="豆瓣刮削器Python" provider-name="zhengfan" version="0.1.1">
-  <requires>
-    <import addon="xbmc.metadata" version="2.1.0" />
-    <import addon="xbmc.python" version="2.26.0" />
-    <import addon="script.module.xbmcswift2" version="2.4.0" />
-    <import addon="script.module.beautifulsoup4" version="4.5.3" />
-    <import addon="script.module.requests" version="2.19.1" />
-    <import addon="script.module.html5lib" version="0.999.0" />
-  </requires>
-  <extension library="python/scraper.py" point="xbmc.metadata.scraper.movies" />
-  <extension point="xbmc.addon.metadata">
-
-    <summary>豆瓣刮削器Python</summary>
-    <description>豆瓣电影提供最新的电影介绍及评论包括上映影片的影讯查询及购票服务。你可以记录想看、在看和看过的电影电视剧，顺便打分、写影评。根据你的口味，豆瓣电影会推荐好电影给你。</description>
-    <platform>all</platform>
-    <language />
-    <assets>
-      <icon>icon.png</icon>
-    </assets>
-  </extension>
-</addon><addon id="plugin.video.huanxi" name="欢喜首映" provider-name="zhengfan" version="0.1.0">
+</addon><addon id="plugin.video.skypixel" name="天空之城" provider-name="zhengfan" version="0.1.0">
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
     <import addon="script.module.xbmcswift2" version="2.4.0" />
@@ -112,28 +34,7 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <language />
-    <description>欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影</description>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.png</fanart> 
-    </assets>
-    <news>首个版本</news>
-  </extension>
-</addon><addon id="plugin.video.medicalvideo" name="医学微视" provider-name="zhengfan" version="0.1.0">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0" />
-    <import addon="script.module.xbmcswift2" version="2.4.0" />
-  <import addon="script.module.beautifulsoup4" version="4.5.3" />
-  <import addon="script.module.requests" version="2.19.1" />
-  <import addon="script.module.html5lib" version="0.999.0" />
-  </requires>
-  <extension library="addon.py" point="xbmc.python.pluginsource">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <language />
-    <description>医学微视是配合卫健委宣传司《全民健康素养促进活动》精神，在中华医学会科学普及分会指导下，由中国医学科学院健康科普中心监制而实施，以“让人们多了解一点医学知识，健康就多一份保障”的宗旨，团队只想把医学微视做得更好，让更多的患者能共享到医学专家们多年积累的宝贵经验和知识，能对需要的人有一点点帮助</description>
+    <description>世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中</description>
     <assets>
       <icon>icon.png</icon>
       <fanart>fanart.png</fanart> 
@@ -161,7 +62,7 @@
     </assets>
     <news>首个版本</news>
   </extension>
-</addon><addon id="plugin.video.acfun" name="Acfun" provider-name="zhengfan" version="0.2.3">
+</addon><addon id="plugin.video.kaiyan" name="开眼" provider-name="zhengfan" version="0.1.0">
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
     <import addon="script.module.xbmcswift2" version="2.4.0" />
@@ -175,49 +76,48 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <language />
-    <description>AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐。</description>
+    <description>精选视频推荐，每日大开眼界</description>
   </extension>
-</addon><addon id="plugin.video.skypixel" name="天空之城" provider-name="zhengfan" version="0.1.0">
+</addon><addon id="service.subtitles.bilibili" name="Bilibili 弹幕" provider-name="xodidox,zhengfan,shaolin-kongfu" version="0.1.1">
+    <requires>
+        <import addon="xbmc.python" version="2.1.0" />
+        <import addon="script.module.requests" version="1.1.0" />
+        <import addon="script.module.beautifulsoup4" version="4.3.2" />
+        <import addon="vfs.rar" version="2.3.0" />
+    </requires>
+    <extension library="service.py" point="xbmc.subtitle.module" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="zh">哔哩哔哩 弹幕插件</summary>
+        <description lang="zh">从 哔哩哔哩 下载弹幕</description>
+        <assets>
+            <icon>icon.png</icon>
+            <clearlogo>logo.png</clearlogo>
+            <fanart>resources/media/fanart.jpg</fanart>
+            <screenshot>resources/media/screenshot_1.png</screenshot>
+            <screenshot>resources/media/screenshot_2.png</screenshot>
+            <screenshot>resources/media/screenshot_3.png</screenshot>
+        </assets>
+        <news />
+    </extension>
+</addon><addon id="metadata.douban.com.python" name="豆瓣刮削器Python" provider-name="zhengfan" version="0.1.1">
   <requires>
-    <import addon="xbmc.python" version="2.1.0" />
+    <import addon="xbmc.metadata" version="2.1.0" />
+    <import addon="xbmc.python" version="2.26.0" />
     <import addon="script.module.xbmcswift2" version="2.4.0" />
-  <import addon="script.module.beautifulsoup4" version="4.5.3" />
-  <import addon="script.module.requests" version="2.19.1" />
-  <import addon="script.module.html5lib" version="0.999.0" />
+    <import addon="script.module.beautifulsoup4" version="4.5.3" />
+    <import addon="script.module.requests" version="2.19.1" />
+    <import addon="script.module.html5lib" version="0.999.0" />
   </requires>
-  <extension library="addon.py" point="xbmc.python.pluginsource">
-    <provides>video</provides>
-  </extension>
+  <extension library="python/scraper.py" point="xbmc.metadata.scraper.movies" />
   <extension point="xbmc.addon.metadata">
+
+    <summary>豆瓣刮削器Python</summary>
+    <description>豆瓣电影提供最新的电影介绍及评论包括上映影片的影讯查询及购票服务。你可以记录想看、在看和看过的电影电视剧，顺便打分、写影评。根据你的口味，豆瓣电影会推荐好电影给你。</description>
     <platform>all</platform>
     <language />
-    <description>世界各地的航拍摄影师、拍手叫绝的航拍作品与独具价值的航拍攻略。全世界的探索者们互相启发,乐在其中</description>
     <assets>
       <icon>icon.png</icon>
-      <fanart>fanart.png</fanart> 
     </assets>
-    <news>首个版本</news>
-  </extension>
-</addon><addon id="plugin.video.xinpianchang" name="新片场" provider-name="zhengfan" version="0.1.0">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0" />
-    <import addon="script.module.xbmcswift2" version="2.4.0" />
-  <import addon="script.module.beautifulsoup4" version="4.5.3" />
-  <import addon="script.module.requests" version="2.19.1" />
-  <import addon="script.module.html5lib" version="0.999.0" />
-  </requires>
-  <extension library="addon.py" point="xbmc.python.pluginsource">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <language />
-    <description>新片场汇聚全球原创优质视频及创作人，提供4K、无广告、无水印视频观看，专业的视频艺术学习教程，正版视觉素材交易等，与数百万创作人一起用作品打动世界</description>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.png</fanart> 
-    </assets>
-    <news>首个版本</news>
   </extension>
 </addon><addon id="service.subtitles.acfun" name="Acfun 弹幕" provider-name="xodidox,zhengfan,shaolin-kongfu" version="0.1.1">
     <requires>
@@ -240,6 +140,48 @@
         </assets>
         <news />
     </extension>
+</addon><addon id="plugin.video.medicalvideo" name="医学微视" provider-name="zhengfan" version="0.1.0">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0" />
+    <import addon="script.module.xbmcswift2" version="2.4.0" />
+  <import addon="script.module.beautifulsoup4" version="4.5.3" />
+  <import addon="script.module.requests" version="2.19.1" />
+  <import addon="script.module.html5lib" version="0.999.0" />
+  </requires>
+  <extension library="addon.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language />
+    <description>医学微视是配合卫健委宣传司《全民健康素养促进活动》精神，在中华医学会科学普及分会指导下，由中国医学科学院健康科普中心监制而实施，以“让人们多了解一点医学知识，健康就多一份保障”的宗旨，团队只想把医学微视做得更好，让更多的患者能共享到医学专家们多年积累的宝贵经验和知识，能对需要的人有一点点帮助</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
+  </extension>
+</addon><addon id="plugin.video.taptap" name="Taptap" provider-name="zhengfan" version="0.2.2">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0" />
+    <import addon="script.module.xbmcswift2" version="2.4.0" />
+  <import addon="script.module.beautifulsoup4" version="4.5.3" />
+  <import addon="script.module.requests" version="2.19.1" />
+  <import addon="script.module.html5lib" version="0.999.0" />
+  </requires>
+  <extension library="addon.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language />
+    <description>TapTap是一个推荐高品质手游的手游分享社区，实时同步全球各大应用市场游戏排行榜，与全球玩家共同交流并发掘高品质手游。每一款推荐游戏，都是由专业的测评团队从全球海量的游戏中精选而出，只为你提供好玩的手机游戏。</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
+  </extension>
 </addon><addon id="plugin.video.bilibili" name="Bilibili" provider-name="zhengfan,shaolin-kongfu,YingjieSong,ArchieMeng" version="0.5.8">
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
@@ -258,7 +200,7 @@
     <language />
     <description>bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐</description>
   </extension>
-</addon><addon id="plugin.video.kaiyan" name="开眼" provider-name="zhengfan" version="0.1.0">
+</addon><addon id="plugin.video.weibotv" name="微博视频" provider-name="zhengfan" version="0.1.1">
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
     <import addon="script.module.xbmcswift2" version="2.4.0" />
@@ -272,6 +214,64 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <language />
-    <description>精选视频推荐，每日大开眼界</description>
+    <description>随时随地发现新鲜事！微博带你欣赏世界上每一个精彩瞬间，了解每一个幕后故事。</description>
+  </extension>
+</addon><addon id="plugin.video.xinpianchang" name="新片场" provider-name="zhengfan" version="0.1.0">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0" />
+    <import addon="script.module.xbmcswift2" version="2.4.0" />
+  <import addon="script.module.beautifulsoup4" version="4.5.3" />
+  <import addon="script.module.requests" version="2.19.1" />
+  <import addon="script.module.html5lib" version="0.999.0" />
+  </requires>
+  <extension library="addon.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language />
+    <description>新片场汇聚全球原创优质视频及创作人，提供4K、无广告、无水印视频观看，专业的视频艺术学习教程，正版视觉素材交易等，与数百万创作人一起用作品打动世界</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
+  </extension>
+</addon><addon id="plugin.video.acfun" name="Acfun" provider-name="zhengfan" version="0.2.3">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0" />
+    <import addon="script.module.xbmcswift2" version="2.4.0" />
+  <import addon="script.module.beautifulsoup4" version="4.5.3" />
+  <import addon="script.module.requests" version="2.19.1" />
+  <import addon="script.module.html5lib" version="0.999.0" />
+  </requires>
+  <extension library="addon.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language />
+    <description>AcFun是一家弹幕视频网站，致力于为每一个人带来欢乐。</description>
+  </extension>
+</addon><addon id="plugin.video.huanxi" name="欢喜首映" provider-name="zhengfan" version="0.1.0">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0" />
+    <import addon="script.module.xbmcswift2" version="2.4.0" />
+  <import addon="script.module.beautifulsoup4" version="4.5.3" />
+  <import addon="script.module.requests" version="2.19.1" />
+  <import addon="script.module.html5lib" version="0.999.0" />
+  </requires>
+  <extension library="addon.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <language />
+    <description>欢喜首映拥有王家卫、徐峥、陈可辛、宁浩、顾长卫、张一白、贾樟柯、张艺谋等巨匠影人为平台定制的大制作网剧、网络大电影,将视频播放与内容制作合二为一,首映厅首发好电影</description>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart> 
+    </assets>
+    <news>首个版本</news>
   </extension>
 </addon></addons>
