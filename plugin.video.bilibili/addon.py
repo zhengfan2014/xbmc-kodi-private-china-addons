@@ -429,11 +429,13 @@ def get_search(keyword, page):
         title = title.replace('<em class="keyword">', '')
         title = title.replace('</em>', '')
 
-        videoitem = {}
-        videoitem['name'] = title
-        videoitem['href'] = surl
-        videoitem['thumb'] = 'http:' + pic
-        videoitem['info'] = {'plot': bgm[index]['desc']}
+        videoitem = {
+            'name': title,
+            'href': surl,
+            'thumb': 'http:' + pic.replace("http:", ""),
+            'info': {'plot': bgm[index]['desc']},
+        }
+
         videos.append(videoitem)
     for index in range(len(mov)):
         surl = 'https://www.bilibili.com/bangumi/play/ss' + str(mov[index]['season_id'])
@@ -443,11 +445,8 @@ def get_search(keyword, page):
         title = title.replace('<em class="keyword">', '')
         title = title.replace('</em>', '')
 
-        videoitem = {}
-        videoitem['name'] = title
-        videoitem['href'] = surl
-        videoitem['thumb'] = 'http:' + pic
-        videoitem['info'] = {'plot': mov[index]['desc']}
+        # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+        videoitem = {'name': title, 'href': surl, 'thumb': 'http:' + pic.replace("http:", ""), 'info': {'plot': mov[index]['desc']}}
         videos.append(videoitem)
     # k = k
     # dialog = xbmcgui.Dialog()
@@ -473,7 +472,8 @@ def get_search(keyword, page):
         videoitem = {}
         videoitem['name'] = title
         videoitem['href'] = arcurl
-        videoitem['thumb'] = 'http://' + pic
+        # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+        videoitem['thumb'] = 'http:' + pic.replace("http:", "")
         videoitem['info'] = {'mediatype': 'video', 'genre': genre,
                              'plot': zh(k[index]['play']) + u'播放 · ' + data + '\n'}
         videoitem['info']['plot'] += u'[COLOR pink]UP:[/COLOR]' + k[index]['author'] + '\n\n' + k[index]['description']
@@ -521,12 +521,18 @@ def get_vidsearch(keyword, page):
 
             genre = bgm[index]['tag'].split(u',')
 
-            videoitem = {}
-            videoitem['name'] = title
-            videoitem['href'] = vurl
-            videoitem['thumb'] = 'http:' + pic
-            videoitem['info'] = {'mediatype': 'video', 'genre': genre,
-                                 'plot': zh(bgm[index]['play']) + u'播放 · ' + data + '\n'}
+            videoitem = {
+                'name': title,
+                'href': vurl,
+                # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+                'thumb': 'http:' + pic.replace("http:", ""),
+                'info': {
+                    'mediatype': 'video',
+                    'genre': genre,
+                    'plot': zh(bgm[index]['play']) + u'播放 · ' + data + '\n',
+                },
+            }
+
             videoitem['info']['plot'] += u'[COLOR pink]UP:[/COLOR]' + bgm[index]['author'] + '\n\n' + bgm[index][
                 'description']
             videos.append(videoitem)
@@ -577,7 +583,8 @@ def get_bgsearch(keyword, page):
             videoitem = {}
             videoitem['name'] = title
             videoitem['href'] = surl
-            videoitem['thumb'] = 'http:' + pic
+            # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+            videoitem['thumb'] = 'http:' + pic.replace("http:", "")
             videoitem['info'] = {'plot': bgm[index]['desc']}
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
@@ -627,7 +634,8 @@ def get_movsearch(keyword, page):
             videoitem = {}
             videoitem['name'] = title
             videoitem['href'] = surl
-            videoitem['thumb'] = 'http:' + pic
+            # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+            videoitem['thumb'] = 'http:' + pic.replace("http:", "")
             videoitem['info'] = {'plot': bgm[index]['desc']}
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
@@ -673,7 +681,8 @@ def get_livesearch(keyword, page):
             videoitem = {}
             videoitem['name'] = title
             videoitem['href'] = bgm[index]['roomid']
-            videoitem['thumb'] = 'http:' + pic
+            # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+            videoitem['thumb'] = 'http:' + pic.replace("http:", "")
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
             numResults = str(j['data']['numResults']) + '+'
@@ -721,7 +730,8 @@ def get_upsearch(keyword, page):
             videoitem = {}
             videoitem['name'] = title + '  - ' + zh(bgm[index]['videos']) + '投稿 · ' + zh(bgm[index]['fans']) + '粉丝'
             videoitem['href'] = bgm[index]['mid']
-            videoitem['thumb'] = 'http:' + pic
+            # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+            videoitem['thumb'] = 'http:' + pic.replace("http:", "")
             videos.append(videoitem)
         if int(j['data']['numResults']) == 1000:
             numResults = str(j['data']['numResults']) + '+'
@@ -748,7 +758,8 @@ def get_up(uid, page):
         videoitem = {}
         videoitem['name'] = vlist[index]['title']
         videoitem['href'] = 'https://www.bilibili.com/video/' + vlist[index]['bvid']
-        videoitem['thumb'] = 'http:' + vlist[index]['pic']
+        # 如果图片地址已经带http:协议头，就替换掉，以防出现两次协议头
+        videoitem['thumb'] = 'http:' + vlist[index]['pic'].replace("http:", "")
         videos.append(videoitem)
     dialog = xbmcgui.Dialog()
     dialog.notification('当前' + str(page) + '/' + str(int(int(j['data']['page']['count']) / 30) + 1) + '页',
@@ -786,7 +797,7 @@ def get_bangumiinfo(url):
     except AttributeError:
         mp4info['plot'] = jianjie
     mp4info['title'] = j['mediaInfo']['title']
-    mp4info['img'] = 'http:' + j['mediaInfo']['cover']
+    mp4info['img'] = 'http:' + j['mediaInfo']['cover'].replace("http:", "")
     mp4info['rating'] = j['mediaInfo']['rating']['score']
     mp4info['userrating'] = j['mediaInfo']['rating']['score']
     mp4info['aired'] = j2['mediaInfo']['publish']['pub_date']
