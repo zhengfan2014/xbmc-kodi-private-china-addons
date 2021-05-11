@@ -81,9 +81,11 @@ def get_mp4(url):
     return mp4list
 
 
-def get_videos(url):
+def get_videos(url,page):
     #爬视频列表的
     videos = []
+    if(int(page)!=1):
+        url += "/page-" + str(page)
     r = get_html_1min(url)
     soup = BeautifulSoup(r, 'html.parser')
     filmitem = soup.find_all('li',class_='enter-filmplay')
@@ -91,11 +93,14 @@ def get_videos(url):
     for index in range(len(filmitem)):
         img = filmitem[index].find('img',class_='lazy-img')
         title = filmitem[index].find('p',class_='fs_14 fw_600 c_b_3 line-hide-1')
+
+        videoinfo = filmitem[index].find('span',class_='fw_300 icon-play-volume').text.encode("utf-8") + "播放 · " + filmitem[index].find('span',class_='fw_300 c_b_9 icon-like').text.encode("utf-8") + "赞"
+        plot = filmitem[index].find('div',class_='fs_12 fw_300 c_w_f desc line-hide-3').text.encode("utf-8")
         videoitem = {}
         videoitem['name'] = title.text
         videoitem['href'] = 'https://www.xinpianchang.com/a'+filmitem[index]['data-articleid']
         videoitem['thumb'] = img['_src']
-        videoitem['info'] = ""
+        videoitem['info'] = {"plot":videoinfo + "\n\n" + plot}
         videos.append(videoitem)  
     return videos
 
@@ -110,20 +115,21 @@ def play(name,url):
             items.append(item)
         return items
 
-@plugin.route('/category/<name>/<url>/')
-def category(name,url):
-    videos = get_videos(url)
-   
+@plugin.route('/category/<url>/<page>/')
+def category(url,page):
+    videos = get_videos(url,page)
+    
     items = [{
         'label': video['name'],
         'path': plugin.url_for('play', name= video['name'].encode('utf-8'), url=video['href']),
 	'thumbnail': video['thumb'],
         'icon': video['thumb'],
+        'info':video['info'],
     } for video in videos]
+    nextpage = {'label': '[COLOR yellow]下一页[/COLOR]', 'path': plugin.url_for('category', url=url,page=str(int(page)+1))}
+    items.append(nextpage)
 
-    sorted_items = items
-    #sorted_items = sorted(items, key=lambda item: item['label'])
-    return sorted_items
+    return items
 
 
 
@@ -133,7 +139,7 @@ def index():
     categories = get_categories()
     items = [{
         'label': category['name'],
-        'path': plugin.url_for('category', name=category['name'] , url=category['link']),
+        'path': plugin.url_for('category' , url=category['link'],page=1),
     } for category in categories]
 
     
