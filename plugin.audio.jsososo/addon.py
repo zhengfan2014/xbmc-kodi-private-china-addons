@@ -588,7 +588,7 @@ def one63mvinfo(vid):
     vdict['title'] = i['name']
     vdict['thumb'] = i['cover']
     vdict['duration'] = int(str(i['duration'])[:-3])
-    vdict['plot'] = zh(i['playCount']) + '播放 · ' + zh(i['likeCount']) + '赞 · ' + zh(i['commentCount']) + '评论'
+    vdict['plot'] = zh(i['playCount']) + '播放 · ' + zh(i['commentCount']) + '评论'
     if i['desc']:
         vdict['plot'] += '\n\n' + i['desc'].encode('utf-8')
     vdict['aired'] = i['publishTime']
