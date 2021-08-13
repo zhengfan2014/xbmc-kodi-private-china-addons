@@ -146,7 +146,6 @@ def play(name, url):
         item = {'label': '[' + k.encode('utf-8') + '] - ' + name,
                 'path': i.encode('utf-8'),
                  'is_playable': True,
-                 'cast':mp4list["user"],
                  'thumbnail':mp4list["img"],
                  'icon':mp4list["img"],
                  "info":{"plot":mp4list["desc"],"tag":mp4list["tag"],"genre":mp4list["genre"],"mediatype":"video"}}
