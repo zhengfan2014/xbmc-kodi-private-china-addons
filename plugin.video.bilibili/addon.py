@@ -254,14 +254,14 @@ def get_html_1min(url, head=''):
     r = r.text
     return r
 
-
-def get_up_roomold(uid):
+# 修改了API,参见Issue: https://github.com/MoyuScript/bilibili-api/issues/244
+def get_up_roominfo(uid):
     head = headers
     head['Referer'] = 'https://www.bilibili.com'
-    r = get_html('https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=' + str(uid), head=str(head))
-    # dialog = xbmcgui.Dialog()
-    # dialog.textviewer('错误提示', r)
-    return r
+    return get_html(
+        'https://api.bilibili.com/x/space/acc/info?mid=' + str(uid),
+        head=str(head),
+    )
 
 
 def get_up_baseinfo(uid):
@@ -1654,17 +1654,19 @@ def get_videos(url):
         # 非番剧api
 
         for index in range(len(j['data']['list'])):
-            videoitem = {}
-            videoitem['name'] = j['data']['list'][index]['title']
-            videoitem['href'] = 'https://www.bilibili.com/video/' + j['data']['list'][index]['bvid']
-            videoitem['thumb'] = j['data']['list'][index]['pic']
-            videoitem['info'] = {'plot': ''}
+            videoitem = {
+                'name': j['data']['list'][index]['title'],
+                'href': 'https://www.bilibili.com/video/' + j['data']['list'][index]['bvid'],
+                'thumb': j['data']['list'][index]['pic'],
+                'info': {'plot': ''},
+            }
+
             if 'achievement' in j['data']['list'][index]:
-                videoitem['info']['plot'] += '[COLOR yellow]“' + j['data']['list'][index]['achievement'].encode(
-                    'utf-8') + '”[/COLOR]\n\n'
+                videoitem['info']['plot'] += '[COLOR yellow]“' + j['data']['list'][index]['achievement']\
+                                             + '”[/COLOR]\n\n'
             if 'rcmd_reason' in j['data']['list'][index]:
-                videoitem['info']['plot'] += '[COLOR yellow]“' + j['data']['list'][index]['rcmd_reason'].encode(
-                    'utf-8') + '”[/COLOR]\n\n'
+                videoitem['info']['plot'] += '[COLOR yellow]“' + j['data']['list'][index]['rcmd_reason'] \
+                                             + '”[/COLOR]\n\n'
             videoitem['info']['plot'] += 'UP主: ' + j['data']['list'][index]['owner']['name'] + '\n'
             videoitem['info']['plot'] += zh(j['data']['list'][index]['stat']['view']) + '播放 · ' + zh(
                 j['data']['list'][index]['stat']['danmaku']) + '弹幕 · ' + zh(
@@ -1680,28 +1682,29 @@ def get_videos(url):
             rid = int(rid)
             r = get_html('https://api.bilibili.com/x/web-interface/online', debug='on')
             j = json.loads(r)
-            if rid != 0:
-                if str(rid) in j['data']['region_count']:
-                    dialog = xbmcgui.Dialog()
-                    dialog.notification(two_one(rid) + '区', '目前有' + str(j['data']['region_count'][str(rid)]) + '人在看',
-                                        xbmcgui.NOTIFICATION_INFO, 3000)
+            if rid != 0 and str(rid) in j['data']['region_count']:
+                dialog = xbmcgui.Dialog()
+                dialog.notification(two_one(rid) + '区', '目前有' + str(j['data']['region_count'][str(rid)]) + '人在看',
+                                    xbmcgui.NOTIFICATION_INFO, 3000)
     else:
         # 番剧类排行api
-        if 'result' in j:
-            sign = j['result']['list']
-        else:
-            sign = j['data']['list']
+        sign = j['result']['list'] if 'result' in j else j['data']['list']
         for index in range(len(sign)):
-            videoitem = {}
-            videoitem['name'] = sign[index]['title']
-            videoitem['href'] = 'https://www.bilibili.com/bangumi/play/ss' + str(sign[index]['season_id'])
-            videoitem['thumb'] = sign[index]['cover']
-            videoitem['info'] = {'plot': ''}
+            videoitem = {
+                'name': sign[index]['title'],
+                'href': 'https://www.bilibili.com/bangumi/play/ss'
+                + str(sign[index]['season_id']),
+                'thumb': sign[index]['cover'],
+                'info': {'plot': ''},
+            }
+
             if sign[index]['badge'] != '':
                 videoitem['info']['plot'] += '[COLOR pink]' + sign[index]['badge'] + '[/COLOR] · '
-            if 'copyright' in sign[index]:
-                if sign[index]['copyright'] == 'dujia':
-                    videoitem['info']['plot'] += '[COLOR pink]Bilibili独占[/COLOR] · '
+            if (
+                'copyright' in sign[index]
+                and sign[index]['copyright'] == 'dujia'
+            ):
+                videoitem['info']['plot'] += '[COLOR pink]Bilibili独占[/COLOR] · '
             videoitem['info']['plot'] += sign[index]['new_ep']['index_show'] + '\n'
             videoitem['info']['plot'] += zh(sign[index]['stat']['view']) + '播放 · ' + zh(
                 sign[index]['stat']['danmaku']) + '弹幕 · ' + zh(sign[index]['stat']['follow']) + '追番'
@@ -1799,8 +1802,7 @@ def get_sources(url):
                 if elist[index]['badge'] != '':
                     if elist[index]['longTitle'] == '':
                         ename = '正片 : ' + str(elist[index]['title']) + ' - ' + elist[index][
-                            'longTitle'] + ' [COLOR pink][' + elist[index]['badge'].encode(
-                            'utf-8') + '][/COLOR]'
+                            'longTitle'] + ' [COLOR pink][' + elist[index]['badge'] + '][/COLOR]'
                     else:
                         ename = '正片 : ' + str(elist[index]['title']) + ' [COLOR pink][' + elist[index][
                             'badge'] + '][/COLOR]'
@@ -2863,24 +2865,25 @@ def up(uid, page):
     items = []
     if int(page) == 1:
         u = json.loads(get_up_baseinfo(uid))
-        r = json.loads(get_up_roomold(uid))
+        r = json.loads(get_up_roominfo(uid))['data']['live_room']
+
         items.append({
             'label': u'关于[COLOR yellow]' + u['data']['name'] + u'[/COLOR]目前已知的情报',
             'path': plugin.url_for(upinfo, uid=uid),
             'thumbnail': u['data']['face'],
             'icon': u['data']['face'],
         })
-        if int(r['data']['liveStatus']) == 1:
-            livename = u'通往[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' + u'[COLOR red][·LIVE][/COLOR]' + \
-                       r['data']['title']
+        if int(r['liveStatus']) == 1:
+            livename = u'通往[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' + u'[在线' + zh(
+                r['online']) + u']' + u'[COLOR red][·LIVE][/COLOR]' + r['title']
         else:
-            livename = u'[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' + u'[在线' + zh(
-                r['data']['online']) + u']' + u'[COLOR green][Close][/COLOR]' + r['data']['title']
+            livename = u'[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' \
+                       + u'[COLOR green][Close][/COLOR]' + r['title']
         items.append({
             'label': livename,
-            'path': plugin.url_for(room, id=r['data']['roomid']),
-            'thumbnail': r['data']['cover'],
-            'icon': r['data']['cover'],
+            'path': plugin.url_for(room, id=r['roomid']),
+            'thumbnail': r['cover'],
+            'icon': r['cover'],
         })
     for video in videos:
         items.append(
