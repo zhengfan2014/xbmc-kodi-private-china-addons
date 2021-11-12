@@ -216,7 +216,7 @@ def get_html(url, t=1, debug='no', head=''):
             r.encoding = 'utf-8'
             r = r.text
         else:
-            r = requests.get(url, headers=eval(head))
+            r = requests.get(url, headers=json.loads(head))
             r.encoding = 'utf-8'
             r = r.text
     return r
@@ -227,7 +227,7 @@ def get_html_1hour(url, head=''):
     if head == '':
         r = requests.get(url, headers=headers)
     else:
-        r = requests.get(url, headers=eval(head))
+        r = requests.get(url, headers=json.loads(head))
     r.encoding = 'utf-8'
     r = r.text
     return r
@@ -238,7 +238,7 @@ def get_html_10min(url, head=''):
     if head == '':
         r = requests.get(url, headers=headers)
     else:
-        r = requests.get(url, headers=eval(head))
+        r = requests.get(url, headers=json.loads(head))
     r.encoding = 'utf-8'
     r = r.text
     return r
@@ -249,7 +249,7 @@ def get_html_1min(url, head=''):
     if head == '':
         r = requests.get(url, headers=headers)
     else:
-        r = requests.get(url, headers=eval(head))
+        r = requests.get(url, headers=json.loads(head))
     r.encoding = 'utf-8'
     r = r.text
     return r
@@ -260,7 +260,7 @@ def get_up_roominfo(uid):
     head['Referer'] = 'https://www.bilibili.com'
     return get_html(
         'https://api.bilibili.com/x/space/acc/info?mid=' + str(uid),
-        head=str(head),
+        head=json.dumps(head),
     )
 
 
@@ -336,18 +336,18 @@ def get_upinfo(uid):
             if jinqi2.count(max(jinqi2, key=jinqi2.count)) < jinqi.count(max(jinqi, key=jinqi.count)):
                 text += u'近期，TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count) + u'区」。' + '\n\n'
             else:
-                text += u'虽然TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count) + u'」,不过TA有向「' + max(jinqi2,
-                                                                                                            key=jinqi2.count).decode(
-                    'utf-8') + u'」转型的可能性。' + '\n\n'
+                text += u'虽然TA的投稿仍然大多在「' + max(jinqi, key=jinqi.count) + u'」,不过TA有向「' \
+                        + max(jinqi2, key=jinqi2.count) + u'」转型的可能性。' + '\n\n'
         else:
             text += u'近期，TA的投稿1000%在「' + max(jinqi, key=jinqi.count) + u'区」。' + '\n\n'
     except AttributeError:
         text += u'没有更多关于TA的情报信息了\n\n'
     text += u'----------' * 5 + u'up主最新数据' + u'----------' * 5 + '\n\n'
     if di['follower'] != -1:
-        text += u'粉丝总数:' + zh(di['follower']) + u'     播放总数:' + zh(di['archive']).decode(
-            'utf-8') + u'     获赞总数:' + zh(di['likes']) + u'     专栏阅读:' + zh(di['article']).decode(
-            'utf-8') + '\n\n'
+        text += u'粉丝总数:' + zh(di['follower']) \
+                + u'     播放总数:' + zh(di['archive']) \
+                + u'     获赞总数:' + zh(di['likes']) + u'     专栏阅读:' \
+                + zh(di['article']) + '\n\n'
     else:
         text += u'请设置sessdata后显示\n\n'
     try:
@@ -390,7 +390,7 @@ def up_allnum(uid):
     if sessdata != '':
         head = headers
         head['cookie'] = sessdata()
-        r = get_html('https://api.bilibili.com/x/space/upstat?mid=' + uid + '&jsonp=jsonp', head=str(head), t=10)
+        r = get_html('https://api.bilibili.com/x/space/upstat?mid=' + uid + '&jsonp=jsonp', head=json.dumps(head), t=10)
         j = json.loads(r)
         # 播放量
         di['archive'] = j['data']['archive']['view']
@@ -495,7 +495,7 @@ def get_vidsearch(keyword, page):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
-    r = get_html(serachUrl, head=str(apiheaders), t=10)
+    r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     #
     videos = []
@@ -556,7 +556,7 @@ def get_bgsearch(keyword, page):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
-    r = get_html(serachUrl, head=str(apiheaders), t=10)
+    r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     #
     videos = []
@@ -568,8 +568,7 @@ def get_bgsearch(keyword, page):
         # ok = dialog.ok('错误提示', arcurl)
         for index in range(len(bgm)):
             if bgm[index]['ep_size'] != 0:
-                title = bgm[index]['title'] + ' [更新到第' + str(bgm[index]['ep_size']) + '集]'.decode(
-                    'utf-8')
+                title = bgm[index]['title'] + ' [更新到第' + str(bgm[index]['ep_size']) + '集]'
             else:
                 title = bgm[index]['title'] + ' [未开播]'
 
@@ -607,7 +606,7 @@ def get_movsearch(keyword, page):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
-    r = get_html(serachUrl, head=str(apiheaders), t=10)
+    r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     #
     videos = []
@@ -619,8 +618,7 @@ def get_movsearch(keyword, page):
         # ok = dialog.ok('错误提示', arcurl)
         for index in range(len(bgm)):
             if bgm[index]['ep_size'] != 0:
-                title = bgm[index]['title'] + ' [更新到第' + str(bgm[index]['ep_size']) + '集]'.decode(
-                    'utf-8')
+                title = bgm[index]['title'] + ' [更新到第' + str(bgm[index]['ep_size']) + '集]'
             else:
                 title = bgm[index]['title'] + ' [未开播]'
 
@@ -658,7 +656,7 @@ def get_livesearch(keyword, page):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
-    r = get_html(serachUrl, head=str(apiheaders), t=10)
+    r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     #
     videos = []
@@ -704,7 +702,7 @@ def get_upsearch(keyword, page):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
     }
-    r = get_html(serachUrl, head=str(apiheaders), t=10)
+    r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     #
     videos = []
@@ -993,7 +991,7 @@ def get_comm(url, sort):
         'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36',
         'referer': 'https://www.bilibili.com/video/BV1Ze411W7EL'}
 
-    r = get_html(apiurl, head=str(apiheaders), t=10)
+    r = get_html(apiurl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     rep = j['data']['replies']
     text = ''
@@ -1058,7 +1056,7 @@ def get_bangumijson(url):
     epnum = url[cutep + 4:]
     epnum = re.sub(r'\D', '', epnum)
     apiurl = 'https://api.bilibili.com/pgc/player/web/playurl/html5?ep_id='
-    r = get_html(apiurl + epnum, head=str(mheaders), t=10)
+    r = get_html(apiurl + epnum, head=json.dumps(mheaders), t=10)
 
     j = json.loads(r)
     return j
@@ -1128,7 +1126,7 @@ def get_bgmquality(url):
         'Host': 'api.bilibili.com'
     }
     r = get_html('https://api.bilibili.com/x/player/playurl?cid=' + str(cid) + '&bvid=' + bvid + '&qn=0',
-                 head=str(apiheaders))
+                 head=json.dumps(apiheaders))
     j = json.loads(r)
 
     # vdict = {}
@@ -1224,7 +1222,7 @@ def get_api1(url, quality):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
     }
     # print(url_api)
-    html = json.loads(get_html(url_api, head=str(apiheaders)))
+    html = json.loads(get_html(url_api, head=json.dumps(apiheaders)))
     # print(json.dumps(html))
     video_list = []
     for i in html['durl']:
@@ -1366,7 +1364,7 @@ def get_api3(url, quality):
         'Cookie': sessdata(mode='vip'),  # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         'Host': 'api.bilibili.com'
     }
-    html = json.loads(get_html(url_api, head=str(apiheaders)))
+    html = json.loads(get_html(url_api, head=json.dumps(apiheaders)))
     video_list = []
     # dialog = xbmcgui.Dialog()
     # dialog.textviewer('评论区',str(html['data']['durl']))
@@ -1502,7 +1500,7 @@ def get_api5(url, quality, api):
         # 'Cookie': sessdata, # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
         # 'Host': 'api.bilibili.com'
     }
-    html = json.loads(get_html(url_api, head=str(apiheaders)))
+    html = json.loads(get_html(url_api, head=json.dumps(apiheaders)))
     video_list = []
     # dialog = xbmcgui.Dialog()
     # dialog.textviewer('评论区',str(html))
@@ -1856,7 +1854,7 @@ def get_collectlist(uid):
     }
 
     r = get_html('https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid=' + str(uid) + '&jsonp=jsonp',
-                 head=str(apiheaders), t=10)
+                 head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     try:
         c = j['data']['list']
@@ -1880,7 +1878,7 @@ def get_collect(id, page):
         'Host': 'api.bilibili.com'
     }
     r = get_html('https://api.bilibili.com/x/v3/fav/resource/list?media_id=' + str(id) + '&pn=' + str(
-        page) + '&ps=20&keyword=&order=mtime&type=0&tid=0&jsonp=jsonp', head=str(apiheaders), t=10)
+        page) + '&ps=20&keyword=&order=mtime&type=0&tid=0&jsonp=jsonp', head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     c = j['data']['medias']
     for index in range(len(c)):
@@ -1907,7 +1905,7 @@ def get_zhui(uid, page, mode):
     }
     r = get_html(
         'https://api.bilibili.com/x/space/bangumi/follow/list?type=' + str(mode) + '&follow_status=0&pn=' + str(
-            page) + '&ps=30&vmid=' + str(uid), head=str(apiheaders), t=10)
+            page) + '&ps=30&vmid=' + str(uid), head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
     try:
         c = j['data']['list']
@@ -2147,7 +2145,7 @@ def playvideo(cid, url):
 #     vlist = []
 #     for index in range(len(mp4url)):
 #         vlist.append(mp4url[index]+head)
-#     item = {'label': name+' - '+mp4info['title'],'path': plugin.url_for('playvideo',vlist=str(vlist)),'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
+#     item = {'label': name+' - '+mp4info['title'],'path': plugin.url_for('playvideo',vlist=json.dumps(vlist)),'info':mp4info,'info_type':'video','thumbnail': img,'icon': img}
 #     items.append(item)
 
 #     face = mp4info['face']
@@ -2901,7 +2899,7 @@ def up(uid, page):
 # @plugin.route('/liveplay/<url>/<q>/')
 # def liveplay(url,q):
 #     items = []
-#     q = eval(q)
+#     q = json.loads(q)
 #     for index in range(len(q)):
 #         #qn = re.search('&qn=\d+',url).group()
 #         #url = url.replace(qn,'&qn='+q[index]['qn'])
