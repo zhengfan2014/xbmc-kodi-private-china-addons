@@ -1,4 +1,4 @@
-# bilibili for kodi 0.5.6
+# bilibili for kodi 0.5.10
 ## 简介
 - bilibili是国内知名的视频弹幕网站，这里有最及时的动漫新番，最棒的ACG氛围，最有创意的Up主。大家可以在这里找到许多欢乐
 ## 主要功能
