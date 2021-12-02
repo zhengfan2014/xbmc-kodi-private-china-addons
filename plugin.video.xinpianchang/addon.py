@@ -7,9 +7,9 @@ from bs4 import BeautifulSoup
 import xbmcgui
 import base64
 import json
-import urllib2
+import urllib
 import sys
-import HTMLParser
+from html.parser import HTMLParser
 import re
 
 plugin = Plugin()
@@ -20,23 +20,36 @@ def get_mp4(url):
     headers = {'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
     rec = requests.get(url,headers=headers)
     rec.encoding = 'utf-8'
-    #print(rec.text)
     rectext = rec.text
-    str1 = rectext.find('vid: "')
-    str2 = rectext[str1:str1+30].find('",')
-    vid = rectext[str1+6:str1+str2]
-    api = 'https://openapi-vtom.vmovier.com/v3/video/' + vid + '?expand=resource&usage=xpc_web'
+    soup = BeautifulSoup(rectext, 'html.parser')
+    # 创作者
+    user = soup.find('ul',class_="creator-list").find_all('li')
+    users = []
+    for i in range(len(user)):
+        users.append({"name":user[i].find('span',class_="name").text.encode("utf-8"),"role":user[i].find('span',class_="roles").text.encode("utf-8"),"thumbnail":user[i].find('img')["_src"].encode("utf-8")})
+    vid = re.search("(?<=vid = \").*?(?=\")", rectext).group()
+    modeServerAppKey = re.search(
+        "(?<=modeServerAppKey = \").*?(?=\")", rectext).group()
+    api = 'https://mod-api.xinpianchang.com/mod/api/v2/media/' + vid + \
+        '?appKey=' + modeServerAppKey + '&extend=userInfo,userStatus'
     rec = requests.get(api,headers=headers)
     rec.encoding = 'utf-8'
     j = json.loads(rec.text)
     mp4list = {}
     for index in range(len(j['data']['resource']['progressive'])):
-        mp4list[j['data']['resource']['progressive'][index]['profile']] = 'http' + j['data']['resource']['progressive'][index]['url'][5:]
-        
-    return mp4list
+        mp4list[j['data']['resource']['progressive'][index]['profile']
+                ] = 'http' + j['data']['resource']['progressive'][index]['url'][5:]
+    # 简介
+    '''
+    desc = soup.find('i',class_="play-counts").text.encode('utf-8') + " 播放 · " + soup.find('span',class_="like-counts").text.encode('utf-8') + " 赞 · " + soup.find('span',class_="collect-counts").text.encode('utf-8') +" 收藏\n"
+    desc += soup.find('span',class_='update-time').text.encode('utf-8') +"\n"
+    desc += "[COLOR red]" + soup.find('span',class_='authorize-con').text.encode('utf-8') + "[/COLOR]\n\n"
+    desc += j['data']['description'].encode('utf-8')
+    '''
+    return {"mp4":mp4list,"user":users,"genre":j['data']['categories'],"tag":j['data']['keywords'],'desc':'','img':j['data']['cover']}
 
 def unescape(string):
-    string = urllib2.unquote(string).decode('utf8')
+    string = urllib.unquote(string).decode('utf8')
     quoted = HTMLParser.HTMLParser().unescape(string).encode('utf-8')
     #转成中文
     return re.sub(r'%u([a-fA-F0-9]{4}|[a-fA-F0-9]{2})', lambda m: unichr(int(m.group(1), 16)), quoted)
@@ -86,9 +99,9 @@ def get_videos(url):
 def play(name,url):
         mp4list = get_mp4(url)
         items = []
-        for k,i in mp4list.items():
+        for k,i in mp4list['mp4'].items():
 
-            item = {'label':'[' + k.encode('utf-8') + ']' + name,'path':i.encode('utf-8'),'is_playable': True}
+            item = {'label':'[' + k + ']' + name,'path':i,'is_playable': True}
             items.append(item)
         return items
 
