@@ -78,10 +78,11 @@ def bp(li):
 
 his = plugin.get_storage('his')
 cache = plugin.get_storage('cache')
-
+buvid3=xbmcplugin.getSetting(int(sys.argv[1]), 'buvid3') 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
-    'Connection': 'close'}
+    'Connection': 'close',
+    "cookie": str(buvid3)}
 mheaders = {
     'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
 
@@ -416,11 +417,11 @@ def get_search(keyword, page):
     r = get_html(serachUrl, t=10)
     j = json.loads(r)
     # 视频
-    k = j['data']['result'][8]['data']
+    k = j['data']['result'][10]['data']
     # 番剧
-    bgm = j['data']['result'][3]['data']
+    bgm = j['data']['result'][5]['data']
     # 影视
-    mov = j['data']['result'][4]['data']
+    mov = j['data']['result'][6]['data']
     videos = []
     for index in range(len(bgm)):
         surl = 'https://www.bilibili.com/bangumi/play/ss' + str(bgm[index]['season_id'])
@@ -494,7 +495,8 @@ def get_vidsearch(keyword, page):
         page) + '&duration=&category_id=&tids_1=&tids_2=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword,
+        "cookie": str(buvid3)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -549,7 +551,8 @@ def get_bgsearch(keyword, page):
         page) + '&category_id=&__refresh__=true&_extra=&highlight=1&single_column=1&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword,
+        "cookie": str(buvid3)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -599,7 +602,8 @@ def get_movsearch(keyword, page):
         page) + '&category_id=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword,
+        "cookie": str(buvid3)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -649,7 +653,8 @@ def get_livesearch(keyword, page):
         page) + '&order=&category_id=&duration=&user_type=&order_sort=&tids_1=&tids_2=&search_type=live&changing=id&cover_type=user_cover&__refresh__=true&__reload__=false&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword,
+        "cookie": str(buvid3)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
@@ -694,7 +699,8 @@ def get_upsearch(keyword, page):
         page) + '&category_id=&user_type=&order_sort=&changing=mid&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword
+        'Referer': 'https://search.bilibili.com/all?keyword=' + keyword,
+        "cookie": str(buvid3)
     }
     r = get_html(serachUrl, head=str(apiheaders), t=10)
     j = json.loads(r)
