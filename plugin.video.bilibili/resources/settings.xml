@@ -5,7 +5,7 @@
 
       <setting id="uid" type="text" label="32003" default=""/>
       <setting id="sessdata" type="text" label="32004" default=""/>
-
+      <setting id="buvid3" type="text" label="32008" default=""/>
       <setting label="32005" type="lsep"/>
 
       <setting label="32006" type="bool" id="vipstatus" default="false"/>
