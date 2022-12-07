@@ -41,6 +41,10 @@ msgctxt "#32007"
 msgid "VIPSESSDATA"
 msgstr "VIPSESSDATA"
 
+msgctxt "#32008"
+msgid "buvid3"
+msgstr "buvid3"
+
 msgctxt "#32101"
 msgid "Function Setting"
 msgstr "Function Setting"
