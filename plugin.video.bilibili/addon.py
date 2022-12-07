@@ -82,9 +82,11 @@ buvid3=xbmcplugin.getSetting(int(sys.argv[1]), 'buvid3')
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
     'Connection': 'close',
-    "cookie": str(buvid3)}
+    "cookie": str(buvid3)
+    }
 mheaders = {
-    'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
+    'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'
+    }
 
 
 # 仿b站随机输出主播正在xx
@@ -987,7 +989,8 @@ def get_comm(url, sort):
     apiurl = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&oid=' + str(aid) + '&sort=' + sort
     apiheaders = {
         'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36',
-        'referer': 'https://www.bilibili.com/video/BV1Ze411W7EL'}
+        'referer': 'https://www.bilibili.com/video/BV1Ze411W7EL'
+        }
 
     r = get_html(apiurl, head=str(apiheaders), t=10)
     j = json.loads(r)
